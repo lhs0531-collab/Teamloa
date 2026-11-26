@@ -444,6 +444,7 @@
     <Compile Include="script\monster\demon\ZombieBlue.cs" />
     <Compile Include="script\monster\Loot.cs" />
     <Compile Include="script\monster\LootPackage.cs" />
+    <Compile Include="script\monster\Event.cs" />
     <Compile Include="script\monster\nodes\miner\1\Aluminium.cs" />
     <Compile Include="script\monster\nodes\BaseNode.cs" />
     <Compile Include="script\monster\nodes\miner\1\Bronze.cs" />

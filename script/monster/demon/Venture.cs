@@ -960,12 +960,12 @@ namespace LKCamelot.script.monster
                 {
                     new LootPackEntry(0.01, typeof(script.item.Cadeceus), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.01, typeof(script.item.ForkedSpear), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.009, typeof(script.item.GrandStaff), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.009, typeof(script.item.GreatLance), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.01, typeof(script.item.GrandStaff), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.01, typeof(script.item.GreatLance), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.04, LKCamelot.script.Packs.AccessorySet26, "10d22+250", 40, 1, 1),  //12.02.12 ���� 0.01 -> 0.04 GMƼ����
-                    new LootPackEntry(0.015, typeof(script.item.FamilyShield), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.015, typeof(script.item.RocketMaul), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.015, typeof(script.item.WarriorAngel), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.02, typeof(script.item.FamilyShield), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.02, typeof(script.item.RocketMaul), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.02, typeof(script.item.WarriorAngel), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.05, typeof(script.item.AssassinSpecialBook), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(3, typeof(script.item.AssassinBook), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.05, typeof(script.item.GrandBigBangBook), "15d10+225", 1, 1, 1),
