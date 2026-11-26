@@ -94,12 +94,10 @@ namespace LKCamelot.script.npc
 
             if (str2.Count() >= 3 && str2[str2.Count() - 1] == "산다")
             {
-                if (!System.Text.RegularExpressions.Regex.IsMatch(str2[str2.Count() - 2], @"^[0-9]{1,3}"))
+                int amount;
+                if (!int.TryParse(str2[str2.Count() - 2], System.Globalization.NumberStyles.None,
+                    System.Globalization.CultureInfo.InvariantCulture, out amount) || amount <= 0 || amount > 200)
                     return;
-                if (Convert.ToInt64(str2[str2.Count() - 2]) <= 0 && Convert.ToInt64(str2[str2.Count() - 2]) > 200)
-                    return;
-
-                int amount = Convert.ToInt32(str2[str2.Count() - 2]);
                 string ItName = string.Empty;
 
                 for (int i = 0; i < str2.Count() - 2; i++)
@@ -137,27 +135,33 @@ namespace LKCamelot.script.npc
                         amount = 1;
                     if (sellitem.Limit < amount)
                         amount = sellitem.Limit;
-                    if (player.Gold < (tempitem.BuyPrice * (ulong)amount))
-                        return;
                     if (amount <= 0)
                         return;
 
 
-                    var inv = player.Inventory.Where(xe => xe.Name == ItName).FirstOrDefault();
+                    var inv = player.Inventory.Where(xe => xe.Name == ItName && xe.InvSlot >= 0 && xe.InvSlot < 24).FirstOrDefault();
                     if (inv != null && inv.Quantity + amount > tempitem.Limit)
                     {
                         amount = tempitem.Limit - inv.Quantity;
-                        if (amount == 0)
+                        if (amount <= 0)
                             return;
                     }
 
-                    checked
-                    {
-                        player.Gold -= (ulong)(tempitem.BuyPrice * (ulong)amount);
-                    }
+                    ulong cost;
+                    try { cost = checked(tempitem.BuyPrice * (ulong)amount); }
+                    catch (OverflowException) { return; }
+                    if (player.Gold < cost)
+                        return;
 
                     tempitem.Quantity = (int)amount;
-                    tempitem = tempitem.Inventory(player);
+                    var purchasedItem = tempitem.Inventory(player);
+                    if (purchasedItem == null)
+                    {
+                        this.Event_Chat("인벤토리에 빈 공간이 없습니다.", true);
+                        return;
+                    }
+                    player.Gold -= cost;
+                    tempitem = purchasedItem;
                     this.Event_Chat(string.Format("{0}를 {1}개 판매했습니다.", tempitem.Name, amount), true);
                 }
             }
