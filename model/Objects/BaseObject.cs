@@ -23,6 +23,7 @@ namespace LKCamelot.model
         public BaseObject(Serial Serial)
         {
             m_Serial = Serial;
+            model.Serial.Reserve(Serial);
         }
 
         public byte[] BuffArray
