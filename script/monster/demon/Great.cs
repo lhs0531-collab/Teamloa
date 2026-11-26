@@ -26,9 +26,9 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    new LootPackEntry(0.01, LKCamelot.script.Packs.GreatArmorPack, "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.08, LKCamelot.script.Packs.CSWSFS, "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.09, LKCamelot.script.Packs.AccessorySet36, "10d22+250", 40, 1, 1),  // 15.02.12 매찬 0.07 -> 0.09 GM티리엘
+                    new LootPackEntry(1.0, LKCamelot.script.Packs.GreatArmorPack, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, LKCamelot.script.Packs.CSWSFS, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, LKCamelot.script.Packs.AccessorySet36, "10d22+250", 40, 1, 1),  // 15.02.12 매찬 0.07 -> 0.09 GM티리엘
                     //new LootPackEntry(0.1, LKCamelot.script.Packs.GreatWeaponPack, "10d22+250", 40, 1, 1),
                     new LootPackEntry(15.0, typeof(script.item.Gold), "10d3000+25550", 40, 1, 1),
 
@@ -88,12 +88,9 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    new LootPackEntry(0.01, LKCamelot.script.Packs.GreatArmorPack, "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.08, LKCamelot.script.Packs.CSWSFS, "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.09, typeof(script.item.BarbarrianRing), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.09, typeof(script.item.MagicianRing), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.09, typeof(script.item.CraftsmanRing), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.09, typeof(script.item.YoungsterRing), "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, LKCamelot.script.Packs.GreatArmorPack, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, LKCamelot.script.Packs.CSWSFS, "10d22+250", 40, 1, 1),
+					new LootPackEntry(1.0, LKCamelot.script.Packs.AccessorySet36, "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.1, LKCamelot.script.Packs.GreatWeaponPack, "10d22+250", 40, 1, 1),
                     new LootPackEntry(15.0, typeof(script.item.Gold), "10d3000+25550", 40, 1, 1),
 
@@ -152,12 +149,9 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    new LootPackEntry(0.01, LKCamelot.script.Packs.GreatArmorPack, "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.08, LKCamelot.script.Packs.CSWSFS, "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.09, typeof(script.item.BarbarrianRing), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.09, typeof(script.item.MagicianRing), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.09, typeof(script.item.CraftsmanRing), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.09, typeof(script.item.YoungsterRing), "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, LKCamelot.script.Packs.GreatArmorPack, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, LKCamelot.script.Packs.CSWSFS, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, LKCamelot.script.Packs.AccessorySet36, "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.1, LKCamelot.script.Packs.GreatWeaponPack, "10d22+250", 40, 1, 1),
                     new LootPackEntry(15.0, typeof(script.item.Gold), "10d3000+25550", 40, 1, 1),
 
@@ -268,21 +262,33 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    //드랍대기
-                    //new LootPackEntry(0.01, typeof(script.item.AmityPlate), "10d22+250", 40, 1, 1),         // 15.01.30 GM티리엘
-                    //new LootPackEntry(0.01, typeof(script.item.SRing), "10d22+250", 40, 1, 1),              // 15.01.30 GM티리엘
-                    //new LootPackEntry(0.01, typeof(script.item.SAmulet), "10d22+250", 40, 1, 1),            // 15.01.30 GM티리엘
-                    //new LootPackEntry(0.01, LKCamelot.script.Packs.AccessorySet46, "10d22+250", 40, 1, 1),  // 15.01.30 GM티리엘
-                    //new LootPackEntry(0.01, LKCamelot.script.Packs.AccessorySet41, "10d22+250", 40, 1, 1),  // 15.01.30 GM티리엘
+					//카산, 엑칼, 대웅, 태극펜, 골드베스트, 해모수
+					//글라디, 월계, 그프, 홀디, 골럇, 위저드옷, 샤먼옷
+					//새마(기,위,샤)
+					//36셋
+					//전직책(기,위,샤,검)
+					//1,000,000 마돈(확률 100%)
+					new LootPackEntry(1.0, LKCamelot.script.Packs.CSWSFS, "10d22+250", 40, 1, 1),
+					new LootPackEntry(1.0, LKCamelot.script.Packs.GreatWeaponPack, "10d22+250", 40, 1, 1),
+					new LootPackEntry(1.0, LKCamelot.script.Packs.GreatArmorPack, "10d22+250", 40, 1, 1),
+					new LootPackEntry(1.0, LKCamelot.script.Packs.NewVVArmorPack, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, LKCamelot.script.Packs.AccessorySet36, "10d22+250", 40, 1, 1),
+					new LootPackEntry(1.0, typeof(script.item.Haemosu), "10d22+250", 40, 1, 1),
+					new LootPackEntry(1.0, typeof(script.item.GoldVest), "10d22+250", 40, 1, 1),
+					new LootPackEntry(1.0, typeof(script.item.ShamanBook), "10d22+250", 40, 1, 1),
+					new LootPackEntry(1.0, typeof(script.item.WizardBook), "10d22+250", 40, 1, 1),
+					new LootPackEntry(1.0, typeof(script.item.SwordmanBook), "10d22+250", 40, 1, 1),
+					new LootPackEntry(1.0, typeof(script.item.KnightBook), "10d22+250", 40, 1, 1),
+					new LootPackEntry(100, typeof(script.item.Gold), "d+1000000", 40, 1, 1),
 
-                    new LootPackEntry(0.01, typeof(script.item.Haemosu), "10d30+550", 40, 1, 1),              // 15.01.23 GM티리엘
-                    new LootPackEntry(0.08, LKCamelot.script.Packs.CSWSFS, "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.09, LKCamelot.script.Packs.AccessorySet36, "10d22+250", 40, 1, 1),  // 15.02.12 매찬 0.07 -> 0.09 GM티리엘
-                    new LootPackEntry(0.2, LKCamelot.script.Packs.GreatArmorPack, "10d22+250", 40, 1, 1),
-                    //new LootPackEntry(0.2, LKCamelot.script.Packs.GreatWeaponPack, "10d22+250", 40, 1, 1),
-                    new LootPackEntry(1, LKCamelot.script.Packs.ArmorPack110, "10d22+250", 40, 1, 1),
-                    new LootPackEntry(1, LKCamelot.script.Packs.WeaponPack110, "10d22+250", 40, 1, 1),
-                    new LootPackEntry(15.0, typeof(script.item.Gold), "10d3000+100000", 40, 1, 1),
+                    //new LootPackEntry(0.01, typeof(script.item.Haemosu), "10d30+550", 40, 1, 1),              // 15.01.23 GM티리엘
+                    //new LootPackEntry(0.08, LKCamelot.script.Packs.CSWSFS, "10d22+250", 40, 1, 1),
+                    //new LootPackEntry(0.09, LKCamelot.script.Packs.AccessorySet36, "10d22+250", 40, 1, 1),  // 15.02.12 매찬 0.07 -> 0.09 GM티리엘
+                    //new LootPackEntry(0.2, LKCamelot.script.Packs.GreatArmorPack, "10d22+250", 40, 1, 1),
+                    ////new LootPackEntry(0.2, LKCamelot.script.Packs.GreatWeaponPack, "10d22+250", 40, 1, 1),
+                    //new LootPackEntry(1, LKCamelot.script.Packs.ArmorPack110, "10d22+250", 40, 1, 1),
+                    //new LootPackEntry(1, LKCamelot.script.Packs.WeaponPack110, "10d22+250", 40, 1, 1),
+                    //new LootPackEntry(15.0, typeof(script.item.Gold), "10d3000+100000", 40, 1, 1),
 
                     //삭제리스트(15.02.01)
                     //new LootPackEntry(0.01, typeof(script.item.FSofdk), "10d22+250", 40, 1, 1),
@@ -338,13 +344,10 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    new LootPackEntry(0.01, LKCamelot.script.Packs.GreatArmorPack, "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.08, LKCamelot.script.Packs.CSWSFS, "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.09, typeof(script.item.BarbarrianRing), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.09, typeof(script.item.MagicianRing), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.09, typeof(script.item.CraftsmanRing), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.09, typeof(script.item.YoungsterRing), "10d22+250", 40, 1, 1),
-                    //new LootPackEntry(0.1, LKCamelot.script.Packs.GreatWeaponPack, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, LKCamelot.script.Packs.GreatArmorPack, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, LKCamelot.script.Packs.CSWSFS, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, LKCamelot.script.Packs.AccessorySet36, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, LKCamelot.script.Packs.GreatWeaponPack, "10d22+250", 40, 1, 1),
                     new LootPackEntry(15.0, typeof(script.item.Gold), "10d3000+25550", 40, 1, 1),
 
                     //삭제리스트(15.02.01)
@@ -402,13 +405,9 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    new LootPackEntry(0.01, LKCamelot.script.Packs.GreatArmorPack, "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.09, typeof(script.item.BarbarrianRing), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.09, typeof(script.item.MagicianRing), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.09, typeof(script.item.CraftsmanRing), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.09, typeof(script.item.YoungsterRing), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.16, LKCamelot.script.Packs.CSWSFS, "10d22+250", 40, 1, 1),
-                    //new LootPackEntry(0.2, LKCamelot.script.Packs.GreatWeaponPack, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, LKCamelot.script.Packs.GreatArmorPack, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, LKCamelot.script.Packs.AccessorySet36, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, LKCamelot.script.Packs.GreatWeaponPack, "10d22+250", 40, 1, 1),
                     new LootPackEntry(15.0, typeof(script.item.Gold), "10d3000+25550", 40, 1, 1),
 
                     //삭제리스트(15.02.01)
@@ -466,13 +465,10 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    new LootPackEntry(0.01, LKCamelot.script.Packs.GreatArmorPack, "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.08, LKCamelot.script.Packs.CSWSFS, "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.09, typeof(script.item.BarbarrianRing), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.09, typeof(script.item.MagicianRing), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.09, typeof(script.item.CraftsmanRing), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.09, typeof(script.item.YoungsterRing), "10d22+250", 40, 1, 1),
-                    //new LootPackEntry(0.1, LKCamelot.script.Packs.GreatWeaponPack, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, LKCamelot.script.Packs.GreatArmorPack, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, LKCamelot.script.Packs.CSWSFS, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, LKCamelot.script.Packs.AccessorySet36, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, LKCamelot.script.Packs.GreatWeaponPack, "10d22+250", 40, 1, 1),
                     new LootPackEntry(15.0, typeof(script.item.Gold), "10d3000+25550", 40, 1, 1),
 
                     //삭제리스트(15.02.01)

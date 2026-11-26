@@ -26,8 +26,12 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
+					new LootPackEntry(25.0, LKCamelot.script.Packs.ItemGolemPark, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(25.0, typeof(script.item.Gold), "10d20+3200", 40, 1, 1),
+
                     // 15.01.31 GM티리엘
                     // 아이템 확률 전체 1 ~ 15 ~20 로 변경
+					/*
                     new LootPackEntry(8, typeof(script.item.FullPlate), "15d10+225", 1, 1, 1),
                     new LootPackEntry(8, typeof(script.item.GrandeurHelmet), "15d10+225", 1, 1, 1),
                     new LootPackEntry(8, typeof(script.item.FlyingSwordBook), "15d10+225", 1, 1, 1),
@@ -38,6 +42,7 @@ namespace LKCamelot.script.monster
                     new LootPackEntry(8, typeof(script.item.SkillAmulet), "15d10+225", 1, 1, 1),
                     new LootPackEntry(8, typeof(script.item.HealthRing), "15d10+225", 1, 1, 1),
                     new LootPackEntry(8, typeof(script.item.HealthAmulet), "15d10+225", 1, 1, 1),
+					*/
 
                     //new LootPackEntry(0.1, typeof(script.item.BraveRing), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(0.1, typeof(script.item.BraveAmulet), "15d10+225", 1, 1, 1),
@@ -52,7 +57,7 @@ namespace LKCamelot.script.monster
                     //new LootPackEntry(3, typeof(script.item.DeadlyBoomBook), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(3, typeof(script.item.AssassinBook), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(2, typeof(script.item.BigBangBook), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(25.0, typeof(script.item.Gold), "10d20+3200", 40, 1, 1),
+
                 });
             }
         }

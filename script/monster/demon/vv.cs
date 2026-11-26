@@ -25,13 +25,16 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    new LootPackEntry(0.04, typeof(script.item.DiamondStick), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.04, typeof(script.item.Calypso), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.04, typeof(script.item.AssassinSpecialBook), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.04, typeof(script.item.GrandBigBangBook), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.04, typeof(script.item.UltraBigBangBook), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.05, LKCamelot.script.Packs.NewVVArmorPack, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(0.7, typeof(script.item.DiamondStick), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.7, typeof(script.item.Calypso), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.7, typeof(script.item.AssassinSpecialBook), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.7, typeof(script.item.GrandBigBangBook), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.7, typeof(script.item.UltraBigBangBook), "10d22+250", 40, 1, 1),
+                    new LootPackEntry(0.7, LKCamelot.script.Packs.NewVVArmorPack, "10d22+250", 40, 1, 1),
                     new LootPackEntry(15.0, typeof(script.item.Gold), "10d3000+20550", 40, 1, 1),
+                    new LootPackEntry(0.7, typeof(script.item.CurveShockBook), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(0.7, typeof(script.item.WindySpiritBook), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(0.7, typeof(script.item.FrameStrikeBook), "10d12+150", 40, 1, 1),
                 });
             }
         }
@@ -85,11 +88,14 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    //new LootPackEntry(0.01, LKCamelot.script.Packs.AccessorySet31, "10d22+250", 40, 1, 1), 
-                    new LootPackEntry(0.04, typeof(script.item.DiamondStick), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.04, typeof(script.item.Calypso), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.05, LKCamelot.script.Packs.NewVVArmorPack, "10d22+250", 40, 1, 1),
+                    //new LootPackEntry(0.01, LKCamelot.script.Packs.AccessorySet31, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.DiamondStick), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.Calypso), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(1.0, LKCamelot.script.Packs.NewVVArmorPack, "10d22+250", 40, 1, 1),
                     new LootPackEntry(15.0, typeof(script.item.Gold), "10d300+20000", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.CurveShockBook), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.WindySpiritBook), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.FrameStrikeBook), "10d12+150", 40, 1, 1),
                 });
             }
         }
@@ -142,21 +148,25 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    new LootPackEntry(0.04, typeof(script.item.DiamondStick), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.04, typeof(script.item.Calypso), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.05, LKCamelot.script.Packs.NewVVArmorPack, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.DiamondStick), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.Calypso), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(1.0, LKCamelot.script.Packs.NewVVArmorPack, "10d22+250", 40, 1, 1),
 
-                    new LootPackEntry(0.1, typeof(script.item.LionHeart), "10d12+150", 40, 1, 1),
-                    new LootPackEntry(0.1, typeof(script.item.DragonBlade), "10d12+150", 40, 1, 1),
-                    new LootPackEntry(0.2, typeof(script.item.Tomahawk), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.2, typeof(script.item.GiantHammer), "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.LionHeart), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.DragonBlade), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.Tomahawk), "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.GiantHammer), "10d22+250", 40, 1, 1),
+
+                    new LootPackEntry(1.0, typeof(script.item.CurveShockBook), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.WindySpiritBook), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.FrameStrikeBook), "10d12+150", 40, 1, 1),
 
                     //new LootPackEntry(0.03, typeof(script.item.HolyDefender), "10d22+250", 40, 1, 1),     //15.02.26 삭제 GM티리엘
                     //new LootPackEntry(0.01, typeof(script.item.Kassandra), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.01, typeof(script.item.TaegkFan), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.01, typeof(script.item.Excalibur), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.01, typeof(script.item.DaeungDaegum), "10d22+250", 40, 1, 1),
-                    //new LootPackEntry(0.03, typeof(script.item.GrandeurPride), "10d22+250", 40, 1, 1), 
+                    //new LootPackEntry(0.03, typeof(script.item.GrandeurPride), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.03, typeof(script.item.GoliathPlate), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.03, typeof(script.item.UnicornProtectoria), "10d22+250", 40, 1, 1),//15.01.24 삭제처리 gm티리엘
                     //new LootPackEntry(0.0025, typeof(script.item.SRing), "10d22+250", 40, 1, 1),
@@ -213,21 +223,25 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    new LootPackEntry(0.04, typeof(script.item.DiamondStick), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.04, typeof(script.item.Calypso), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.05, LKCamelot.script.Packs.NewVVArmorPack, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(0.7, typeof(script.item.DiamondStick), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.7, typeof(script.item.Calypso), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.7, LKCamelot.script.Packs.NewVVArmorPack, "10d22+250", 40, 1, 1),
 
-                    new LootPackEntry(0.1, typeof(script.item.LionHeart), "10d12+150", 40, 1, 1),
-                    new LootPackEntry(0.1, typeof(script.item.DragonBlade), "10d12+150", 40, 1, 1),
-                    new LootPackEntry(0.2, typeof(script.item.Tomahawk), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.2, typeof(script.item.GiantHammer), "10d22+250", 40, 1, 1),
+                    new LootPackEntry(0.7, typeof(script.item.LionHeart), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(0.7, typeof(script.item.DragonBlade), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(0.7, typeof(script.item.Tomahawk), "10d22+250", 40, 1, 1),
+                    new LootPackEntry(0.7, typeof(script.item.GiantHammer), "10d22+250", 40, 1, 1),
+
+                    new LootPackEntry(0.7, typeof(script.item.CurveShockBook), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(0.7, typeof(script.item.WindySpiritBook), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(0.7, typeof(script.item.FrameStrikeBook), "10d12+150", 40, 1, 1),
 
                     //new LootPackEntry(0.03, typeof(script.item.HolyDefender), "10d22+250", 40, 1, 1),     //15.02.26 삭제 GM티리엘
                     //new LootPackEntry(0.01, typeof(script.item.Kassandra), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.01, typeof(script.item.TaegkFan), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.01, typeof(script.item.Excalibur), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.01, typeof(script.item.DaeungDaegum), "10d22+250", 40, 1, 1),
-                    //new LootPackEntry(0.03, typeof(script.item.GrandeurPride), "10d22+250", 40, 1, 1), 
+                    //new LootPackEntry(0.03, typeof(script.item.GrandeurPride), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.03, typeof(script.item.GoliathPlate), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.03, typeof(script.item.UnicornProtectoria), "10d22+250", 40, 1, 1),//15.01.24 삭제처리 gm티리엘
                     //new LootPackEntry(0.0025, typeof(script.item.SRing), "10d22+250", 40, 1, 1),
@@ -284,21 +298,25 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    new LootPackEntry(0.04, typeof(script.item.DiamondStick), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.04, typeof(script.item.Calypso), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.05, LKCamelot.script.Packs.NewVVArmorPack, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(0.7, typeof(script.item.DiamondStick), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.7, typeof(script.item.Calypso), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.7, LKCamelot.script.Packs.NewVVArmorPack, "10d22+250", 40, 1, 1),
 
-                    new LootPackEntry(0.1, typeof(script.item.LionHeart), "10d12+150", 40, 1, 1),
-                    new LootPackEntry(0.1, typeof(script.item.DragonBlade), "10d12+150", 40, 1, 1),
-                    new LootPackEntry(0.2, typeof(script.item.Tomahawk), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.2, typeof(script.item.GiantHammer), "10d22+250", 40, 1, 1),
+                    new LootPackEntry(0.7, typeof(script.item.LionHeart), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(0.7, typeof(script.item.DragonBlade), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(0.7, typeof(script.item.Tomahawk), "10d22+250", 40, 1, 1),
+                    new LootPackEntry(0.7, typeof(script.item.GiantHammer), "10d22+250", 40, 1, 1),
+
+                    new LootPackEntry(0.7, typeof(script.item.CurveShockBook), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(0.7, typeof(script.item.WindySpiritBook), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(0.7, typeof(script.item.FrameStrikeBook), "10d12+150", 40, 1, 1),
 
                     //new LootPackEntry(0.03, typeof(script.item.HolyDefender), "10d22+250", 40, 1, 1),     //15.02.26 삭제 GM티리엘
                     //new LootPackEntry(0.01, typeof(script.item.Kassandra), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.01, typeof(script.item.TaegkFan), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.01, typeof(script.item.Excalibur), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.01, typeof(script.item.DaeungDaegum), "10d22+250", 40, 1, 1),
-                    //new LootPackEntry(0.03, typeof(script.item.GrandeurPride), "10d22+250", 40, 1, 1), 
+                    //new LootPackEntry(0.03, typeof(script.item.GrandeurPride), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.03, typeof(script.item.GoliathPlate), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.03, typeof(script.item.UnicornProtectoria), "10d22+250", 40, 1, 1),//15.01.24 삭제처리 gm티리엘
                     //new LootPackEntry(0.0025, typeof(script.item.SRing), "10d22+250", 40, 1, 1),
@@ -357,26 +375,30 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    new LootPackEntry(0.04, typeof(script.item.DiamondStick), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.04, typeof(script.item.Calypso), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.05, LKCamelot.script.Packs.NewVVArmorPack, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.DiamondStick), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.Calypso), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(1.0, LKCamelot.script.Packs.NewVVArmorPack, "10d22+250", 40, 1, 1),
 
-                    new LootPackEntry(0.1, typeof(script.item.LionHeart), "10d12+150", 40, 1, 1),
-                    new LootPackEntry(0.1, typeof(script.item.DragonBlade), "10d12+150", 40, 1, 1),
-                    new LootPackEntry(0.2, typeof(script.item.Tomahawk), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.2, typeof(script.item.GiantHammer), "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.LionHeart), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.DragonBlade), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.Tomahawk), "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.GiantHammer), "10d22+250", 40, 1, 1),
+
+                    new LootPackEntry(1.0, typeof(script.item.CurveShockBook), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.WindySpiritBook), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.FrameStrikeBook), "10d12+150", 40, 1, 1),
 
                     //new LootPackEntry(0.03, typeof(script.item.HolyDefender), "10d22+250", 40, 1, 1),     //15.02.26 삭제 GM티리엘
                     //new LootPackEntry(0.01, typeof(script.item.Kassandra), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.01, typeof(script.item.TaegkFan), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.01, typeof(script.item.Excalibur), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.01, typeof(script.item.DaeungDaegum), "10d22+250", 40, 1, 1),
-                    //new LootPackEntry(0.03, typeof(script.item.GrandeurPride), "10d22+250", 40, 1, 1), 
+                    //new LootPackEntry(0.03, typeof(script.item.GrandeurPride), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.03, typeof(script.item.GoliathPlate), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.03, typeof(script.item.UnicornProtectoria), "10d22+250", 40, 1, 1),//15.01.24 삭제처리 gm티리엘
                     //new LootPackEntry(0.0025, typeof(script.item.SRing), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.0025, typeof(script.item.SAmulet), "10d22+250", 40, 1, 1),
-                    //new LootPackEntry(0.03, typeof(script.item.GrandeurPride), "10d22+250", 40, 1, 1), 
+                    //new LootPackEntry(0.03, typeof(script.item.GrandeurPride), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.03, typeof(script.item.GoliathPlate), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.03, typeof(script.item.UnicornProtectoria), "10d22+250", 40, 1, 1),//15.01.24 삭제처리 gm티리엘
                     //new LootPackEntry(0.0025, typeof(script.item.SRing), "10d22+250", 40, 1, 1),
@@ -433,26 +455,30 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    new LootPackEntry(0.04, typeof(script.item.DiamondStick), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.04, typeof(script.item.Calypso), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.05, LKCamelot.script.Packs.NewVVArmorPack, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.DiamondStick), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.Calypso), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(1.0, LKCamelot.script.Packs.NewVVArmorPack, "10d22+250", 40, 1, 1),
 
-                    new LootPackEntry(0.1, typeof(script.item.LionHeart), "10d12+150", 40, 1, 1),
-                    new LootPackEntry(0.1, typeof(script.item.DragonBlade), "10d12+150", 40, 1, 1),
-                    new LootPackEntry(0.2, typeof(script.item.Tomahawk), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.2, typeof(script.item.GiantHammer), "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.LionHeart), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.DragonBlade), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.Tomahawk), "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.GiantHammer), "10d22+250", 40, 1, 1),
+
+                    new LootPackEntry(1.0, typeof(script.item.CurveShockBook), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.WindySpiritBook), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.FrameStrikeBook), "10d12+150", 40, 1, 1),
 
                     //new LootPackEntry(0.03, typeof(script.item.HolyDefender), "10d22+250", 40, 1, 1),     //15.02.26 삭제 GM티리엘
                     //new LootPackEntry(0.01, typeof(script.item.Kassandra), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.01, typeof(script.item.TaegkFan), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.01, typeof(script.item.Excalibur), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.01, typeof(script.item.DaeungDaegum), "10d22+250", 40, 1, 1),
-                    //new LootPackEntry(0.03, typeof(script.item.GrandeurPride), "10d22+250", 40, 1, 1), 
+                    //new LootPackEntry(0.03, typeof(script.item.GrandeurPride), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.03, typeof(script.item.GoliathPlate), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.03, typeof(script.item.UnicornProtectoria), "10d22+250", 40, 1, 1),//15.01.24 삭제처리 gm티리엘
                     //new LootPackEntry(0.0025, typeof(script.item.SRing), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.0025, typeof(script.item.SAmulet), "10d22+250", 40, 1, 1),
-                    //new LootPackEntry(0.03, typeof(script.item.GrandeurPride), "10d22+250", 40, 1, 1), 
+                    //new LootPackEntry(0.03, typeof(script.item.GrandeurPride), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.03, typeof(script.item.GoliathPlate), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.03, typeof(script.item.UnicornProtectoria), "10d22+250", 40, 1, 1),//15.01.24 삭제처리 gm티리엘
                     //new LootPackEntry(0.0025, typeof(script.item.SRing), "10d22+250", 40, 1, 1),
@@ -510,19 +536,19 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    new LootPackEntry(0.01, typeof(script.item.LaurelCrown), "10d12+150", 40, 1, 1),
-                    new LootPackEntry(0.04, typeof(script.item.DiamondStick), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.04, typeof(script.item.Calypso), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.05, LKCamelot.script.Packs.NewVVArmorPack, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.LaurelCrown), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.DiamondStick), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.Calypso), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(1.0, LKCamelot.script.Packs.NewVVArmorPack, "10d22+250", 40, 1, 1),
 
-                    new LootPackEntry(0.05, typeof(script.item.CurveShockBook), "10d12+150", 40, 1, 1),
-                    new LootPackEntry(0.05, typeof(script.item.WindySpiritBook), "10d12+150", 40, 1, 1),
-                    new LootPackEntry(0.05, typeof(script.item.FrameStrikeBook), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.CurveShockBook), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.WindySpiritBook), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.FrameStrikeBook), "10d12+150", 40, 1, 1),
 
-                    new LootPackEntry(0.1, typeof(script.item.LionHeart), "10d12+150", 40, 1, 1),
-                    new LootPackEntry(0.1, typeof(script.item.DragonBlade), "10d12+150", 40, 1, 1),
-                    new LootPackEntry(0.2, typeof(script.item.Tomahawk), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.2, typeof(script.item.GiantHammer), "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.LionHeart), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.DragonBlade), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.Tomahawk), "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.GiantHammer), "10d22+250", 40, 1, 1),
                 });
             }
         }
@@ -575,16 +601,16 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    new LootPackEntry(0.04, typeof(script.item.DiamondStick), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.04, typeof(script.item.Calypso), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.05, LKCamelot.script.Packs.NewVVArmorPack, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.DiamondStick), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.Calypso), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(1.0, LKCamelot.script.Packs.NewVVArmorPack, "10d22+250", 40, 1, 1),
 
-                    new LootPackEntry(0.05, typeof(script.item.CurveShockBook), "10d12+150", 40, 1, 1),
-                    new LootPackEntry(0.05, typeof(script.item.WindySpiritBook), "10d12+150", 40, 1, 1),
-                    new LootPackEntry(0.05, typeof(script.item.FrameStrikeBook), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.CurveShockBook), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.WindySpiritBook), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.FrameStrikeBook), "10d12+150", 40, 1, 1),
 
-                    new LootPackEntry(0.2, typeof(script.item.Tomahawk), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.2, typeof(script.item.GiantHammer), "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.Tomahawk), "10d22+250", 40, 1, 1),
+                    new LootPackEntry(1.0, typeof(script.item.GiantHammer), "10d22+250", 40, 1, 1),
                     new LootPackEntry(15.0, typeof(script.item.Gold), "10d300+22000", 40, 1, 1),
                 });
             }
@@ -638,14 +664,14 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    //new LootPackEntry(0.01, typeof(script.item.LaurelCrown), "10d12+150", 40, 1, 1),
-                    //new LootPackEntry(0.04, typeof(script.item.DiamondStick), "15d10+225", 1, 1, 1),
-                    //new LootPackEntry(0.04, typeof(script.item.Calypso), "15d10+225", 1, 1, 1),
-                    //new LootPackEntry(0.05, LKCamelot.script.Packs.NewVVArmorPack, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(0.01, typeof(script.item.LaurelCrown), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(0.04, typeof(script.item.DiamondStick), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.04, typeof(script.item.Calypso), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.05, LKCamelot.script.Packs.NewVVArmorPack, "10d22+250", 40, 1, 1),
 
-                    //new LootPackEntry(0.05, typeof(script.item.CurveShockBook), "10d12+150", 40, 1, 1),
-                    //new LootPackEntry(0.05, typeof(script.item.WindySpiritBook), "10d12+150", 40, 1, 1),
-                    //new LootPackEntry(0.05, typeof(script.item.FrameStrikeBook), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(0.05, typeof(script.item.CurveShockBook), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(0.05, typeof(script.item.WindySpiritBook), "10d12+150", 40, 1, 1),
+                    new LootPackEntry(0.05, typeof(script.item.FrameStrikeBook), "10d12+150", 40, 1, 1),
 
                     //new LootPackEntry(0.1, typeof(script.item.LionHeart), "10d12+150", 40, 1, 1),
                     //new LootPackEntry(0.1, typeof(script.item.DragonBlade), "10d12+150", 40, 1, 1),
@@ -656,7 +682,7 @@ namespace LKCamelot.script.monster
                     //new LootPackEntry(0.1, typeof(script.item.TaegkFan), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.1, typeof(script.item.Excalibur), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.1, typeof(script.item.DaeungDaegum), "10d22+250", 40, 1, 1),
-                    //new LootPackEntry(0.1, typeof(script.item.GrandeurPride), "10d22+250", 40, 1, 1), 
+                    //new LootPackEntry(0.1, typeof(script.item.GrandeurPride), "10d22+250", 40, 1, 1),
                     //new LootPackEntry(0.1, typeof(script.item.GoliathPlate), "10d22+250", 40, 1, 1),// 아머펙에 포함
                     //new LootPackEntry(0.01, typeof(script.item.CelestialArmor), "10d22+250", 40, 1, 1),// 아머펙에 포함
                     //new LootPackEntry(0.1, typeof(script.item.UnicornProtectoria), "10d22+250", 40, 1, 1),//15.01.24 삭제처리 gm티리엘

@@ -28,6 +28,7 @@ namespace LKCamelot.script.monster
                 {
                     new LootPackEntry(0.01, LKCamelot.script.Packs.AccessorySet26, "10d22+250", 40, 1, 1),
                     new LootPackEntry(0.1, typeof(script.item.UltraBigBangBook), "10d22+250", 40, 1, 1),
+                    new LootPackEntry(0.04, typeof(script.item.AssassinSpecialBook), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.1, typeof(script.item.MagmaHandBook), "10d22+250", 40, 1, 1),
                     new LootPackEntry(0.15, typeof(script.item.ThunderStormBook), "10d22+250", 40, 1, 1),
                     new LootPackEntry(0.15, typeof(script.item.RevelationBook), "10d22+250", 40, 1, 1),

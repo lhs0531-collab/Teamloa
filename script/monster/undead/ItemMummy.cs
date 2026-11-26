@@ -25,9 +25,13 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
+					new LootPackEntry(25.0, LKCamelot.script.Packs.ItemMummyPark, "10d22+250", 40, 1, 1),
+					new LootPackEntry(25.0, typeof(script.item.Gold), "10d20+3200", 40, 1, 1),
+
                     // 15.01.31 GM티리엘
                     // 아이템 확률 전체 2 ->15로 변경
-                    new LootPackEntry(8, typeof(script.item.TeleportBook), "15d10+225", 1, 1, 1),
+                    /*
+					new LootPackEntry(8, typeof(script.item.TeleportBook), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15, typeof(script.item.BattleArmor), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15, typeof(script.item.LargeAxe), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15, typeof(script.item.FullHelmet), "15d10+225", 1, 1, 1),
@@ -35,11 +39,10 @@ namespace LKCamelot.script.monster
                     new LootPackEntry(15, typeof(script.item.PlusHealBook), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15, typeof(script.item.TeagueShieldBook), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15, typeof(script.item.FlameRoundBook), "15d10+225", 1, 1, 1),
-                    
+                    */
                     //new LootPackEntry(2, typeof(script.item.ThunderCrossBook), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(2, typeof(script.item.BattleShield), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(2, typeof(script.item.ChestGuard), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(25.0, typeof(script.item.Gold), "10d20+3200", 40, 1, 1),
 
                     /*should drop Book of Oblivion, (Chest Guard, Large Axe,
                     Full Helmet, Battle Armor, Battle Shield). Shouldn't drop Thunder Cross, Teleport.

@@ -26,8 +26,12 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
+					new LootPackEntry(25.0, LKCamelot.script.Packs.ItemWarDummyPark, "10d22+250", 40, 1, 1),
+                    new LootPackEntry(25.0, typeof(script.item.Gold), "10d20+4200", 40, 1, 1),
+
                     // 15.01.31 GM티리엘
                     // 아이템 확률 전체 1 ~ 15 ~20 로 변경
+					/*
                     new LootPackEntry(7, typeof(script.item.Javelin), "15d10+225", 1, 1, 1),         //temp (은신 나오면 삭제)
                     new LootPackEntry(7, typeof(script.item.WarStaff), "15d10+225", 1, 1, 1),        //temp (은신 나오면 삭제)
                     new LootPackEntry(8, typeof(script.item.BastardSword), "15d10+225", 1, 1, 1),
@@ -43,13 +47,13 @@ namespace LKCamelot.script.monster
                     new LootPackEntry(8, typeof(script.item.WidePlate), "15d10+225", 1, 1, 1),
                     new LootPackEntry(8, typeof(script.item.GreatMaul), "15d10+225", 1, 1, 1),
                     new LootPackEntry(8, typeof(script.item.FullPlate), "15d10+225", 1, 1, 1),
+					*/
 
-                    //new LootPackEntry(0.1, typeof(script.item.BraveRing), "15d10+225", 1, 1, 1),                   
-                    //new LootPackEntry(1, typeof(script.item.AssassinBook), "15d10+225", 1, 1, 1),                 
+                    //new LootPackEntry(0.1, typeof(script.item.BraveRing), "15d10+225", 1, 1, 1),
+                    //new LootPackEntry(1, typeof(script.item.AssassinBook), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(.1, typeof(script.item.GrandStaff), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(1, typeof(script.item.GreatSword), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(1, typeof(script.item.GreatAxe), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(25.0, typeof(script.item.Gold), "10d20+4200", 40, 1, 1),
                 });
             }
         }

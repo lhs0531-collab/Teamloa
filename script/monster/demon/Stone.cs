@@ -25,11 +25,11 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    new LootPackEntry(0.05, typeof(script.item.DeadlyBoomBook), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.05, typeof(script.item.RevelationBook), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.1, typeof(script.item.FireHawkBook), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.1, typeof(script.item.FireShotBook), "10d22+250", 40, 1, 1),
-                    new LootPackEntry(0.1, typeof(script.item.ExecutionBook), "10d22+250", 40, 1, 1),
+                    new LootPackEntry(0.06, typeof(script.item.DeadlyBoomBook), "10d22+250", 40, 1, 1),
+                    new LootPackEntry(0.06, typeof(script.item.RevelationBook), "10d22+250", 40, 1, 1),
+                    new LootPackEntry(0.11, typeof(script.item.FireHawkBook), "10d22+250", 40, 1, 1),
+                    new LootPackEntry(0.11, typeof(script.item.FireShotBook), "10d22+250", 40, 1, 1),
+                    new LootPackEntry(0.11, typeof(script.item.ExecutionBook), "10d22+250", 40, 1, 1),
                     new LootPackEntry(0.2, typeof(script.item.Robe), "10d22+250", 40, 1, 1),
                     new LootPackEntry(0.2, typeof(script.item.BroadSword), "10d22+250", 40, 1, 1),
                     new LootPackEntry(0.2, typeof(script.item.IceAxe), "10d22+250", 40, 1, 1),
@@ -37,6 +37,8 @@ namespace LKCamelot.script.monster
                     new LootPackEntry(0.2, typeof(script.item.TowerShield), "10d22+250", 40, 1, 1),
                     new LootPackEntry(0.2, typeof(script.item.Crown), "10d22+250", 40, 1, 1),
                     new LootPackEntry(0.2, typeof(script.item.LargeShield), "10d22+250", 40, 1, 1),
+					new LootPackEntry(0.2, typeof(script.item.WarStaff), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.2, typeof(script.item.Javelin), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15.0, typeof(script.item.Gold), "10d30+550", 40, 1, 1),
 
                     //15.02.12 이전데이터

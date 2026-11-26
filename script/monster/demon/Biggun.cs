@@ -25,15 +25,15 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    new LootPackEntry(0.05, typeof(script.item.DarkPlate), "15d10+225", 1, 1, 1),           // 15.02.12 매찬 0.1 -> 0.05 (GM티리엘)
-                    new LootPackEntry(0.05, typeof(script.item.Protectoria), "15d10+225", 1, 1, 1),         // 15.02.12 매찬 0.1 -> 0.05 (GM티리엘)
-                    new LootPackEntry(0.05, typeof(script.item.PythonScale), "15d10+225", 1, 1, 1),         // 15.02.12 매찬 0.1 -> 0.05 (GM티리엘)
-                    new LootPackEntry(0.05, typeof(script.item.GoldPlate), "15d10+225", 1, 1, 1),           // 15.02.12 매찬 0.1 -> 0.05 (GM티리엘)
+                    new LootPackEntry(0.1, typeof(script.item.DarkPlate), "15d10+225", 1, 1, 1),           // 15.02.12 매찬 0.1 -> 0.05 (GM티리엘)
+                    new LootPackEntry(0.1, typeof(script.item.Protectoria), "15d10+225", 1, 1, 1),         // 15.02.12 매찬 0.1 -> 0.05 (GM티리엘)
+                    new LootPackEntry(0.1, typeof(script.item.PythonScale), "15d10+225", 1, 1, 1),         // 15.02.12 매찬 0.1 -> 0.05 (GM티리엘)
+                    new LootPackEntry(0.1, typeof(script.item.GoldPlate), "15d10+225", 1, 1, 1),           // 15.02.12 매찬 0.1 -> 0.05 (GM티리엘)
                     new LootPackEntry(0.06, LKCamelot.script.Packs.AccessorySet21, "10d22+250", 40, 1, 1),  // 15.02.12 매찬 0.04 -> 0.06 (GM티리엘)
                     new LootPackEntry(0.1, typeof(script.item.Wand), "15d10+225", 1, 1, 1),             // 15.01.25 매찬 0.001 -> 0.1 (GM티리엘)
                     new LootPackEntry(0.1, typeof(script.item.WarPike), "15d10+225", 1, 1, 1),          // 15.01.25 매찬 0.001 -> 0.1 (GM티리엘)
-                    new LootPackEntry(0.1, typeof(script.item.WarStaff), "15d10+225", 1, 1, 1),         // 15.01.25 매찬 0.009 -> 0.1 (GM티리엘)
-                    new LootPackEntry(0.1, typeof(script.item.Javelin), "15d10+225", 1, 1, 1),          // 15.01.25 매찬 0.009 -> 0.1 (GM티리엘)
+                    new LootPackEntry(0.2, typeof(script.item.WarStaff), "15d10+225", 1, 1, 1),         // 15.01.25 매찬 0.009 -> 0.1 (GM티리엘)
+                    new LootPackEntry(0.2, typeof(script.item.Javelin), "15d10+225", 1, 1, 1),          // 15.01.25 매찬 0.009 -> 0.1 (GM티리엘)
                     new LootPackEntry(0.1, typeof(script.item.ThunderStormBook), "5d500+8000", 40, 1, 1),
                     new LootPackEntry(0.1, typeof(script.item.BigBangBook), "5d500+8000", 40, 1, 1),
                     new LootPackEntry(0.1, typeof(script.item.AssassinBook), "5d500+8000", 40, 1, 1),
@@ -94,11 +94,11 @@ namespace LKCamelot.script.monster
             get
             {
                 return new LootPack(new LootPackEntry[]
-                {  
+                {
                     new LootPackEntry(0.1, typeof(script.item.Wand), "15d10+225", 1, 1, 1),         // 15.01.25 매찬 0.001 -> 0.1 (GM티리엘)
                     new LootPackEntry(0.1, typeof(script.item.WarPike), "15d10+225", 1, 1, 1),      // 15.01.25 매찬 0.001 -> 0.1 (GM티리엘)
-                    new LootPackEntry(0.1, typeof(script.item.WarStaff), "15d10+225", 1, 1, 1),     // 15.01.25 매찬 0.009 -> 0.1 (GM티리엘)
-                    new LootPackEntry(0.1, typeof(script.item.Javelin), "15d10+225", 1, 1, 1),      // 15.01.25 매찬 0.009 -> 0.1 (GM티리엘)
+                    new LootPackEntry(0.2, typeof(script.item.WarStaff), "15d10+225", 1, 1, 1),     // 15.01.25 매찬 0.009 -> 0.1 (GM티리엘)
+                    new LootPackEntry(0.2, typeof(script.item.Javelin), "15d10+225", 1, 1, 1),      // 15.01.25 매찬 0.009 -> 0.1 (GM티리엘)
                     new LootPackEntry(0.1, typeof(script.item.GoldPlate), "15d10+225", 1, 1, 1),    // 15.01.25 매찬 0.02 -> 0.1 (GM티리엘)
                     new LootPackEntry(0.1, typeof(script.item.DarkPlate), "15d10+225", 1, 1, 1),    // 15.01.25 매찬 0.02 -> 0.1 (GM티리엘)
                     new LootPackEntry(0.1, typeof(script.item.Protectoria), "15d10+225", 1, 1, 1),  // 15.01.25 매찬 0.02 -> 0.1 (GM티리엘)

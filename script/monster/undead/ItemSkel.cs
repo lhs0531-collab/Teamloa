@@ -27,9 +27,12 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
+					new LootPackEntry(25.0, LKCamelot.script.Packs.ItemSkelPark, "10d22+250", 40, 1, 1),
+					new LootPackEntry(25.0, typeof(script.item.Gold), "5d10+1800", 40, 1, 1),
+
                     // 15.01.31 GM티리엘
                     // 아이템 확률 15 ~20 로 변경
-                    new LootPackEntry(15, typeof(script.item.Robe), "15d10+225", 1, 1, 1),
+                    /*new LootPackEntry(15, typeof(script.item.Robe), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15, typeof(script.item.Crown), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15, typeof(script.item.LargeShield), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15, typeof(script.item.IronSword), "15d10+225", 1, 1, 1),
@@ -41,8 +44,7 @@ namespace LKCamelot.script.monster
                     new LootPackEntry(15, typeof(script.item.Helmet), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15, typeof(script.item.Cutlass), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15, typeof(script.item.LongSword), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(20, typeof(script.item.TeleportBook), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(25.0, typeof(script.item.Gold), "5d10+1800", 40, 1, 1),
+                    new LootPackEntry(20, typeof(script.item.TeleportBook), "15d10+225", 1, 1, 1),*/
                     //shouldn't drop Thundercross, Teleport
                 });
             }

@@ -25,9 +25,13 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
+					new LootPackEntry(25.0, LKCamelot.script.Packs.ItemPigmyPark, "10d22+250", 40, 1, 1),
+					new LootPackEntry(25.0, typeof(script.item.Gold), "5d10+800", 40, 1, 1),
+
                     // 15.01.31 GM티리엘
                     // 아이템 확률 전체 2.0 -> 15 ~25 로 변경
-                    new LootPackEntry(15, typeof(script.item.Mantle), "15d10+225", 1, 1, 1),
+                    /*
+					new LootPackEntry(15, typeof(script.item.Mantle), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15, typeof(script.item.Rapier), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15, typeof(script.item.Mask), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15, typeof(script.item.Saber), "15d10+225", 1, 1, 1),
@@ -37,11 +41,11 @@ namespace LKCamelot.script.monster
                     new LootPackEntry(15, typeof(script.item.TraceBook), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15, typeof(script.item.OneEdgedAxe), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15, typeof(script.item.SmallAxe), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(15, typeof(script.item.ComeBackBook), "15d10+225", 1, 1, 1), 
-                    new LootPackEntry(15, typeof(script.item.Cape), "15d10+225", 1, 1, 1),          
+                    new LootPackEntry(15, typeof(script.item.ComeBackBook), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(15, typeof(script.item.Cape), "15d10+225", 1, 1, 1),
                     new LootPackEntry(25, typeof(script.item.ThunderCrossBook), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(25, typeof(script.item.FlameRoundBook), "15d10+225", 1, 1, 1),                     
-                    new LootPackEntry(25.0, typeof(script.item.Gold), "5d10+800", 40, 1, 1),
+                    new LootPackEntry(25, typeof(script.item.FlameRoundBook), "15d10+225", 1, 1, 1),
+					*/
                 });
             }
         }

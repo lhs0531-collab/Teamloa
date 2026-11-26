@@ -6,7 +6,7 @@ using System.Text;
 using LKCamelot.model;
 namespace LKCamelot.script.monster
 {
-    #region µ¿±¼
+    #region ï¿½ï¿½ï¿½ï¿½
     //public class DeadlyMessenger : Monster
     //{
     //    public override string Name { get { return "Deadly Messenger"; } }
@@ -123,14 +123,24 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    new LootPackEntry(0.03, typeof(script.item.Protectoria), "15d10+225", 1, 1, 1),      //15.02.12 ¸ÅÂù 0.01 -> 0.03 GMÆ¼¸®¿¤
-                    new LootPackEntry(0.03, typeof(script.item.PythonScale), "15d10+225", 1, 1, 1),      //15.02.12 ¸ÅÂù 0.01 -> 0.03 GMÆ¼¸®¿¤
-                    new LootPackEntry(0.05, typeof(script.item.BlackHandBook), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.05, typeof(script.item.TripleBook), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.05, typeof(script.item.TwisterBook), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.1, typeof(script.item.Protectoria), "15d10+225", 1, 1, 1),      //15.02.12 ï¿½ï¿½ï¿½ï¿½ 0.01 -> 0.03 GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    new LootPackEntry(0.1, typeof(script.item.PythonScale), "15d10+225", 1, 1, 1),      //15.02.12 ï¿½ï¿½ï¿½ï¿½ 0.01 -> 0.03 GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    new LootPackEntry(0.3, typeof(script.item.BlackHandBook), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.3, typeof(script.item.TripleBook), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.3, typeof(script.item.TwisterBook), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.2, typeof(script.item.WarStaff), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.2, typeof(script.item.Javelin), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15.0, typeof(script.item.Gold), "5d10+80", 40, 1, 1),
 
-                    //ÀÌÀüµ¥ÀÌÅÍ(15.02.01)
+					//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(19.12.02)
+                    //new LootPackEntry(0.03, typeof(script.item.Protectoria), "15d10+225", 1, 1, 1),      //15.02.12 ï¿½ï¿½ï¿½ï¿½ 0.01 -> 0.03 GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    //new LootPackEntry(0.03, typeof(script.item.PythonScale), "15d10+225", 1, 1, 1),      //15.02.12 ï¿½ï¿½ï¿½ï¿½ 0.01 -> 0.03 GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    //new LootPackEntry(0.05, typeof(script.item.BlackHandBook), "15d10+225", 1, 1, 1),
+                    //new LootPackEntry(0.05, typeof(script.item.TripleBook), "15d10+225", 1, 1, 1),
+                    //new LootPackEntry(0.05, typeof(script.item.TwisterBook), "15d10+225", 1, 1, 1),
+                    //new LootPackEntry(15.0, typeof(script.item.Gold), "5d10+80", 40, 1, 1),
+
+                    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(15.02.01)
                     //new LootPackEntry(0.01, typeof(script.item.GreatLance), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(0.01, typeof(script.item.GreatStaff), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(0.01, typeof(script.item.Protectoria), "15d10+225", 1, 1, 1),
@@ -191,16 +201,26 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    //new LootPackEntry(0.01, typeof(script.item.Wand), "15d10+225", 1, 1, 1),
-                    //new LootPackEntry(0.01, typeof(script.item.WarPike), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.03, typeof(script.item.Protectoria), "15d10+225", 1, 1, 1),     //15.02.12 ¸ÅÂù 0.01 -> 0.03 GMÆ¼¸®¿¤
-                    new LootPackEntry(0.03, typeof(script.item.PythonScale), "15d10+225", 1, 1, 1),      //15.02.12 ¸ÅÂù 0.01 -> 0.03 GMÆ¼¸®¿¤
-                    new LootPackEntry(0.05, typeof(script.item.BlackHandBook), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.05, typeof(script.item.TripleBook), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.05, typeof(script.item.TwisterBook), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.1, typeof(script.item.Protectoria), "15d10+225", 1, 1, 1),     //15.02.12 ï¿½ï¿½ï¿½ï¿½ 0.01 -> 0.03 GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    new LootPackEntry(0.1, typeof(script.item.PythonScale), "15d10+225", 1, 1, 1),      //15.02.12 ï¿½ï¿½ï¿½ï¿½ 0.01 -> 0.03 GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    new LootPackEntry(0.3, typeof(script.item.BlackHandBook), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.3, typeof(script.item.TripleBook), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.3, typeof(script.item.TwisterBook), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.2, typeof(script.item.WarStaff), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.2, typeof(script.item.Javelin), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15.0, typeof(script.item.Gold), "5d10+80", 40, 1, 1),
 
-                    //ÀÌÀüµ¥ÀÌÅÍ(15.02.01)
+					//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(19.12.02)
+                    //new LootPackEntry(0.01, typeof(script.item.Wand), "15d10+225", 1, 1, 1),
+                    //new LootPackEntry(0.01, typeof(script.item.WarPike), "15d10+225", 1, 1, 1),
+                    //new LootPackEntry(0.03, typeof(script.item.Protectoria), "15d10+225", 1, 1, 1),     //15.02.12 ï¿½ï¿½ï¿½ï¿½ 0.01 -> 0.03 GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    //new LootPackEntry(0.03, typeof(script.item.PythonScale), "15d10+225", 1, 1, 1),      //15.02.12 ï¿½ï¿½ï¿½ï¿½ 0.01 -> 0.03 GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    //new LootPackEntry(0.05, typeof(script.item.BlackHandBook), "15d10+225", 1, 1, 1),
+                    //new LootPackEntry(0.05, typeof(script.item.TripleBook), "15d10+225", 1, 1, 1),
+                    //new LootPackEntry(0.05, typeof(script.item.TwisterBook), "15d10+225", 1, 1, 1),
+                    //new LootPackEntry(15.0, typeof(script.item.Gold), "5d10+80", 40, 1, 1),
+
+                    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(15.02.01)
                     //new LootPackEntry(0.01, typeof(script.item.GreatLance), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(0.01, typeof(script.item.GreatStaff), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(0.01, typeof(script.item.Protectoria), "15d10+225", 1, 1, 1),
@@ -260,15 +280,25 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    new LootPackEntry(0.03, typeof(script.item.Protectoria), "15d10+225", 1, 1, 1),      //15.02.12 ¸ÅÂù 0.01 -> 0.03 GMÆ¼¸®¿¤
-                    new LootPackEntry(0.03, typeof(script.item.PythonScale), "15d10+225", 1, 1, 1),      //15.02.12 ¸ÅÂù 0.01 -> 0.03 GMÆ¼¸®¿¤
-                    new LootPackEntry(0.04, typeof(script.item.Cadeceus), "15d10+225", 1, 1, 1),         //15.02.12 Ãß°¡ GMÆ¼¸®¿¤
-                    new LootPackEntry(0.04, typeof(script.item.ForkedSpear), "15d10+225", 1, 1, 1),      //15.02.12 Ãß°¡ GMÆ¼¸®¿¤
-                    new LootPackEntry(0.05, typeof(script.item.BlackHandBook), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.05, typeof(script.item.WildMonkBook), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(15.0, typeof(script.item.Gold), "5d10+80", 40, 1, 1),
+                    new LootPackEntry(0.1, typeof(script.item.Protectoria), "15d10+225", 1, 1, 1),      //15.02.12 ï¿½ï¿½ï¿½ï¿½ 0.01 -> 0.03 GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    new LootPackEntry(0.1, typeof(script.item.PythonScale), "15d10+225", 1, 1, 1),      //15.02.12 ï¿½ï¿½ï¿½ï¿½ 0.01 -> 0.03 GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    new LootPackEntry(0.2, typeof(script.item.Cadeceus), "15d10+225", 1, 1, 1),         //15.02.12 ï¿½ß°ï¿½ GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    new LootPackEntry(0.2, typeof(script.item.ForkedSpear), "15d10+225", 1, 1, 1),      //15.02.12 ï¿½ß°ï¿½ GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    new LootPackEntry(0.3, typeof(script.item.BlackHandBook), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.2, typeof(script.item.WarStaff), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.2, typeof(script.item.Javelin), "15d10+225", 1, 1, 1),
+					new LootPackEntry(15.0, typeof(script.item.Gold), "5d10+80", 40, 1, 1),
 
-                    //ÀÌÀüµ¥ÀÌÅÍ(15.02.01)
+					//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(19.12.02)
+					//new LootPackEntry(0.03, typeof(script.item.Protectoria), "15d10+225", 1, 1, 1),      //15.02.12 ï¿½ï¿½ï¿½ï¿½ 0.01 -> 0.03 GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    //new LootPackEntry(0.03, typeof(script.item.PythonScale), "15d10+225", 1, 1, 1),      //15.02.12 ï¿½ï¿½ï¿½ï¿½ 0.01 -> 0.03 GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    //new LootPackEntry(0.04, typeof(script.item.Cadeceus), "15d10+225", 1, 1, 1),         //15.02.12 ï¿½ß°ï¿½ GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    //new LootPackEntry(0.04, typeof(script.item.ForkedSpear), "15d10+225", 1, 1, 1),      //15.02.12 ï¿½ß°ï¿½ GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    //new LootPackEntry(0.05, typeof(script.item.BlackHandBook), "15d10+225", 1, 1, 1),
+                    //new LootPackEntry(0.05, typeof(script.item.WildMonkBook), "15d10+225", 1, 1, 1),
+                    //new LootPackEntry(15.0, typeof(script.item.Gold), "5d10+80", 40, 1, 1),
+
+                    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(15.02.01)
                     //new LootPackEntry(0.01, typeof(script.item.GreatLance), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(0.05, typeof(script.item.GreatStaff), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(0.01, typeof(script.item.Protectoria), "15d10+225", 1, 1, 1),
@@ -326,17 +356,27 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    //new LootPackEntry(0.01, typeof(script.item.Wand), "15d10+225", 1, 1, 1),
-                    //new LootPackEntry(0.01, typeof(script.item.WarPike), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.03, typeof(script.item.Protectoria), "15d10+225", 1, 1, 1),      //15.02.12 ¸ÅÂù 0.01 -> 0.03 GMÆ¼¸®¿¤
-                    new LootPackEntry(0.03, typeof(script.item.PythonScale), "15d10+225", 1, 1, 1),      //15.02.12 ¸ÅÂù 0.01 -> 0.03 GMÆ¼¸®¿¤
-                    new LootPackEntry(0.04, typeof(script.item.Cadeceus), "15d10+225", 1, 1, 1),         //15.02.12 Ãß°¡ GMÆ¼¸®¿¤
-                    new LootPackEntry(0.04, typeof(script.item.ForkedSpear), "15d10+225", 1, 1, 1),      //15.02.12 Ãß°¡ GMÆ¼¸®¿¤
-                    new LootPackEntry(0.05, typeof(script.item.BlackHandBook), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.05, typeof(script.item.DeadlyMessengerBook), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.1, typeof(script.item.Protectoria), "15d10+225", 1, 1, 1),      //15.02.12 ï¿½ï¿½ï¿½ï¿½ 0.01 -> 0.03 GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    new LootPackEntry(0.1, typeof(script.item.PythonScale), "15d10+225", 1, 1, 1),      //15.02.12 ï¿½ï¿½ï¿½ï¿½ 0.01 -> 0.03 GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    new LootPackEntry(0.2, typeof(script.item.Cadeceus), "15d10+225", 1, 1, 1),         //15.02.12 ï¿½ß°ï¿½ GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    new LootPackEntry(0.2, typeof(script.item.ForkedSpear), "15d10+225", 1, 1, 1),      //15.02.12 ï¿½ß°ï¿½ GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    new LootPackEntry(0.3, typeof(script.item.BlackHandBook), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.2, typeof(script.item.WarStaff), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.2, typeof(script.item.Javelin), "15d10+225", 1, 1, 1),
+					new LootPackEntry(15.0, typeof(script.item.Gold), "5d10+80", 40, 1, 1),
+
+					//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(19.12.02)
+                    ////new LootPackEntry(0.01, typeof(script.item.Wand), "15d10+225", 1, 1, 1),
+                    ////new LootPackEntry(0.01, typeof(script.item.WarPike), "15d10+225", 1, 1, 1),
+                    //new LootPackEntry(0.03, typeof(script.item.Protectoria), "15d10+225", 1, 1, 1),      //15.02.12 ï¿½ï¿½ï¿½ï¿½ 0.01 -> 0.03 GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    //new LootPackEntry(0.03, typeof(script.item.PythonScale), "15d10+225", 1, 1, 1),      //15.02.12 ï¿½ï¿½ï¿½ï¿½ 0.01 -> 0.03 GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    //new LootPackEntry(0.04, typeof(script.item.Cadeceus), "15d10+225", 1, 1, 1),         //15.02.12 ï¿½ß°ï¿½ GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    //new LootPackEntry(0.04, typeof(script.item.ForkedSpear), "15d10+225", 1, 1, 1),      //15.02.12 ï¿½ß°ï¿½ GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    //new LootPackEntry(0.05, typeof(script.item.BlackHandBook), "15d10+225", 1, 1, 1),
+					////new LootPackEntry(0.05, typeof(script.item.BlackHandBook), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15.0, typeof(script.item.Gold), "5d10+80", 40, 1, 1),
 
-                    //ÀÌÀüµ¥ÀÌÅÍ
+                    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
                     //new LootPackEntry(0.01, typeof(script.item.GreatLance), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(0.05, typeof(script.item.GreatStaff), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(0.01, typeof(script.item.Protectoria), "15d10+225", 1, 1, 1),
@@ -376,7 +416,7 @@ namespace LKCamelot.script.monster
     }
     #endregion
 
-    #region ¹ÙÀÌÅ·
+    #region ï¿½ï¿½ï¿½ï¿½Å·
     public class vViking : Monster
     {
         public override int INDEX { get { return 107; } }
@@ -396,6 +436,7 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
+					new LootPackEntry(0.1, typeof(script.item.ThunderCrossBook), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.1, typeof(script.item.HealthRing), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.1, typeof(script.item.MagicRing), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.1, typeof(script.item.SkillRing), "15d10+225", 1, 1, 1),
@@ -406,7 +447,7 @@ namespace LKCamelot.script.monster
                     new LootPackEntry(0.1, typeof(script.item.SkillAmulet), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.1, typeof(script.item.LifeAmulet), "15d10+225", 1, 1, 1),
 
-                    new LootPackEntry(0.5, typeof(script.item.MentalSwordBook), "15d10+225", 1, 1, 1), // 15.02.01 ¸ÅÂù : 0.2 -> 0.5 (GMÆ¼¸®¿¤)
+                    new LootPackEntry(0.5, typeof(script.item.MentalSwordBook), "15d10+225", 1, 1, 1), // 15.02.01 ï¿½ï¿½ï¿½ï¿½ : 0.2 -> 0.5 (GMÆ¼ï¿½ï¿½ï¿½ï¿½)
                     new LootPackEntry(15.0, typeof(script.item.Gold), "5d10+80", 40, 1, 1),
                 });
             }
@@ -468,7 +509,7 @@ namespace LKCamelot.script.monster
                     new LootPackEntry(0.1, typeof(script.item.MagicAmulet), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.1, typeof(script.item.SkillAmulet), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.1, typeof(script.item.LifeAmulet), "15d10+225", 1, 1, 1),
-                    
+
                     new LootPackEntry(0.2, typeof(script.item.MentalSwordBook), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15.0, typeof(script.item.Gold), "5d10+80", 40, 1, 1),
                 });
@@ -505,7 +546,7 @@ namespace LKCamelot.script.monster
     }
     #endregion
 
-    #region ½ºÄÝÇÇ¿Â
+    #region ï¿½ï¿½ï¿½ï¿½ï¿½Ç¿ï¿½
 
     public class Venture_MadDog : Monster
     {
@@ -580,14 +621,14 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    new LootPackEntry(0.05, typeof(script.item.FlameRoundBook), "15d10+225", 1, 1, 1),  
-                    new LootPackEntry(0.05, typeof(script.item.FireWallBook), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.05, typeof(script.item.LightningWallBook), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.1, typeof(script.item.FlameRoundBook), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.1, typeof(script.item.FireWallBook), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.1, typeof(script.item.LightningWallBook), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.05, typeof(script.item.ThunderStormBook), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(0.075, typeof(script.item.TornadoBook), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(0.075, typeof(script.item.StoneCurseBook), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.09, typeof(script.item.FlameWaveBook), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.09, typeof(script.item.ThunderStrokeBook), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.1, typeof(script.item.FlameWaveBook), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.1, typeof(script.item.ThunderStrokeBook), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15.0, typeof(script.item.Gold), "5d30+400", 40, 1, 1),
                 });
             }
@@ -639,14 +680,14 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    new LootPackEntry(0.05, typeof(script.item.ThunderCrossBook), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.05, typeof(script.item.FireWallBook), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.05, typeof(script.item.LightningWallBook), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.1, typeof(script.item.ThunderCrossBook), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.1, typeof(script.item.FireWallBook), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.1, typeof(script.item.LightningWallBook), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.05, typeof(script.item.ThunderStormBook), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(0.075, typeof(script.item.TornadoBook), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(0.075, typeof(script.item.StoneCurseBook), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.075, typeof(script.item.FlameWaveBook), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.09, typeof(script.item.ThunderStrokeBook), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.1, typeof(script.item.FlameWaveBook), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.1, typeof(script.item.ThunderStrokeBook), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15.0, typeof(script.item.Gold), "5d10+400", 40, 1, 1),
                 });
             }
@@ -700,9 +741,9 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    new LootPackEntry(0.03, typeof(script.item.DarkPlate), "15d10+225", 1, 1, 1),        // 15.02.12 Ãß°¡ GMÆ¼¸®¿¤
-                    new LootPackEntry(0.03, typeof(script.item.GoldPlate), "15d10+225", 1, 1, 1),        // 15.02.12 Ãß°¡ GMÆ¼¸®¿¤
-                    new LootPackEntry(0.05, LKCamelot.script.Packs.AccessorySet26, "10d22+250", 40, 1, 1), //15.02.10 ¸ÅÂù 0.02 -> 0.05·Î º¯°æ
+                    new LootPackEntry(0.03, typeof(script.item.DarkPlate), "15d10+225", 1, 1, 1),        // 15.02.12 ï¿½ß°ï¿½ GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    new LootPackEntry(0.03, typeof(script.item.GoldPlate), "15d10+225", 1, 1, 1),        // 15.02.12 ï¿½ß°ï¿½ GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    new LootPackEntry(0.05, LKCamelot.script.Packs.AccessorySet26, "10d22+250", 40, 1, 1), //15.02.10 ï¿½ï¿½ï¿½ï¿½ 0.02 -> 0.05ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                     new LootPackEntry(0.05, typeof(script.item.GrandStaff), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.05, typeof(script.item.GreatLance), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.05, typeof(script.item.AssassinSpecialBook), "15d10+225", 1, 1, 1),
@@ -710,10 +751,10 @@ namespace LKCamelot.script.monster
                     new LootPackEntry(0.05, typeof(script.item.Excalido), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.05, typeof(script.item.BarbarianAxe), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.05, typeof(script.item.ArmShield), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.05, typeof(script.item.BoneMail), "15d10+225", 1, 1, 1), 
+                    new LootPackEntry(0.05, typeof(script.item.BoneMail), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15.0, typeof(script.item.Gold), "5d1000+3000", 40, 1, 1),
 
-                    //ÀÌÀüµ¥ÀÌÅÍ(15.02.01)
+                    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(15.02.01)
                     //new LootPackEntry(0.005, typeof(script.item.DiamondArmor), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(0.005, typeof(script.item.GoliathPlate), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(0.01, LKCamelot.script.Packs.AccessorySet26, "10d22+250", 40, 1, 1),
@@ -722,7 +763,7 @@ namespace LKCamelot.script.monster
                     //new LootPackEntry(0.05, typeof(script.item.Excalido), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(0.05, typeof(script.item.BarbarianAxe), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(0.05, typeof(script.item.ArmShield), "15d10+225", 1, 1, 1),
-                    //new LootPackEntry(0.05, typeof(script.item.BoneMail), "15d10+225", 1, 1, 1), 
+                    //new LootPackEntry(0.05, typeof(script.item.BoneMail), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(15.0, typeof(script.item.Gold), "5d1000+3000", 40, 1, 1),
                 });
             }
@@ -774,16 +815,17 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    new LootPackEntry(0.03, typeof(script.item.DarkPlate), "15d10+225", 1, 1, 1),        // 15.02.12 Ãß°¡ GMÆ¼¸®¿¤
-                    new LootPackEntry(0.03, typeof(script.item.GoldPlate), "15d10+225", 1, 1, 1),        // 15.02.12 Ãß°¡ GMÆ¼¸®¿¤
-                    new LootPackEntry(0.05, LKCamelot.script.Packs.AccessorySet26, "10d22+250", 40, 1, 1), //15.02.10 ¸ÅÂù 0.02 -> 0.05·Î º¯°æ
+                    new LootPackEntry(0.03, typeof(script.item.DarkPlate), "15d10+225", 1, 1, 1),        // 15.02.12 ï¿½ß°ï¿½ GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    new LootPackEntry(0.03, typeof(script.item.GoldPlate), "15d10+225", 1, 1, 1),        // 15.02.12 ï¿½ß°ï¿½ GMÆ¼ï¿½ï¿½ï¿½ï¿½
+                    new LootPackEntry(0.05, LKCamelot.script.Packs.AccessorySet26, "10d22+250", 40, 1, 1), //15.02.10 ï¿½ï¿½ï¿½ï¿½ 0.02 -> 0.05ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                     new LootPackEntry(0.05, typeof(script.item.GrandStaff), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.05, typeof(script.item.GreatLance), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.08, typeof(script.item.AssassinSpecialBook), "15d10+225", 1, 1, 1),
+                    //new LootPackEntry(3, typeof(script.item.AssassinBook), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.08, typeof(script.item.GrandBigBangBook), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15.0, typeof(script.item.Gold), "5d1000+3000", 40, 1, 1),
 
-                    //ÀÌÀüµ¥ÀÌÅÍ(15.02.01)
+                    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(15.02.01)
                     //new LootPackEntry(0.008, typeof(script.item.GoliathPlate), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(0.008, typeof(script.item.DiamondArmor), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(0.01, LKCamelot.script.Packs.AccessorySet26, "10d22+250", 40, 1, 1),
@@ -844,17 +886,17 @@ namespace LKCamelot.script.monster
                     new LootPackEntry(0.05, typeof(script.item.GrandStaff), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.05, typeof(script.item.GreatLance), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.05, typeof(script.item.UltraBigBangBook), "10d22+250", 40, 1, 1),
-                    //new LootPackEntry(0.05, typeof(script.item.MagmaHandBook), "10d22+250", 40, 1, 1),
+                    new LootPackEntry(0.05, typeof(script.item.MagmaHandBook), "10d22+250", 40, 1, 1),
                     new LootPackEntry(0.05, typeof(script.item.AssassinSpecialBook), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(0.05, typeof(script.item.GrandBigBangBook), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.05, typeof(script.item.ExtraScimitar), "15d10+225", 1, 1, 1),
-                    //new LootPackEntry(0.05, typeof(script.item.VikingHelmet), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.05, typeof(script.item.VikingHelmet), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.05, typeof(script.item.BarbarianAxe), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.05, typeof(script.item.ArmShield), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.05, typeof(script.item.BoneMail), "15d10+225", 1, 1, 1), 
+                    new LootPackEntry(0.05, typeof(script.item.BoneMail), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15.0, typeof(script.item.Gold), "5d1000+3000", 40, 1, 1),
 
-                    //ÀÌÀüµ¥ÀÌÅÍ(15.02.01)
+                    //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½(15.02.01)
                     //new LootPackEntry(0.005, typeof(script.item.DiamondArmor), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(0.005, typeof(script.item.GoliathPlate), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(0.05, typeof(script.item.AssassinSpecialBook), "15d10+225", 1, 1, 1),
@@ -862,7 +904,7 @@ namespace LKCamelot.script.monster
                     //new LootPackEntry(0.05, typeof(script.item.Excalido), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(0.05, typeof(script.item.BarbarianAxe), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(0.05, typeof(script.item.ArmShield), "15d10+225", 1, 1, 1),
-                    //new LootPackEntry(0.05, typeof(script.item.BoneMail), "15d10+225", 1, 1, 1), 
+                    //new LootPackEntry(0.05, typeof(script.item.BoneMail), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(15.0, typeof(script.item.Gold), "5d1000+3000", 40, 1, 1),
                 });
             }
@@ -916,15 +958,16 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    new LootPackEntry(0.0075, typeof(script.item.Cadeceus), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.0075, typeof(script.item.ForkedSpear), "15d10+225", 1, 1, 1),                                    
+                    new LootPackEntry(0.01, typeof(script.item.Cadeceus), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.01, typeof(script.item.ForkedSpear), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.009, typeof(script.item.GrandStaff), "15d10+225", 1, 1, 1),
-                    new LootPackEntry(0.009, typeof(script.item.GreatLance), "15d10+225", 1, 1, 1), 
-                    new LootPackEntry(0.04, LKCamelot.script.Packs.AccessorySet26, "10d22+250", 40, 1, 1),  //12.02.12 ¸ÅÂù 0.01 -> 0.04 GMÆ¼¸®¿¤
+                    new LootPackEntry(0.009, typeof(script.item.GreatLance), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(0.04, LKCamelot.script.Packs.AccessorySet26, "10d22+250", 40, 1, 1),  //12.02.12 ï¿½ï¿½ï¿½ï¿½ 0.01 -> 0.04 GMÆ¼ï¿½ï¿½ï¿½ï¿½
                     new LootPackEntry(0.015, typeof(script.item.FamilyShield), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.015, typeof(script.item.RocketMaul), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.015, typeof(script.item.WarriorAngel), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.05, typeof(script.item.AssassinSpecialBook), "15d10+225", 1, 1, 1),
+                    //new LootPackEntry(3, typeof(script.item.AssassinBook), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.05, typeof(script.item.GrandBigBangBook), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15.0, typeof(script.item.Gold), "5d1000+3000", 40, 1, 1),
 
@@ -979,12 +1022,13 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    new LootPackEntry(0.05, LKCamelot.script.Packs.AccessorySet26, "10d22+250", 40, 1, 1), //15.02.10 ¸ÅÂù 0.02 -> 0.05·Î º¯°æ
+                    new LootPackEntry(0.05, LKCamelot.script.Packs.AccessorySet26, "10d22+250", 40, 1, 1), //15.02.10 ï¿½ï¿½ï¿½ï¿½ 0.02 -> 0.05ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
                     new LootPackEntry(0.05, typeof(script.item.GrandStaff), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.05, typeof(script.item.GreatLance), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.05, typeof(script.item.ExtraScimitar), "15d10+225", 1, 1, 1),
                     //new LootPackEntry(0.05, typeof(script.item.VikingHelmet), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.05, typeof(script.item.AssassinSpecialBook), "15d10+225", 1, 1, 1),
+                    //new LootPackEntry(3, typeof(script.item.AssassinBook), "15d10+225", 1, 1, 1),
                     new LootPackEntry(0.05, typeof(script.item.GrandBigBangBook), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15.0, typeof(script.item.Gold), "10d1000+5000", 40, 1, 1),
 
