@@ -111,7 +111,7 @@ namespace LKCamelot
 #if DEBUG
         public static bool OverlapLogin = true;            // 아이피 중복 접속 여부 ( False : 중복접속 방지, True : 중복접속허용)
 #else
-        public static bool OverlapLogin = false;            // 아이피 중복 접속 여부 ( False : 중복접속 방지, True : 중복접속허용)
+        public static bool OverlapLogin = true;            // 아이피 중복 접속 여부 ( False : 중복접속 방지, True : 중복접속허용)
 
 #endif
 
