@@ -29,7 +29,7 @@ namespace LKCamelot.script.item
 
          */
         public override float ValidTime { get { return 1 * Settings.Minute; } }
-        public override short Limit { get { return 250; } }
+        public override short Limit { get { return 200; } }
         public override void Event_Give(Player player, Item itemdragdrop){ }
 
         public override void Use(Player player)
