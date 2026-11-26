@@ -396,130 +396,114 @@ namespace LKCamelot.io
             World.NewItems.TryAdd(newitem.m_Serial, newitem);
             SendPacket(new AddItemToInventory2(newitem).Compile());
         }
+        private bool TryParseRateEvent(string[] args, string command, float maxRate, out float rate, out long duration)
+        {
+            rate = 0;
+            duration = 0;
+            string usage = command + " [배율: 0.1~" + maxRate.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + "] [시간(분 또는 시:분)]";
+
+            if (args == null || args.Length != 3)
+            {
+                SendPacket(new UpdateChatBox(0x00, 0xff, 1, usage).Compile());
+                SendPacket(new UpdateChatBox(0x00, 0xff, 1, "예: " + command + " 1.5 24:00").Compile());
+                return false;
+            }
+
+            double parsedRate;
+            if (!System.Text.RegularExpressions.Regex.IsMatch(args[1], @"^[0-9]+(\.[0-9]+)?$")
+                || !double.TryParse(args[1], System.Globalization.NumberStyles.AllowDecimalPoint,
+                    System.Globalization.CultureInfo.InvariantCulture, out parsedRate)
+                || double.IsNaN(parsedRate) || double.IsInfinity(parsedRate)
+                || parsedRate < 0.1 || parsedRate > maxRate)
+            {
+                SendPacket(new UpdateChatBox(0x00, 0xff, 1, "배율은 0.1~" + maxRate.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture) + " 사이 숫자로 입력하세요.").Compile());
+                return false;
+            }
+
+            long totalMinutes;
+            string[] timeParts = args[2].Split(':');
+            long firstPart;
+            if (timeParts.Length == 1)
+            {
+                if (!System.Text.RegularExpressions.Regex.IsMatch(timeParts[0], @"^[0-9]+$")
+                    || !long.TryParse(timeParts[0], System.Globalization.NumberStyles.None,
+                        System.Globalization.CultureInfo.InvariantCulture, out totalMinutes))
+                {
+                    SendPacket(new UpdateChatBox(0x00, 0xff, 1, "시간은 분 또는 시:분 형식으로 입력하세요.").Compile());
+                    return false;
+                }
+            }
+            else if (timeParts.Length == 2)
+            {
+                long minutes;
+                if (!System.Text.RegularExpressions.Regex.IsMatch(timeParts[0], @"^[0-9]+$")
+                    || !System.Text.RegularExpressions.Regex.IsMatch(timeParts[1], @"^[0-9]+$")
+                    || !long.TryParse(timeParts[0], System.Globalization.NumberStyles.None,
+                        System.Globalization.CultureInfo.InvariantCulture, out firstPart)
+                    || !long.TryParse(timeParts[1], System.Globalization.NumberStyles.None,
+                        System.Globalization.CultureInfo.InvariantCulture, out minutes)
+                    || firstPart > 365L * 24 || minutes > 59)
+                {
+                    SendPacket(new UpdateChatBox(0x00, 0xff, 1, "시간은 분 또는 시:분 형식으로 입력하세요. 분은 0~59입니다.").Compile());
+                    return false;
+                }
+                totalMinutes = firstPart * 60 + minutes;
+            }
+            else
+            {
+                SendPacket(new UpdateChatBox(0x00, 0xff, 1, "시간은 분 또는 시:분 형식으로 입력하세요.").Compile());
+                return false;
+            }
+
+            if (totalMinutes <= 0 || totalMinutes > 365L * 24 * 60)
+            {
+                SendPacket(new UpdateChatBox(0x00, 0xff, 1, "이벤트 시간은 1분부터 365일 사이로 입력하세요.").Compile());
+                return false;
+            }
+
+            rate = (float)parsedRate;
+            duration = totalMinutes * Settings.Minute;
+            return true;
+        }
+
+        private void SetRateEvent(float[] setting, float rate, long duration, string eventName)
+        {
+            setting[0] = rate;
+            setting[1] = Server.tickcount.ElapsedMilliseconds + duration;
+            World.SendToAll(new QueDele("all", new UpdateChatBox(0xff, 0x7e, 15461,
+                string.Format("{0} 이벤트(x{1:0.##}배)가 {2}분 적용되었습니다.", eventName, rate, duration / Settings.Minute)).Compile()));
+        }
+
         private void GMEXPRate(string[] str2)
         {
-            try
-            {
-                if (str2.Count() <= 2)
-                {
-                    SendPacket(new UpdateChatBox(0x00, 0xff, 1, "#경험치배율 [수치:기본1.0] [시간(시간:분)]").Compile());
-                    SendPacket(new UpdateChatBox(0x00, 0xff, 1, "ex> #경험치배율 1.0 24:00").Compile());
-                    return;
-                }
-                if (!System.Text.RegularExpressions.Regex.IsMatch(str2[1], @"^[0-9].[0-9]+$"))
-                    return;
-
-                long Time = 0;
-                string[] temp = str2[2].Split(':');
-
-                if (temp.Count() == 1)
-                    Time += Convert.ToInt32(temp[0]) * Settings.Minute;
-                else if (temp.Count() == 2)
-                {
-                    Time += Convert.ToInt32(temp[0]) * Settings.Hour;
-                    Time += Convert.ToInt32(temp[1]) * Settings.Minute;
-                }
-
-                Settings.XPrate[0] = (float)Convert.ToDouble(str2[1]);
-                Settings.XPrate[1] = Server.tickcount.ElapsedMilliseconds + Time;
-
-                World.SendToAll(new QueDele("all", new UpdateChatBox(0xff, 0x7e, 15461, string.Format("경험치 이벤트(x{0}배)가 {1}분 적용되었습니다.", str2[1], Time / Settings.Minute)).Compile()));
-            }
-            catch { }
+            float rate;
+            long duration;
+            if (TryParseRateEvent(str2, "#경험치배율", 1000.0f, out rate, out duration))
+                SetRateEvent(Settings.XPrate, rate, duration, "경험치");
         }
 
         private void GMDropRate(string[] str2)
         {
-            try
-            {
-                if (str2.Count() <= 2)
-                {
-                    SendPacket(new UpdateChatBox(0x00, 0xff, 1, "#드랍배율 [수치:기본1.0] [시간(시간:분)]").Compile());
-                    SendPacket(new UpdateChatBox(0x00, 0xff, 1, "ex> #드랍배율 1.0 24:00").Compile());
-                    return;
-                }
-                //if (!System.Text.RegularExpressions.Regex.IsMatch(str2[1], @"^[0-9].[0-9]+$"))
-                //    return;
-
-                long Time = 0;
-                string[] temp = str2[2].Split(':');
-
-                if (temp.Count() == 1)
-                    Time += Convert.ToInt32(temp[0]) * Settings.Minute;
-                else if (temp.Count() == 2)
-                {
-                    Time += Convert.ToInt32(temp[0]) * Settings.Hour;
-                    Time += Convert.ToInt32(temp[1]) * Settings.Minute;
-                }
-
-                Settings.DropRate[0] = (float)Convert.ToDouble(str2[1]);
-                Settings.DropRate[1] = Server.tickcount.ElapsedMilliseconds + Time;
-
-                World.SendToAll(new QueDele("all", new UpdateChatBox(0xff, 0x7e, 15461, string.Format("드랍 이벤트(x{0}배)가 {1}분 적용되었습니다.", str2[1], Time / Settings.Minute)).Compile()));
-            }
-            catch { }
+            float rate;
+            long duration;
+            if (TryParseRateEvent(str2, "#드랍배율", 1000.0f, out rate, out duration))
+                SetRateEvent(Settings.DropRate, rate, duration, "드랍");
         }
+
         private void GMGoldRate(string[] str2)
         {
-            try
-            {
-                if (str2.Count() <= 1)
-                {
-                    SendPacket(new UpdateChatBox(0x00, 0xff, 1, "#골드배율 [수치:기본1.0] [시간(시간:분)]").Compile());
-                    SendPacket(new UpdateChatBox(0x00, 0xff, 1, "ex> #골드배율 1.0 24:00").Compile());
-                    return;
-                }
-                if (!System.Text.RegularExpressions.Regex.IsMatch(str2[1], @"^[0-9].[0-9]+$"))
-                    return;
-
-                long Time = 0;
-                string[] temp = str2[2].Split(':');
-
-                if (temp.Count() == 1)
-                    Time += Convert.ToInt32(temp[0]) * Settings.Minute;
-                else if (temp.Count() == 2)
-                {
-                    Time += Convert.ToInt32(temp[0]) * Settings.Hour;
-                    Time += Convert.ToInt32(temp[1]) * Settings.Minute;
-                }
-
-                Settings.GOLDRate[0] = (float)Convert.ToDouble(str2[1]);
-                Settings.GOLDRate[1] = Server.tickcount.ElapsedMilliseconds + Time;
-
-                World.SendToAll(new QueDele("all", new UpdateChatBox(0xff, 0x7e, 15461, string.Format("골드 이벤트(x{0})배가 {1}분 적용되었습니다.", str2[1], Time / Settings.Minute)).Compile()));
-            }
-            catch { }
+            float rate;
+            long duration;
+            if (TryParseRateEvent(str2, "#골드배율", 1000.0f, out rate, out duration))
+                SetRateEvent(Settings.GOLDRate, rate, duration, "골드");
         }
+
         private void GMAbalRate(string[] str2)
         {
-            try
-            {
-                if (str2.Count() <= 2)
-                {
-                    SendPacket(new UpdateChatBox(0x00, 0xff, 1, "#아발론배율 [수치:기본1.0] [시간(시간:분)]").Compile());
-                    SendPacket(new UpdateChatBox(0x00, 0xff, 1, "ex> #아발론배율 1.5 24:00").Compile());
-                    return;
-                }
-                if (!System.Text.RegularExpressions.Regex.IsMatch(str2[1], @"^[0-9].[0-9]+$"))
-                    return;
-
-                long Time = 0;
-                string[] temp = str2[2].Split(':');
-
-                if (temp.Count() == 1)
-                    Time += Convert.ToInt32(temp[0]) * Settings.Minute;
-                else if (temp.Count() == 2)
-                {
-                    Time += Convert.ToInt32(temp[0]) * Settings.Hour;
-                    Time += Convert.ToInt32(temp[1]) * Settings.Minute;
-                }
-
-                Settings.ABALRate[0] = (float)Convert.ToDouble(str2[1]);
-                Settings.ABALRate[1] = Server.tickcount.ElapsedMilliseconds + Time;
-
-                World.SendToAll(new QueDele("all", new UpdateChatBox(0xff, 0x7e, 15461, string.Format("아발론 이벤트(x{0}배)가 {1}분 적용되었습니다.", str2[1], Time / Settings.Minute)).Compile()));
-            }
-            catch { }
+            float rate;
+            long duration;
+            if (TryParseRateEvent(str2, "#아발론배율", 50.0f, out rate, out duration))
+                SetRateEvent(Settings.ABALRate, rate, duration, "아발론");
         }
         private void GMGO(string[] str2)
         {
@@ -586,12 +570,22 @@ namespace LKCamelot.io
         }
         private void GMRate()
         {
-            int Gold = (int)(Settings.GOLDRate[1] - Server.tickcount.ElapsedMilliseconds) / Settings.Minute;
-            int XP = (int)(Settings.XPrate[1] - Server.tickcount.ElapsedMilliseconds) / Settings.Minute;
-            SendPacket(new UpdateChatBox(0x00, 0xff, 1, string.Format("골드배율:x{0:f}({1}분), 경험치배율:x{2:f}({3}분)가 적용중입니다.", Settings.GOLDRate[0],
-                                                                                                                                      Gold,
-                                                                                                                                      Settings.XPrate[0],
-                                                                                                                                      XP)).Compile());
+            long now = Server.tickcount.ElapsedMilliseconds;
+            long goldMinutes = RemainingEventMinutes(Settings.GOLDRate[1], now);
+            long xpMinutes = RemainingEventMinutes(Settings.XPrate[1], now);
+            long dropMinutes = RemainingEventMinutes(Settings.DropRate[1], now);
+            long abalMinutes = RemainingEventMinutes(Settings.ABALRate[1], now);
+            SendPacket(new UpdateChatBox(0x00, 0xff, 1, string.Format(
+                "골드 x{0:0.##}({1}분), 경험치 x{2:0.##}({3}분), 드랍 x{4:0.##}({5}분), 아발론 x{6:0.##}({7}분)",
+                Settings.GOLDRate[0], goldMinutes, Settings.XPrate[0], xpMinutes,
+                Settings.DropRate[0], dropMinutes, Settings.ABALRate[0], abalMinutes)).Compile());
+        }
+
+        private static long RemainingEventMinutes(float expiresAt, long now)
+        {
+            if (expiresAt <= now)
+                return 0;
+            return (long)Math.Ceiling((expiresAt - now) / Settings.Minute);
         }
         private void GMReset()
         {

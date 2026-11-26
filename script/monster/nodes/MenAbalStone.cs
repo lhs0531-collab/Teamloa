@@ -24,7 +24,7 @@ namespace LKCamelot.script.monster
         {
             base.Hits++;
 
-            if (base.Hits % (50 / Settings.ABALRate[0]) == 0)
+            if (IsAbalRewardHit())
             {
                 if (player.m_Men > 0 && (player.m_Extra + 1) < uint.MaxValue)
                 {

@@ -78,7 +78,8 @@ namespace LKCamelot.script.monster
         public bool TryDrop()
         {
             var roll = Util.Random(1, 10000); // 100.00
-            if (roll <= (int)(Settings.DropRate[0] * m_Chance))
+            double chance = (double)Settings.DropRate[0] * m_Chance;
+            if (!double.IsNaN(chance) && chance > 0 && roll <= chance)
                 return true;
             return false;
         }
