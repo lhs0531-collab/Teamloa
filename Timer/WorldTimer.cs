@@ -150,6 +150,12 @@ namespace LKCamelot.Timer
                 Settings.DropRate[1] = 0;
                 World.SendToAll(new QueDele("all", new UpdateChatBox(0xff, 0x7e, 15461, string.Format("드랍 배율 이벤트가 종료되었습니다.")).Compile()));
             }
+            if (Settings.ABALRate[1] != 0 && Settings.ABALRate[1] < Server.tickcount.ElapsedMilliseconds)
+            {
+                Settings.ABALRate[0] = 1.0f;
+                Settings.ABALRate[1] = 0;
+                World.SendToAll(new QueDele("all", new UpdateChatBox(0xff, 0x7e, 15461, "아발론 배율 이벤트가 종료되었습니다.").Compile()));
+            }
         }
         private void PlayerTick()
         {

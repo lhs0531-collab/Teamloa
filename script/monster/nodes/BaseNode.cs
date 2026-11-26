@@ -12,6 +12,16 @@ namespace LKCamelot.script.monster
     {
         public int Hits = 0;
 
+        protected bool IsAbalRewardHit()
+        {
+            double rate = Settings.ABALRate[0];
+            if (rate <= 0 || double.IsNaN(rate) || double.IsInfinity(rate))
+                return false;
+
+            int interval = Math.Max(1, (int)Math.Round(50.0 / rate, MidpointRounding.AwayFromZero));
+            return Hits % interval == 0;
+        }
+
         public virtual int aFrames { get { return 0; } }
         public virtual int aStartFrames { get { return 0; } }
 

@@ -245,13 +245,13 @@ namespace LKCamelot.script.monster
                         var inst = Activator.CreateInstance(Type.GetType(loot.t_item.ToString()));
                         if (inst is script.item.Gold)
                         {
-                            var amount = (int)(loot.m_Quantity.Roll() * Settings.GOLDRate[0]);
+                            var amount = ScaleGoldQuantity(loot.m_Quantity.Roll(), Settings.GOLDRate[0]);
                             (inst as script.item.Gold).Quantity = amount;
                         }
                         if (play.AutoLoot)
                         {
                             if (inst is script.item.Gold)
-                                play.Gold += (uint)((inst as script.item.Item).Quantity);
+                                AddGoldSafely(play, (inst as script.item.Item).Quantity);
                             else
                             {
                                 if (play.GetFreeSlots() > 0)
@@ -278,6 +278,56 @@ namespace LKCamelot.script.monster
                         return;
                     }
                 }
+            }
+        }
+
+        private static int ScaleGoldQuantity(int amount, float rate)
+        {
+            double scaled = (double)amount * rate;
+            if (double.IsNaN(scaled) || scaled <= 0)
+                return 0;
+            if (double.IsInfinity(scaled) || scaled >= int.MaxValue)
+                return int.MaxValue;
+            return (int)scaled;
+        }
+
+        private static void AddGoldSafely(Player player, int amount)
+        {
+            if (amount <= 0)
+                return;
+
+            ulong current = player.Gold;
+            ulong addition = (uint)amount;
+            player.Gold = ulong.MaxValue - current < addition ? ulong.MaxValue : current + addition;
+        }
+
+        private static void AwardExperience(Player recipient, float amount)
+        {
+            if (recipient == null || amount <= 0 || float.IsNaN(amount) || float.IsInfinity(amount))
+                return;
+
+            try
+            {
+                // Preserve the existing promotion reduction before applying the event multiplier.
+                if (recipient.Promo > 0)
+                    amount = (int)(amount * 0.01f);
+
+                double scaled = (double)amount * Settings.XPrate[0];
+                if (double.IsNaN(scaled) || scaled <= 0)
+                    return;
+
+                long current = recipient.XP;
+                long room = int.MaxValue - current;
+                if (room <= 0)
+                    return;
+
+                long gain = scaled >= room ? room : (long)scaled;
+                if (gain > 0)
+                    recipient.XP = (int)(current + gain);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("Experience award failed for {0}: {1}", recipient.Name, e);
             }
         }
 
@@ -449,23 +499,7 @@ namespace LKCamelot.script.monster
                         if (p.Key.Level == Settings.MaxLevel && !currMap.isLegend)
                             temp = 0;
 
-                        try
-                        {
-                            checked
-                            {
-                                if (p.Key.Promo > 0)
-                                {
-                                    temp = (int)(temp * 0.01);
-                                    p.Key.XP += (int)(temp * Settings.XPrate[0]);
-                                }
-                                else
-                                    p.Key.XP += (int)(temp * Settings.XPrate[0]);
-                            }
-                        }
-                        catch (OverflowException)
-                        {
-                            p.Key.client.SendPacket(new UpdateChatBox(0x00, 0xff, 1, "더 이상 경험치를 누적할 수 없습니다.").Compile());
-                        }
+                        AwardExperience(p.Key, temp);
                     }
                     Exp.Clear();
                     DropLoot(player);
@@ -530,16 +564,7 @@ namespace LKCamelot.script.monster
                         if (p.Key.Level == Settings.MaxLevel && !currMap.isLegend)
                             temp = 0;
 
-                        checked
-                        {
-                            if (p.Key.Promo > 0)
-                            {
-                                temp = (int)(temp * 0.01);
-                                p.Key.XP += (int)(temp * Settings.XPrate[0]);
-                            }
-                            else
-                                p.Key.XP += (int)(temp * Settings.XPrate[0]);
-                        }
+                        AwardExperience(p.Key, temp);
                     }
                     Exp.Clear();
                     DropLoot(player);
@@ -602,16 +627,7 @@ namespace LKCamelot.script.monster
                         if (p.Key.Level == Settings.MaxLevel && !currMap.isLegend)
                             temp = 0;
 
-                        checked
-                        {
-                            if (p.Key.Promo > 0)
-                            {
-                                temp = (int)(temp * 0.01);
-                                p.Key.XP += (int)(temp * Settings.XPrate[0]);
-                            }
-                            else
-                                p.Key.XP += (int)(temp * Settings.XPrate[0]);
-                        }
+                        AwardExperience(p.Key, temp);
                     }
                     Exp.Clear();
                     DropLoot(player);
