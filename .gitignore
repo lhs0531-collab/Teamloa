@@ -1,0 +1,14 @@
+# Build output and restored package cache
+bin/
+obj/
+packages/
+
+# IDE and local performance profile files
+.vs/
+*.suo
+*.user
+*.userprefs
+*.psess
+
+# Production database dump contains personal account information
+/lastking.sql
