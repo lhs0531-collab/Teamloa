@@ -305,7 +305,9 @@ namespace LKCamelot.model
         {
             get
             {
-                return World.NewItems.Where(xe => xe.Value.Parent == this || xe.Value.ParSer == this.m_Serial && xe.Value.InvSlot >= 0 && xe.Value.InvSlot < 24).Select(xe => xe.Value).ToList();
+                return World.NewItems.Where(xe =>
+                    (xe.Value.Parent == this || xe.Value.ParSer == this.m_Serial) &&
+                    xe.Value.InvSlot >= 0 && xe.Value.InvSlot < 24).Select(xe => xe.Value).ToList();
             }
         }
 
@@ -1766,40 +1768,23 @@ namespace LKCamelot.model
 
         public int GetFreeSlots()
         {
-            var inventory = World.NewItems.Where(xe => xe.Value.m_Parent != null
-    && (xe.Value.m_Parent == this || xe.Value.ParSer == this.m_Serial)
-    && xe.Value.InvSlot < 24)
-    .OrderBy(xe => xe.Value.InvSlot).ToList();
-
-            return 24 - inventory.Count;
+            return Math.Max(0, 24 - GetOccupiedInventorySlots().Count);
         }
         public int GetFreeSlot()
         {
-            var inventory = World.NewItems.Where(xe => xe.Value.m_Parent != null
-                && (xe.Value.m_Parent == this || xe.Value.ParSer == this.m_Serial)
-                && xe.Value.InvSlot < 24)
-                .OrderBy(xe => xe.Value.InvSlot).ToList();
+            var occupied = GetOccupiedInventorySlots();
+            for (int slot = 0; slot < 24; slot++)
+                if (!occupied.Contains(slot))
+                    return slot;
+            return -1;
+        }
 
-            if (inventory.Count() == 0)
-                return 0;
-            if (inventory.Count() >= 24)
-                return -1;
-
-            if (inventory != null)
-            {
-                int itr = 0;
-                foreach (var item in inventory)
-                {
-                    if (item.Value.InvSlot == -1)
-                    {
-                        continue;
-                    }
-                    if (item.Value.InvSlot != itr)
-                        return itr;
-                    itr++;
-                }
-            }
-            return inventory.Count();
+        private HashSet<int> GetOccupiedInventorySlots()
+        {
+            return new HashSet<int>(World.NewItems.Values
+                .Where(item => (item.Parent == this || item.ParSer == this.m_Serial) &&
+                    item.InvSlot >= 0 && item.InvSlot < 24)
+                .Select(item => item.InvSlot));
         }
         public int FreeBankSlot
         {
@@ -2308,7 +2293,7 @@ namespace LKCamelot.model
                     script.item.Item Cloneitem = (script.item.Item)giveItem.Clone();
                     Cloneitem.Quantity = amount;
                     Cloneitem.Parent = this;
-                    Cloneitem.InvSlot = this.GetFreeSlot();
+                    Cloneitem.InvSlot = slot;
                     Cloneitem.m_Parent.client.SendPacket(new AddItemToInventory2(Cloneitem).Compile());
 
                     return true;
