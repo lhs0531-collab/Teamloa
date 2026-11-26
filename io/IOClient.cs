@@ -146,7 +146,10 @@ namespace LKCamelot.io
             //}
 
             //초기화
+            bool soundFlag = player.SoundFlag;
             player.Clear();
+            if (!first)
+                player.SoundFlag = soundFlag;
 
             //마법셋팅
             foreach (var spell in player.MagicLearned)
