@@ -95,7 +95,10 @@ namespace LKCamelot.script.npc
             if (str2.Count() >= 3 && str2[str2.Count() - 1] == "산다")
             {
                 int amount;
-                if (!int.TryParse(str2[str2.Count() - 2], System.Globalization.NumberStyles.None,
+                string amountText = str2[str2.Count() - 2];
+                if (amountText == "다")
+                    amount = 200;
+                else if (!int.TryParse(amountText, System.Globalization.NumberStyles.None,
                     System.Globalization.CultureInfo.InvariantCulture, out amount) || amount <= 0 || amount > 200)
                     return;
                 string ItName = string.Empty;
