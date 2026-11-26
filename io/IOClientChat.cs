@@ -27,6 +27,16 @@ namespace LKCamelot.io
             SendPacket(new UpdateChatBox(c1, c2, 1, text).Compile());
         }
 
+        private static List<Player> RankSort(IEnumerable<Player> players)
+        {
+            return players
+                .OrderByDescending(xe => xe.TotalBounsStat)
+                .ThenByDescending(xe => xe.Level)
+                .ThenByDescending(xe => xe.XP)
+                .ThenBy(xe => xe.Name, StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+
 
         public void HandleChat(string[] str2, string str)
         {
@@ -846,9 +856,10 @@ namespace LKCamelot.io
                 message = "[" + player.Name + "] : " + message;
 
                 var keys = handler.Total.Values.Where(xe => xe != null && !Settings.GMS.Contains(xe.Name.ToUpper()) && xe.loggedIn).ToList();
-                var kl = keys.OrderByDescending(xe => xe.Level).OrderByDescending(xe=>xe.TotalBounsStat).ToList().FindIndex(xe => xe.Name == player.Name) + 1;
+                int rankIndex = RankSort(keys).FindIndex(xe => xe.Name == player.Name);
+                int rank = rankIndex < 0 ? int.MaxValue : rankIndex + 1;
 
-                if (kl <= Settings.PinkGlobalChat)
+                if (rank <= Settings.PinkGlobalChat)
                 {
                     Server.mainForm.EnqueueChat("[분홍]" + message);
                     World.SendToChatAll(new QueDele("all", new UpdateChatBox(0x86, 0x61, 9, message).Compile()));  // 분홍색 외치기
@@ -1165,20 +1176,20 @@ namespace LKCamelot.io
                         keys = handler.Total.Values.Where(xe => xe != null && xe.ClassBase == baseClass && !Settings.GMS.Contains(xe.Name.ToUpper()) && xe.loggedIn).ToList();
                     }
 
-                    var kl = keys.OrderByDescending(xe => xe.Level).ToList();
-
-                    int Rank = kl.OrderByDescending(xe => xe.TotalBounsStat).ToList().FindIndex(xe => xe.Name == player.Name);
-                    SendPacket(new UpdateChatBox(0x20, 0x02, 1, string.Format("{0}님은 {1}번째 입니다.[현재{2}명]", player.Name, Rank + 1, keys.Count())).Compile());
+                    var kl = RankSort(keys);
+                    int rankIndex = kl.FindIndex(xe => xe.Name == player.Name);
+                    if (rankIndex < 0)
+                        SendPacket(new UpdateChatBox(0x20, 0x02, 1, string.Format("{0}님은 랭킹 대상에 포함되지 않습니다.[현재{1}명]", player.Name, keys.Count)).Compile());
+                    else
+                        SendPacket(new UpdateChatBox(0x20, 0x02, 1, string.Format("{0}님은 {1}번째 입니다.[현재{2}명]", player.Name, rankIndex + 1, keys.Count)).Compile());
 
                     string rankr = string.Empty;
 
-                    if (Rank > 9 && Rank + 10 < kl.Count())        //일반적인 랭크 ( 앞에 10명, 뒤에 9명)
-                        kl = kl.GetRange(Rank - 10, 20);
-                    else if (kl.Count() > 20 && Rank + 9 > kl.Count())      // 마지막인 경우
-                        kl = kl.GetRange(kl.Count() - 20, 20);
-                    //kl.RemoveRange(20 - (kl.Count() - Rank + 1), kl.Count() - 1);
-                    else if (kl.Count() > 20 && Rank <= 9)
-                        kl = kl.GetRange(0, 20);
+                    if (kl.Count > 20)
+                    {
+                        int start = rankIndex < 0 ? 0 : Math.Max(0, Math.Min(rankIndex - 10, kl.Count - 20));
+                        kl = kl.GetRange(start, 20);
+                    }
 
                     foreach (var rnk in kl)
                     {
@@ -1219,11 +1230,10 @@ namespace LKCamelot.io
                         int baseClass = str2[1] == "평민" ? 0 : str2[1] == "기사" ? 1 : str2[1] == "검객" ? 2 : str2[1] == "위저드" ? 3 : 4;
                         keys = handler.Total.Values.Where(xe => xe != null && xe.ClassBase == baseClass && !Settings.GMS.Contains(xe.Name.ToUpper())).ToList();
                     }
-                    var kl = keys.OrderByDescending(xe => xe.Level).ToList();
-                    kl = kl.OrderByDescending(xe => xe.TotalBounsStat).ToList();
+                    var kl = RankSort(keys);
 
                     if (kl.Count > 25)
-                        kl.RemoveRange(24, kl.Count - 24 - 1);
+                        kl.RemoveRange(25, kl.Count - 25);
 
                     foreach (var rnk in kl)
                     {
