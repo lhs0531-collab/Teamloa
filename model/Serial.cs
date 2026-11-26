@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,7 @@ namespace LKCamelot.model
 
         private static Serial m_LastMobile = 0x10000;
         private static Serial m_LastItem = 0x40000000;
+        private static readonly object AllocationLock = new object();
 
         public static Serial LastMobile { get { return m_LastMobile; } }
         public static Serial LastItem { get { return m_LastItem; } }
@@ -23,21 +25,68 @@ namespace LKCamelot.model
         {
             get
             {
-                while (World.FindMobile(++m_LastMobile) == -1);
-
-                World.m_MObjects.TryAdd(m_LastMobile, m_LastMobile);
-                return m_LastMobile;
+                lock (AllocationLock)
+                {
+                    var registry = GetRegistry();
+                    while (true)
+                    {
+                        if (m_LastMobile.Value >= 0x3FFFFFFF)
+                            throw new InvalidOperationException("Mobile serial space is exhausted.");
+                        Serial candidate = m_LastMobile.Value + 1;
+                        if (registry.TryAdd(candidate, candidate))
+                        {
+                            m_LastMobile = candidate;
+                            return candidate;
+                        }
+                        m_LastMobile = candidate;
+                    }
+                }
             }
         }
         public static Serial NewItem
         {
             get
             {
-                while (World.FindMobile(++m_LastItem) == -1) ;
+                lock (AllocationLock)
+                {
+                    var registry = GetRegistry();
+                    while (true)
+                    {
+                        if (m_LastItem.Value >= int.MaxValue)
+                            throw new InvalidOperationException("Item serial space is exhausted.");
+                        Serial candidate = m_LastItem.Value + 1;
+                        if (registry.TryAdd(candidate, candidate))
+                        {
+                            m_LastItem = candidate;
+                            return candidate;
+                        }
+                        m_LastItem = candidate;
+                    }
+                }
+            }
+        }
 
-                World.m_MObjects.TryAdd(m_LastItem, m_LastItem);
-                return m_LastItem;
-            }            
+        // Explicit serials from saved data must also be reserved before new IDs are issued.
+        public static void Reserve(Serial serial)
+        {
+            if (!serial.IsValid)
+                return;
+
+            lock (AllocationLock)
+            {
+                GetRegistry().TryAdd(serial, serial);
+                if (serial.IsMobile && serial.Value > m_LastMobile.Value)
+                    m_LastMobile = serial;
+                else if (serial.IsItem && serial.Value > m_LastItem.Value)
+                    m_LastItem = serial;
+            }
+        }
+
+        private static ConcurrentDictionary<Serial, Serial> GetRegistry()
+        {
+            if (World.m_MObjects == null)
+                World.m_MObjects = new ConcurrentDictionary<Serial, Serial>();
+            return World.m_MObjects;
         }
         private Serial(int serial)
         {
