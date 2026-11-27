@@ -748,7 +748,7 @@ namespace LKCamelot.script.item
 
         public override ulong BuyPrice { get { return 10000; } }
 
-        public override spells.Spell SpellTaught { get { return new spells.Transparency(); } }
+        public override spells.Spell SpellTaught { get { return new spells.SharpEye(); } }
 
         public SharpEyeBook()
             : base(3)

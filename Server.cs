@@ -513,6 +513,7 @@ namespace LKCamelot
             {
                 connection.Client.player.InstancedObjects.Clear();
                 connection.Client.player.m_Buffs.Clear();
+                connection.Client.player.RefreshTransparency();
             }
 
             // Remove the connection from the dictionary and raise the OnDisconnection event.

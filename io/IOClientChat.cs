@@ -843,12 +843,13 @@ namespace LKCamelot.io
         }
         private void GMTransparancy()
         {
-            if (player.Transparancy == 0)
-            {
-                player.Transparancy = 100;
-            }
-            else player.Transparancy = 0;
-            World.SendToAll(new QueDele(player.m_Channel, player.Map, new SetObjectEffects(player).Compile()));
+            // 운영자 은신: 완전 투명 + 남에게 빛 원이 보이지 않음 + 몬스터가 대상으로 잡지 않음.
+            player.GMHidden = !player.GMHidden;
+            player.RefreshTransparency();
+            // 맵 밝기(안개)는 맵을 로드할 때만 전달되므로, 현재 맵을 다시 로드해 바로 반영한다.
+            player.Map = player.Map;
+            player.SendEffects();
+            SendPacket(new UpdateChatBox(0x00, 0xff, 1, player.GMHidden ? "은신 ON" : "은신 OFF").Compile());
         }
         private void GMKick(string[] str2)
         {

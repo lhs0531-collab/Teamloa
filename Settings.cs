@@ -73,6 +73,13 @@ namespace LKCamelot
         public static int IceBagSlowTimePl = 1 * Second;    // 권당 증가
         public static int SlowPercentMax = 90;              // 감속 상한(%)
 
+        // 은신(TRANSPARENCY): 권당 투명도(%)와 지속시간. 샤프아이(SHARP EYE): 권당 벗기는 투명도(%)와 대상 판정 범위(칸).
+        public static int HidePercentPl = 10;               // 1권 10% ~ 10권 100%
+        public static int HideTime = 30 * Second;           // 1권 기준
+        public static int HideTimePl = 10 * Second;         // 권당 증가 (10권 = 120초)
+        public static int SharpEyePercentPl = 10;
+        public static int SharpEyeRange = 2;                // 누른 좌표에서 이 범위 안의 은신 유저를 찾는다
+
         // 쇼크(몬스터 대상 지속 피해). 주기마다 마법 피해(30 + 권당 5)를 준다.
         public static int ShokeTickInterval = 1 * Second;   // 피해 주기
         public static int ShokeTime = 5 * Second;           // 지속시간, 1권 기준

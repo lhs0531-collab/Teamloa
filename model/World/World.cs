@@ -284,7 +284,7 @@ namespace LKCamelot.model
 
                             if (mob.Value.Target == 0)
                             {
-                                var LocalPlayers = PlayerList.Where(xe => xe.Value.client != null && xe.Value.m_Channel == mob.Value.m_Channel && World.Dist2d(xe.Value.Loc, mob.Value.m_Loc) <= mob.Value.MinAggro).OrderBy(xe => xe.Value.Level).FirstOrDefault().Value;
+                                var LocalPlayers = PlayerList.Where(xe => xe.Value.client != null && !xe.Value.GMHidden && xe.Value.m_Channel == mob.Value.m_Channel && World.Dist2d(xe.Value.Loc, mob.Value.m_Loc) <= mob.Value.MinAggro).OrderBy(xe => xe.Value.Level).FirstOrDefault().Value;
 
                                 if (LocalPlayers == null)
                                 {
@@ -301,7 +301,8 @@ namespace LKCamelot.model
                             }
                             else
                             {
-                                if (!mob.Value.TargetP.loggedIn || mob.Value.TargetP.Map != mob.Value.m_Map || mob.Value.TargetP.m_Channel != mob.Value.m_Channel)
+                                // 운영자 은신 중인 대상은 놓는다.
+                                if (!mob.Value.TargetP.loggedIn || mob.Value.TargetP.GMHidden || mob.Value.TargetP.Map != mob.Value.m_Map || mob.Value.TargetP.m_Channel != mob.Value.m_Channel)
                                 {
                                     mob.Value.Target = 0;
                                     mob.Value.TargetP = null;
@@ -479,7 +480,7 @@ namespace LKCamelot.model
                             {
                                 //var LocalPlayers = w_server.OnlineConnections.Where(xe => xe.Client != null && xe.Client.player != null &&
                                 //xe.Client.player.Map != null && xe.Client.player.loggedIn && xe.Client.player.m_Map == mob.Value.m_Map).Select(xe => xe.Client.player);
-                                var LocalPlayers = PlayerHandler.getSingleton().add[i].Where(xe => xe.Value.client != null && xe.Value.loggedIn && xe.Value.m_Channel == mob.Value.m_Channel && xe.Value.Map == mob.Value.m_Map && World.Dist2d(xe.Value.Loc, mob.Value.m_Loc) <= mob.Value.MinAggro).OrderBy(xe => xe.Value.Level).FirstOrDefault().Value;
+                                var LocalPlayers = PlayerHandler.getSingleton().add[i].Where(xe => xe.Value.client != null && xe.Value.loggedIn && !xe.Value.GMHidden && xe.Value.m_Channel == mob.Value.m_Channel && xe.Value.Map == mob.Value.m_Map && World.Dist2d(xe.Value.Loc, mob.Value.m_Loc) <= mob.Value.MinAggro).OrderBy(xe => xe.Value.Level).FirstOrDefault().Value;
 
                                 if (LocalPlayers == null)
                                 {
@@ -496,7 +497,7 @@ namespace LKCamelot.model
                             }
                             else
                             {
-                                if (!mob.Value.TargetP.loggedIn || mob.Value.TargetP.Map != mob.Value.m_Map)
+                                if (!mob.Value.TargetP.loggedIn || mob.Value.TargetP.GMHidden || mob.Value.TargetP.Map != mob.Value.m_Map)
                                 {
                                     mob.Value.Target = 0;
                                     mob.Value.TargetP = null;

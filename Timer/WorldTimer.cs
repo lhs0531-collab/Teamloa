@@ -262,7 +262,10 @@ namespace LKCamelot.Timer
                         {
                             script.spells.Spell temp;
                             playe.m_Buffs.TryRemove(buff.Key, out temp);
+                            playe.RefreshTransparency();        // 은신 마법이 끝났으면 투명도를 되돌린다
                             World.SendToRange(new QueDele(playe.m_Channel, playe.m_Map, new LKCamelot.model.SetObjectEffects(playe).Compile()), playe);
+                            if (playe.Transparancy >= 100)
+                                playe.client.SendPacket(new LKCamelot.model.SetObjectEffects(playe, true).Compile());
                             playe.client.SendPacket(new UpdateChatBox(0x21, 0x67, 1, string.Format("{0} 마법이 종료 됐습니다.", buff.Value.Name)).Compile());
                         }
                         else if (time <= 10 && time % 10 == 0)

@@ -1133,7 +1133,8 @@ namespace LKCamelot.model
                 
                 client.SendPacket(new PlayMusic(filename.SoundTrack).Compile());
                 client.SendPacket(new LoadTile(model.Map.Mapsizes1[filename.Filename]).Compile());
-                client.SendPacket(new LoadWorld(this, filename.Dark).Compile());
+                // 은신 중인 운영자에게는 맵을 밝게(안개 0) 보여 준다. 순찰용. 다른 유저의 화면에는 영향이 없다.
+                client.SendPacket(new LoadWorld(this, GMHidden ? (byte)0 : filename.Dark).Compile());
 
                 InstancedObjects.Clear();
                 InstancedRangeObjects.Clear();
@@ -1984,6 +1985,40 @@ namespace LKCamelot.model
             return true;
         }
 
+        // 운영자 #은신 상태. 완전 투명(100)이며 몬스터가 대상으로 잡지 않고 샤프아이로 벗겨지지 않는다.
+        public bool GMHidden;
+        // 은신 마법(TRANSPARENCY)으로 얻은 현재 투명도(%). 샤프아이를 맞으면 줄어든다.
+        public byte SpellHide;
+
+        /// <summary>
+        /// 투명도(Transparancy)를 현재 상태에 맞게 다시 계산한다.
+        /// 운영자 은신이면 100, 은신 마법이 걸려 있으면 SpellHide, 둘 다 아니면 0.
+        /// </summary>
+        public void RefreshTransparency()
+        {
+            if (GMHidden)
+                Transparancy = 100;
+            else if (m_Buffs.Values.Any(xe => xe is script.spells.Transparency))
+                Transparancy = SpellHide;
+            else
+            {
+                SpellHide = 0;
+                Transparancy = 0;
+            }
+        }
+
+        /// <summary>
+        /// 이 유저의 표시 상태(투명도, 빛, 버프 효과)를 주변과 본인에게 보낸다.
+        /// 완전 투명일 때 주변에는 빛 반경을 0으로 보내 어두운 맵에서 위치가 드러나지 않게 하고,
+        /// 본인에게는 원래 빛 반경을 보내 자기 화면은 그대로 보이게 한다.
+        /// </summary>
+        public void SendEffects()
+        {
+            World.SendToAll(new QueDele(m_Serial, m_Channel, m_Map, new SetObjectEffects(this).Compile()));
+            if (client != null)
+                client.SendPacket(new SetObjectEffects(this, true).Compile());
+        }
+
         /// <summary>
         /// 지속 피해 마법의 한 주기 피해를 받는다. 시전자의 현재 상태(접속, 맵, 대인공격)는 보지 않는다.
         /// 이 피해로 죽었으면 true. (죽으면 HPCur 처리에서 휴게실로 이동하므로 맵이 바뀐 것으로 판단한다)
@@ -2434,6 +2469,7 @@ namespace LKCamelot.model
             InstancedObjects.Clear();
             InstancedRangeObjects.Clear();
             m_Buffs.Clear();
+            RefreshTransparency();      // 은신 마법이 지워졌으므로 투명도를 되돌린다 (운영자 은신은 유지)
             CombackLoc = null;
             CombackMap = string.Empty;
             GuildJoinFlag = false;
