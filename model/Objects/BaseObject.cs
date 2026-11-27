@@ -63,9 +63,12 @@ namespace LKCamelot.model
                 {
                     m_Buffs.TryAdd(Server.tickcount.ElapsedMilliseconds + (buff.BuffEffect.Time + ((buff.Level - 1) * buff.BuffEffect.TimePI)), buff);
 
-                    if (this is Player)
+                    if (this is Player && !(buff is script.spells.Wall))
                         (this as Player).client.SendPacket(new UpdateCharStats((this as Player)).Compile());
                     World.SendToAll(new QueDele(this.m_Channel, this.m_Map, new LKCamelot.model.SetObjectEffects(this).Compile()));
+                    // 완전 투명 상태면 위 패킷에 빛 반경이 0으로 들어가므로, 본인에게는 원래 값을 다시 보낸다.
+                    if (this is Player && this.Transparancy >= 100 && (this as Player).client != null)
+                        (this as Player).client.SendPacket(new LKCamelot.model.SetObjectEffects(this, true).Compile());
                     return true;
                 }
                 else

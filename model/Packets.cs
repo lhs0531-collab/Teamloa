@@ -706,12 +706,17 @@ namespace LKCamelot.model
 
     public sealed class SetObjectEffects : Packet
     {
-        public SetObjectEffects(BaseObject obj)
+        /// <param name="self">대상 본인에게 보내는 패킷이면 true. 완전 투명이어도 본인에게는 원래 빛 반경을 보낸다.</param>
+        public SetObjectEffects(BaseObject obj, bool self = false)
             : base(0x34)
         {
             //  SetObjectEffects = 0x34; // 0x34 4id 1light 1trans 4byffs 1staticmagic
             m_Stream.Write(obj.m_Serial);
-            m_Stream.Write((byte)obj.LightRad); //lightrad
+            // 완전 투명(100)인 유저는 남에게 빛 반경을 0으로 보낸다. 어두운 맵에서 빛 원으로 위치가 드러나는 것을 막는다.
+            byte light = obj.LightRad;
+            if (!self && obj is model.Player && obj.Transparancy >= 100)
+                light = 0;
+            m_Stream.Write((byte)light); //lightrad
             m_Stream.Write((byte)obj.Transparancy); //transp
             m_Stream.Write(obj.BuffArray, 0, 4);
 

@@ -195,6 +195,7 @@ namespace LKCamelot.model
         public byte Stage;
         public ushort m_Str, m_Men, m_Dex, m_Vit, m_AC, m_Hit, m_Dam;
         public ushort b_Str, b_Men, b_Dex, b_Vit;
+        public uint b_Extra;            // 미분배 턴. 전직·턴 초기화로 회수된 턴이 여기 쌓인다. 저장 컬럼 40번째
         public uint m_Extra;
         public short pStr, pMen, pDex, pVit;
         public ushort apStr, apMen, apDex, apVit;
@@ -560,8 +561,69 @@ namespace LKCamelot.model
         {
             get
             {
-                return b_Str + b_Men + b_Dex + b_Vit;
+                // 미분배 턴도 합계에 넣는다. 전직·초기화로 재분배하는 동안 서열이 떨어지지 않게 한다.
+                return (int)(b_Str + b_Men + b_Dex + b_Vit + b_Extra);
             }
+        }
+
+        /// <summary>
+        /// 턴으로 올린 속성(b_Str/b_Men/b_Dex/b_Vit)을 모두 회수해 미분배 턴(b_Extra)으로 돌린다.
+        /// 합계는 변하지 않는다. 이미 모두 미분배 상태면 아무것도 하지 않는다(연속 전직해도 수치 불변).
+        /// </summary>
+        /// <returns>이번에 회수한 턴 수</returns>
+        public uint ResetTurnStats()
+        {
+            uint moved = (uint)b_Str + (uint)b_Men + (uint)b_Dex + (uint)b_Vit;
+            if (moved == 0)
+                return 0;
+
+            b_Extra += moved;
+            b_Str = 0;
+            b_Men = 0;
+            b_Dex = 0;
+            b_Vit = 0;
+
+            // 생명·지력 턴이 빠지면 최대치가 줄어든다. 현재치가 최대치를 넘지 않게 맞춘다.
+            // (HPCur setter를 쓰면 매직실드가 감소분을 마나로 흡수하므로 필드에 직접 넣는다)
+            if (m_HPCur > HP)
+                m_HPCur = HP;
+            if (m_MPCur > MP)
+                m_MPCur = MP;
+
+            if (client != null)
+            {
+                client.SendPacket(new UpdateCharStats(this).Compile());
+                client.SendPacket(new SetHP(this).Compile());
+                client.SendPacket(new SetMP(this).Compile());
+            }
+            return moved;
+        }
+
+        /// <summary>미분배 턴이 남아 있으면 분배 방법을 안내한다.</summary>
+        public void NotifyUnspentTurn()
+        {
+            if (b_Extra == 0 || client == null)
+                return;
+
+            client.SendPacket(new UpdateChatBox(Settings.TurnNoticeColor1, Settings.TurnNoticeColor2, 1,
+                string.Format("분배하지 않은 턴 속성이 {0} 남아 있습니다. 아론에게 \"힘 [수량] 올려주세요\"라고 말하세요.", b_Extra)).Compile());
+        }
+
+        /// <summary>
+        /// 전직 책으로 직업을 바꾼다. 직업이 실제로 바뀌면 턴 속성을 회수해 미분배로 돌린다.
+        /// </summary>
+        public void ChangeClassByBook(Class newClass)
+        {
+            bool changed = newClass != m_Class;
+            Class = newClass;
+            if (!changed)
+                return;
+
+            uint moved = ResetTurnStats();
+            if (moved > 0 && client != null)
+                client.SendPacket(new UpdateChatBox(Settings.TurnNoticeColor1, Settings.TurnNoticeColor2, 1,
+                    string.Format("전직으로 턴 속성 {0}이(가) 초기화되었습니다.", moved)).Compile());
+            NotifyUnspentTurn();
         }
         public ushort GetStat(string stat, bool bas = false)
         {
@@ -1058,13 +1120,21 @@ namespace LKCamelot.model
 
                 if (filename == null)
                 {
-                    Map = oldMap;
-                    return;
+                    // 새 맵이 목록에 없으면 이전 맵을 다시 로드한다(기존 동작 유지: 바뀐 좌표를 클라이언트에 반영).
+                    // setter를 다시 부르지 않는다. 이전 맵도 목록에 없을 때 무한 재귀(StackOverflow)로 서버가 즉시 종료된다.
+                    m_Map = oldMap;
+                    if (oldMap == null)
+                        return;
+
+                    filename = model.Map.FullMaps[this.m_Channel].Where(xe => xe.Key == oldMap).FirstOrDefault().Value;
+                    if (filename == null)
+                        return;
                 }
                 
                 client.SendPacket(new PlayMusic(filename.SoundTrack).Compile());
                 client.SendPacket(new LoadTile(model.Map.Mapsizes1[filename.Filename]).Compile());
-                client.SendPacket(new LoadWorld(this, filename.Dark).Compile());
+                // 은신 중인 운영자에게는 맵을 밝게(안개 0) 보여 준다. 순찰용. 다른 유저의 화면에는 영향이 없다.
+                client.SendPacket(new LoadWorld(this, GMHidden ? (byte)0 : filename.Dark).Compile());
 
                 InstancedObjects.Clear();
                 InstancedRangeObjects.Clear();
@@ -1640,21 +1710,17 @@ namespace LKCamelot.model
                         if (Settings.DieDropGold)
                         {
                             // 죽었을 경우 돈을 10%의 돈을 바닥에 떨어트림
-                            var dropgold = ((Math.Truncate(m_Gold * 0.1) > 1) ? (m_Gold * 0.1) : 0);
-                            if (dropgold >= Gold && dropgold != 0)
+                            // 기존 조건(dropgold >= Gold)은 10%가 전체 이상일 수 없어 한 번도 실행되지 않았다.
+                            ulong dropgold = m_Gold / 10;
+                            if (dropgold > int.MaxValue)        // 골드 아이템 수량은 int
+                                dropgold = int.MaxValue;
+                            if (dropgold > 1)
                             {
-                                try
-                                {
-                                    checked
-                                    {
-                                        script.item.Gold inst = new script.item.Gold((int)dropgold);
-                                        Gold -= (ulong)dropgold;
-                                        inst.Drop(this);
-                                        World.SendToAll(new QueDele(this.m_Channel, this.m_Map, new CreateItemGround2(inst, inst.m_Serial).Compile()));  // 땅에떨어진 아이템 그려줌
-                                        World.NewItems.TryAdd((inst).m_Serial, (inst as script.item.Item));                            
-                                    }
-                                }
-                                catch (OverflowException) { }   
+                                script.item.Gold inst = new script.item.Gold((int)dropgold);
+                                World.NewItems.TryAdd(inst.m_Serial, inst);     // 바닥에 보이기 전에 먼저 등록해야 바로 주울 수 있다
+                                Gold -= dropgold;
+                                inst.Drop(this);
+                                World.SendToAll(new QueDele(this.m_Channel, this.m_Map, new CreateItemGround2(inst, inst.m_Serial).Compile()));  // 땅에떨어진 아이템 그려줌
                             }
                         }
                         if (Settings.DieDropItem)
@@ -1667,7 +1733,7 @@ namespace LKCamelot.model
                     }
                     #endregion
 
-                    client.HandleGo("휴게실");
+                    client.HandleGo("휴게실", true);
                     value = 1;
                     //  World.SendToAll(new QueDele(Serial, Map, new DeleteObject(Serial).Compile()));
                 }
@@ -1899,6 +1965,77 @@ namespace LKCamelot.model
         }
 
         /// <summary>
+        /// 이 유저가 caster의 공격 마법을 맞을 수 있는 상태인지 확인한다.
+        /// 아래 TakeDamage(Player, Spell)의 조건과 같다: 같은 맵, PK 가능 맵, 시전자 대인공격 ON, 보호 레벨 초과.
+        /// </summary>
+        public bool CanTakeSpellFrom(Player caster)
+        {
+            if (caster == null || caster == this || !caster.loggedIn || !caster.PK)
+                return false;
+            if (caster.m_Channel != this.m_Channel || caster.Map == null || caster.Map != this.Map)
+                return false;
+
+            model.Map.MapAttribute currMap;
+            if (!model.Map.FullMaps[caster.m_Channel].TryGetValue(caster.Map, out currMap) || currMap == null)
+                return false;
+            if (currMap.PKable == model.Map.PKType.ImpossiblePK)
+                return false;
+            if (Settings.PKProtectLevel >= Level && currMap.PKable != model.Map.PKType.PossiblePK_NoIncrease)
+                return false;
+            return true;
+        }
+
+        // 운영자 #은신 상태. 완전 투명(100)이며 몬스터가 대상으로 잡지 않고 샤프아이로 벗겨지지 않는다.
+        public bool GMHidden;
+        // 은신 마법(TRANSPARENCY)으로 얻은 현재 투명도(%). 샤프아이를 맞으면 줄어든다.
+        public byte SpellHide;
+
+        /// <summary>
+        /// 투명도(Transparancy)를 현재 상태에 맞게 다시 계산한다.
+        /// 운영자 은신이면 100, 은신 마법이 걸려 있으면 SpellHide, 둘 다 아니면 0.
+        /// </summary>
+        public void RefreshTransparency()
+        {
+            if (GMHidden)
+                Transparancy = 100;
+            else if (m_Buffs.Values.Any(xe => xe is script.spells.Transparency))
+                Transparancy = SpellHide;
+            else
+            {
+                SpellHide = 0;
+                Transparancy = 0;
+            }
+        }
+
+        /// <summary>
+        /// 이 유저의 표시 상태(투명도, 빛, 버프 효과)를 주변과 본인에게 보낸다.
+        /// 완전 투명일 때 주변에는 빛 반경을 0으로 보내 어두운 맵에서 위치가 드러나지 않게 하고,
+        /// 본인에게는 원래 빛 반경을 보내 자기 화면은 그대로 보이게 한다.
+        /// </summary>
+        public void SendEffects()
+        {
+            World.SendToAll(new QueDele(m_Serial, m_Channel, m_Map, new SetObjectEffects(this).Compile()));
+            if (client != null)
+                client.SendPacket(new SetObjectEffects(this, true).Compile());
+        }
+
+        /// <summary>
+        /// 지속 피해 마법의 한 주기 피해를 받는다. 시전자의 현재 상태(접속, 맵, 대인공격)는 보지 않는다.
+        /// 이 피해로 죽었으면 true. (죽으면 HPCur 처리에서 휴게실로 이동하므로 맵이 바뀐 것으로 판단한다)
+        /// </summary>
+        public bool TakeDotDamage(script.spells.Spell spell)
+        {
+            int take = spell.DamBase + (spell.DamPl * spell.Level - 1) - this.AC;
+            if (take <= 0)
+                return false;
+
+            string mapBefore = this.Map;
+            this.HPCur -= take;
+            World.SendToAll(new QueDele(this.m_Channel, this.m_Map, new HitAnimation(m_Serial, Convert.ToByte(((((float)HPCur / (float)HP) * 100) * 1))).Compile()));
+            return this.Map != mapBefore;
+        }
+
+        /// <summary>
         /// 사용자로부터 마법 경격을 당함
         /// </summary>
         /// <param name="caster">마법 시전자</param>
@@ -1929,14 +2066,18 @@ namespace LKCamelot.model
                 if (spell is script.spells.DemonDeath)
                     take += spell.DamBase + (spell.DamPl * spell.Level) + Convert.ToInt32((player.m_HPCur + (player.HP * 0.30)) * 0.5) + player.GetStat("dex");
 
-                this.HPCur -= (take - this.AC);
+                // 방어력이 피해보다 높으면 0으로 처리한다. (보정이 없으면 피해가 음수가 되어 맞은 쪽이 회복된다)
+                take -= this.AC;
+                if (take < 0)
+                    take = 0;
+                this.HPCur -= take;
                 if (Settings.RestMap.Contains(this.Map) && this.PKCount < Settings.PKRedCount)
                 {
                     //if (Settings.NotIncreasePKCountMap.Contains(player.Map.Split(',')[0]))
                     //    return;
                     if (currMap.PKable == model.Map.PKType.PossiblePK_NoIncrease)
                         return;
-                    
+
                     if (Settings.PKAlarm)
                         World.SendToAll(new QueDele("all", new UpdateChatBox(0x25, 0x65, 0, string.Format("{0}님(PK:{1})이 {2}님을 죽임. 맵:{3}({4},{5})", player.Name, player.PKCount, this.Name, player.Map.Split(',')[0], player.Loc.X, player.Loc.Y)).Compile()));
 
@@ -2118,6 +2259,9 @@ namespace LKCamelot.model
                 DateTime.TryParse(line[36], out LastAccessTime);
                 IP = line[37];
                 Ben = Convert.ToBoolean(line[38]);
+
+                // 40번째 컬럼(미분배 턴)은 나중에 추가됐다. 없는 줄(기존 39컬럼 파일)은 0으로 읽는다.
+                b_Extra = line.Count() >= 40 ? Convert.ToUInt32(line[39]) : 0;
             }
         }
 
@@ -2325,6 +2469,7 @@ namespace LKCamelot.model
             InstancedObjects.Clear();
             InstancedRangeObjects.Clear();
             m_Buffs.Clear();
+            RefreshTransparency();      // 은신 마법이 지워졌으므로 투명도를 되돌린다 (운영자 은신은 유지)
             CombackLoc = null;
             CombackMap = string.Empty;
             GuildJoinFlag = false;

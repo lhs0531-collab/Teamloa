@@ -218,6 +218,9 @@ namespace LKCamelot.model
                         }
                         #endregion
 
+                        // 지속 피해(쇼크 등)
+                        mob.Value.ProcessDot();
+
                         if (mob.Value.Alive == false)
                         {
                             if (Server.tickcount.ElapsedMilliseconds - mob.Value.SpawnTime > mob.Value.LastSpawn)
@@ -281,7 +284,7 @@ namespace LKCamelot.model
 
                             if (mob.Value.Target == 0)
                             {
-                                var LocalPlayers = PlayerList.Where(xe => xe.Value.client != null && xe.Value.m_Channel == mob.Value.m_Channel && World.Dist2d(xe.Value.Loc, mob.Value.m_Loc) <= mob.Value.MinAggro).OrderBy(xe => xe.Value.Level).FirstOrDefault().Value;
+                                var LocalPlayers = PlayerList.Where(xe => xe.Value.client != null && !xe.Value.GMHidden && xe.Value.m_Channel == mob.Value.m_Channel && World.Dist2d(xe.Value.Loc, mob.Value.m_Loc) <= mob.Value.MinAggro).OrderBy(xe => xe.Value.Level).FirstOrDefault().Value;
 
                                 if (LocalPlayers == null)
                                 {
@@ -298,7 +301,8 @@ namespace LKCamelot.model
                             }
                             else
                             {
-                                if (!mob.Value.TargetP.loggedIn || mob.Value.TargetP.Map != mob.Value.m_Map || mob.Value.TargetP.m_Channel != mob.Value.m_Channel)
+                                // 운영자 은신 중인 대상은 놓는다.
+                                if (!mob.Value.TargetP.loggedIn || mob.Value.TargetP.GMHidden || mob.Value.TargetP.Map != mob.Value.m_Map || mob.Value.TargetP.m_Channel != mob.Value.m_Channel)
                                 {
                                     mob.Value.Target = 0;
                                     mob.Value.TargetP = null;
@@ -306,9 +310,15 @@ namespace LKCamelot.model
                                 }
                             }
 
+                            // 불벽·전기벽: 벽 쪽으로 끌려가거나 벽 위에 멈춰 선다.
+                            var wallResult = WallTrap.Process(mob.Value);
+                            if (wallResult == WallTrap.Result.Acted)
+                                continue;
+                            bool wallHold = wallResult == WallTrap.Result.Hold;
+
                             var mobdist = World.Dist2d(mob.Value.m_Loc.X, mob.Value.m_Loc.Y, mob.Value.TargetP.Loc.X, mob.Value.TargetP.Loc.Y);
 
-                            if (mobdist >= 2 && mobdist < mob.Value.MaxAggro && Server.tickcount.ElapsedMilliseconds - mob.Value.WalkSpeed > mob.Value.LastAction)
+                            if (!wallHold && mobdist >= 2 && mobdist < mob.Value.MaxAggro && Server.tickcount.ElapsedMilliseconds - mob.Value.EffectiveWalkSpeed > mob.Value.LastAction)
                             {
                                 //이동
                                 mob.Value.LastAction = LKCamelot.Server.tickcount.ElapsedMilliseconds;
@@ -345,7 +355,7 @@ namespace LKCamelot.model
 
                                 World.SendToAll(new QueDele(mob.Value.m_Channel, mob.Value.m_Map, new SwingAnimation(mob.Value.m_Serial, World.AttackRange((short)mob.Value.TargetP.Loc.X, (short)mob.Value.TargetP.Loc.Y, (short)mob.Value.m_Loc.X, (short)mob.Value.m_Loc.Y)).Compile()));
                             }
-                            else if (mobdist > mob.Value.MaxAggro)
+                            else if (!wallHold && mobdist > mob.Value.MaxAggro)
                             {
                                 mob.Value.Target = 0;
                                 mob.Value.TargetP = null;
@@ -476,7 +486,7 @@ namespace LKCamelot.model
                             {
                                 //var LocalPlayers = w_server.OnlineConnections.Where(xe => xe.Client != null && xe.Client.player != null &&
                                 //xe.Client.player.Map != null && xe.Client.player.loggedIn && xe.Client.player.m_Map == mob.Value.m_Map).Select(xe => xe.Client.player);
-                                var LocalPlayers = PlayerHandler.getSingleton().add[i].Where(xe => xe.Value.client != null && xe.Value.loggedIn && xe.Value.m_Channel == mob.Value.m_Channel && xe.Value.Map == mob.Value.m_Map && World.Dist2d(xe.Value.Loc, mob.Value.m_Loc) <= mob.Value.MinAggro).OrderBy(xe => xe.Value.Level).FirstOrDefault().Value;
+                                var LocalPlayers = PlayerHandler.getSingleton().add[i].Where(xe => xe.Value.client != null && xe.Value.loggedIn && !xe.Value.GMHidden && xe.Value.m_Channel == mob.Value.m_Channel && xe.Value.Map == mob.Value.m_Map && World.Dist2d(xe.Value.Loc, mob.Value.m_Loc) <= mob.Value.MinAggro).OrderBy(xe => xe.Value.Level).FirstOrDefault().Value;
 
                                 if (LocalPlayers == null)
                                 {
@@ -493,7 +503,7 @@ namespace LKCamelot.model
                             }
                             else
                             {
-                                if (!mob.Value.TargetP.loggedIn || mob.Value.TargetP.Map != mob.Value.m_Map)
+                                if (!mob.Value.TargetP.loggedIn || mob.Value.TargetP.GMHidden || mob.Value.TargetP.Map != mob.Value.m_Map)
                                 {
                                     mob.Value.Target = 0;
                                     mob.Value.TargetP = null;
@@ -503,7 +513,7 @@ namespace LKCamelot.model
 
                             var mobdist = World.Dist2d(mob.Value.m_Loc.X, mob.Value.m_Loc.Y, mob.Value.TargetP.Loc.X, mob.Value.TargetP.Loc.Y);
 
-                            if (mobdist >= 2 && mobdist < mob.Value.MaxAggro && Server.tickcount.ElapsedMilliseconds - mob.Value.WalkSpeed > mob.Value.LastAction)
+                            if (mobdist >= 2 && mobdist < mob.Value.MaxAggro && Server.tickcount.ElapsedMilliseconds - mob.Value.EffectiveWalkSpeed > mob.Value.LastAction)
                             {
                                 //이동
                                 mob.Value.LastAction = LKCamelot.Server.tickcount.ElapsedMilliseconds;
@@ -749,8 +759,11 @@ namespace LKCamelot.model
             var cons = w_server.OnlineConnections;
             foreach (var conn in cons)
             {
-                var player = conn.Client.player;
+                // 접속 직후에는 Connections에 먼저 들어가고 Client는 나중에 대입되므로 null일 수 있다.
                 var client = conn.Client;
+                if (client == null)
+                    continue;
+                var player = client.player;
 
                 if (player == null || !player.loggedIn)
                     continue;
@@ -781,8 +794,10 @@ namespace LKCamelot.model
             var cons = w_server.OnlineConnections;
             foreach (var conn in cons)
             {
-                var player = conn.Client.player;
                 var client = conn.Client;
+                if (client == null)
+                    continue;
+                var player = client.player;
 
                 if (player == null || !player.loggedIn || player.ChatBlack)
                     continue;
@@ -997,6 +1012,18 @@ namespace LKCamelot.model
 
         public static void SaveAll()
         {
+                // 저장 파일 로드가 끝나기 전에는 저장하지 않는다. 로드 중 예외로 종료될 때
+                // 플레이어 0명인 상태로 저장 파일을 덮어쓰는 것을 막는다.
+                if (!Server.WorldLoaded)
+                {
+                    Console.WriteLine("World Save skipped: world data is not loaded yet.");
+                    return;
+                }
+
+                // 덮어쓰기 전의 파일을 먼저 백업한다. (기존에는 저장 후에 복사해 직전 상태가 남지 않았다)
+                try { BinaryIO.BackUpData(); }
+                catch (Exception e) { Console.WriteLine("BackUp Err : " + e.Message); }
+
                 Console.WriteLine("Guild Size: ", NewGuilds.Count());
 
                 Console.WriteLine("Player Size: " + Server.playerHandler.Count);
@@ -1034,7 +1061,6 @@ namespace LKCamelot.model
 
 
 
-                BinaryIO.BackUpData();
                 Console.WriteLine("World Save IO Complete");
 
                 World.DeletePlayer.Clear();

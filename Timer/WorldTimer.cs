@@ -26,16 +26,43 @@ namespace LKCamelot.Timer
             timer = new System.Threading.Timer(new System.Threading.TimerCallback(run), null, 0, 1 * Settings.Second);
         }
 
+        private readonly object runLock = new object();
+
         private void run(object state)
         {
-            Tick++;
-            PebbleSpwn();
-            TimeAlarm();
-            ToNotice();
-            Del_GroundItem();
-            PlayerTick();
-            Messages();
-            Quest();
+            // 타이머 콜백은 스레드풀에서 돈다. 여기서 예외가 빠져나가면 서버 프로세스가 종료되므로
+            // 작업마다 따로 잡아 로그만 남기고 나머지 작업은 계속한다.
+            // 앞의 틱이 아직 끝나지 않았으면(30분 주기 저장 등) 겹쳐 실행하지 않고 이번 틱은 건너뛴다.
+            if (!System.Threading.Monitor.TryEnter(runLock))
+                return;
+
+            try
+            {
+                Tick++;
+                SafeRun("PebbleSpwn", PebbleSpwn);
+                SafeRun("TimeAlarm", TimeAlarm);
+                SafeRun("ToNotice", ToNotice);
+                SafeRun("Del_GroundItem", Del_GroundItem);
+                SafeRun("PlayerTick", PlayerTick);
+                SafeRun("Messages", Messages);
+                SafeRun("Quest", Quest);
+            }
+            finally
+            {
+                System.Threading.Monitor.Exit(runLock);
+            }
+        }
+
+        private static void SafeRun(string name, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[{0}] WorldTimer.{1} exception: {2}", DateTime.Now, name, e);
+            }
         }
 
         private void PebbleSpwn()
@@ -167,6 +194,9 @@ namespace LKCamelot.Timer
                 var loginplayer = Server.world.handler.add[i].Values.Where(xe => xe.loggedIn).ToList();
                 foreach (var playe in loginplayer)
                 {
+                    // 한 명에서 난 예외가 나머지 접속자의 틱 처리를 막지 않게 한다.
+                    try
+                    {
                     #region 평민알림
                     if ((Tick % 2400) == 0 && (playe.Class & library.Class.Beginner) != 0 && playe.Level >= 5)
                     {
@@ -175,6 +205,11 @@ namespace LKCamelot.Timer
                         str = "직업에는 기사, 검객, 위저드, 샤먼이 있습니다.";
                         playe.client.SendPacket(new UpdateChatBox(0x21, 0x67, 1, str).Compile());
                     }
+                    #endregion
+
+                    #region 미분배 턴 안내
+                    if (playe.b_Extra > 0 && (Tick % (ulong)Settings.TurnNoticeInterval) == 0)
+                        playe.NotifyUnspentTurn();
                     #endregion
 
                     #region 겹침 처리
@@ -216,12 +251,21 @@ namespace LKCamelot.Timer
                                 Monster.TakeDamage(playe, buff.Value);
                         }
 
+                        // 지속 피해(쇼크). 이 타이머가 1초 주기라 유저에게는 1초마다 들어간다.
+                        // 지속시간이 끝나거나 이 피해로 죽을 때만 풀린다. 시전자의 상태(접속, 맵, 대인공격)는 보지 않는다.
+                        bool isDot = buff.Value.BuffEffect.TickInterval > 0;
+                        if (isDot && time > 0 && playe.TakeDotDamage(buff.Value))
+                            time = 0;
+
 
                         if (time <= 0)
                         {
                             script.spells.Spell temp;
                             playe.m_Buffs.TryRemove(buff.Key, out temp);
+                            playe.RefreshTransparency();        // 은신 마법이 끝났으면 투명도를 되돌린다
                             World.SendToRange(new QueDele(playe.m_Channel, playe.m_Map, new LKCamelot.model.SetObjectEffects(playe).Compile()), playe);
+                            if (playe.Transparancy >= 100)
+                                playe.client.SendPacket(new LKCamelot.model.SetObjectEffects(playe, true).Compile());
                             playe.client.SendPacket(new UpdateChatBox(0x21, 0x67, 1, string.Format("{0} 마법이 종료 됐습니다.", buff.Value.Name)).Compile());
                         }
                         else if (time <= 10 && time % 10 == 0)
@@ -262,8 +306,14 @@ namespace LKCamelot.Timer
 
                         if (playe.PKCount >= Settings.PrisonCount && !playe.Map.Contains("독방"))
                         {
-                            playe.m_Loc = new Point2D(13, 12);
-                            playe.Map = "독방" + "," + Settings.VillageName.ElementAt(playe.m_Channel);
+                            // 맵 목록에 실제로 있는 독방 이름을 쓴다. 없는 이름으로 보내면 독방에 가지 않고
+                            // 지금 있는 맵의 (13, 12)로 10초마다 옮겨지기만 한다.
+                            string prisonMap = io.IOClient.GetPrisonMap(playe.m_Channel);
+                            if (prisonMap != null)
+                            {
+                                playe.m_Loc = new Point2D(13, 12);
+                                playe.Map = prisonMap;
+                            }
                         }
 
                         if (playe.PKhistoryPlayer.Count != 0)
@@ -303,6 +353,7 @@ namespace LKCamelot.Timer
                         if ((Tick % 10) == 0)
                         {
                             var item1 = World.NewItems.Where(xe => xe.Value.m_Map != null
+                                && xe.Value.Loc != null
                                 && xe.Value.m_Channel == playe.m_Channel
                                 && xe.Value.m_Map == playe.Map
                                 && xe.Value.Loc.X == playe.Loc.X && xe.Value.Loc.Y == playe.Loc.Y)
@@ -313,6 +364,11 @@ namespace LKCamelot.Timer
                         }
                     }
                     #endregion
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("[{0}] WorldTimer.PlayerTick exception ({1}): {2}", DateTime.Now, playe.Name, e);
+                    }
                 }
             }
         }

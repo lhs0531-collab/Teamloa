@@ -9,7 +9,7 @@ namespace LKCamelot.script.item
     public class ShamanBook : Item
     {
         public override string Name { get { return "[베타]BOOK OF SHAMAN"; } }
-        public override ulong BuyPrice { get { return 85000000; } }
+        public override ulong BuyPrice { get { return Settings.ClassBookPrice; } }
         public override int SellPrice { get { return 1; } }
 
         public ShamanBook()
@@ -28,13 +28,13 @@ namespace LKCamelot.script.item
                 return;
 
             this.Delete(player);
-            player.Class = LKCamelot.library.Class.Shaman;
+            player.ChangeClassByBook(LKCamelot.library.Class.Shaman);
         }
     }
     public class WizardBook : Item
     {
         public override string Name { get { return "[베타]BOOK OF WIZARD"; } }
-        public override ulong BuyPrice { get { return 85000000; } }
+        public override ulong BuyPrice { get { return Settings.ClassBookPrice; } }
         public override int SellPrice { get { return 1; } }
 
         public WizardBook()
@@ -53,13 +53,13 @@ namespace LKCamelot.script.item
                 return;
 
             this.Delete(player);
-            player.Class = LKCamelot.library.Class.Wizard;
+            player.ChangeClassByBook(LKCamelot.library.Class.Wizard);
         }
     }
     public class SwordmanBook : Item
     {
         public override string Name { get { return "[베타]BOOK OF SWORDMAN"; } }
-        public override ulong BuyPrice { get { return 85000000; } }
+        public override ulong BuyPrice { get { return Settings.ClassBookPrice; } }
         public override int SellPrice { get { return 1; } }
 
         public SwordmanBook()
@@ -78,13 +78,13 @@ namespace LKCamelot.script.item
                 return;
 
             this.Delete(player);
-            player.Class = LKCamelot.library.Class.Swordsman;
+            player.ChangeClassByBook(LKCamelot.library.Class.Swordsman);
         }
     }
     public class KnightBook : Item
     {
         public override string Name { get { return "[베타]BOOK OF KNIGHT"; } }
-        public override ulong BuyPrice { get { return 85000000; } }
+        public override ulong BuyPrice { get { return Settings.ClassBookPrice; } }
         public override int SellPrice { get { return 1; } }
 
         public KnightBook()
@@ -103,7 +103,7 @@ namespace LKCamelot.script.item
                 return;
 
             this.Delete(player);
-            player.Class = LKCamelot.library.Class.Knight;
+            player.ChangeClassByBook(LKCamelot.library.Class.Knight);
         }
     }
 
@@ -128,7 +128,7 @@ namespace LKCamelot.script.item
         public override void Use(Player player)
         {
             this.Delete(player);
-            player.Class = LKCamelot.library.Class.Knight;
+            player.ChangeClassByBook(LKCamelot.library.Class.Knight);
         }
     }
 }

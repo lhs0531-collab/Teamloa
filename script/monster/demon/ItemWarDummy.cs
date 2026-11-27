@@ -28,8 +28,7 @@ namespace LKCamelot.script.monster
                 {
                     // 15.01.31 GM티리엘
                     // 아이템 확률 전체 1 ~ 15 ~20 로 변경
-                    new LootPackEntry(7, typeof(script.item.Javelin), "15d10+225", 1, 1, 1),         //temp (은신 나오면 삭제)
-                    new LootPackEntry(7, typeof(script.item.WarStaff), "15d10+225", 1, 1, 1),        //temp (은신 나오면 삭제)
+                    // 은신이 드랍되면서 임시 항목(Javelin, WarStaff 각 7)을 삭제함
                     new LootPackEntry(8, typeof(script.item.BastardSword), "15d10+225", 1, 1, 1),
                     new LootPackEntry(8, typeof(script.item.GreatSword), "15d10+225", 1, 1, 1),
                     new LootPackEntry(8, typeof(script.item.SevenStarSword), "15d10+225", 1, 1, 1),
@@ -37,7 +36,7 @@ namespace LKCamelot.script.monster
                     new LootPackEntry(8, typeof(script.item.BigBangBook), "15d10+225", 1, 1, 1),
                     new LootPackEntry(8, typeof(script.item.RevelationBook), "15d10+225", 1, 1, 1),
                     new LootPackEntry(9, typeof(script.item.RainbowArmorBook), "15d10+225", 1, 1, 1),
-                    //은신
+                    new LootPackEntry(2, typeof(script.item.TransparencyBook), "15d10+225", 1, 1, 1),      //은신
                     new LootPackEntry(8, typeof(script.item.MailPlate), "15d10+225", 1, 1, 1),
                     new LootPackEntry(8, typeof(script.item.SamuraiPlate), "15d10+225", 1, 1, 1),
                     new LootPackEntry(8, typeof(script.item.WidePlate), "15d10+225", 1, 1, 1),

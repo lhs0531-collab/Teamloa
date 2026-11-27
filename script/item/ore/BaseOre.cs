@@ -19,6 +19,7 @@ namespace LKCamelot.script.item
         public int Hits = 0;
         public virtual int XP { get { return 0; } }
         public override bool Stackable { get { return true; } }
+        public override short Limit { get { return 1000; } }           // 광석·보석류 묶음 한도
         public virtual bool IsJewelry { get { return false; } }
         public override void Event_Give(Player player, Item itemdragdrop){ }
         public virtual script.item.Item OreTaught { get { return null; } }

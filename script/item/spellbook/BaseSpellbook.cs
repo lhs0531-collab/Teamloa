@@ -84,6 +84,29 @@ namespace LKCamelot.script.item
             m_ItemID = 3;
         }
     }
+    public class IceBagBook : BaseSpellbook
+    {
+        public override string Name { get { return "BOOK OF ICE BAG"; } }
+        public override int MenReq { get { return 80; } }
+        public override int MenReqPl { get { return 6; } }
+        public override Class ClassReq { get { return Class.Wizard | Class.Beginner | Class.Knight | Class.Shaman | Class.Swordsman; } }
+
+        public override ulong BuyPrice { get { return 10000; } }
+        public override int SellPrice { get { return 5000; } }
+
+        public override spells.Spell SpellTaught { get { return new spells.IceBag(); } }
+
+        public IceBagBook()
+            : base(3)
+        {
+        }
+
+        public IceBagBook(Serial serial)
+            : base(serial)
+        {
+            m_ItemID = 3;
+        }
+    }
     public class ViewBook : BaseSpellbook
     {
         public override string Name { get { return "BOOK OF VIEW"; } }
@@ -432,6 +455,30 @@ namespace LKCamelot.script.item
         {
         }
     }
+    public class IceWallBook : BaseSpellbook
+    {
+        public override string Name { get { return "BOOK OF ICE WALL"; } }
+        public override int MenReq { get { return 56; } }
+        public override int MenReqPl { get { return 14; } }
+        public override int DexReq { get { return 0; } }
+        public override int DexReqPl { get { return 0; } }
+        public override int LevelReq { get { return 0; } }
+        public override Class ClassReq { get { return 0; } }
+
+        public override int SellPrice { get { return 15000; } }
+
+        public override spells.Spell SpellTaught { get { return new spells.IceWall(); } }
+
+        public IceWallBook()
+            : base(3)
+        {
+        }
+
+        public IceWallBook(Serial serial)
+            : base(serial)
+        {
+        }
+    }
     public class FireWallBook : BaseSpellbook
     {
         public override string Name { get { return "BOOK OF FIRE WALL"; } }
@@ -725,7 +772,7 @@ namespace LKCamelot.script.item
 
         public override ulong BuyPrice { get { return 10000; } }
 
-        public override spells.Spell SpellTaught { get { return new spells.Transparency(); } }
+        public override spells.Spell SpellTaught { get { return new spells.SharpEye(); } }
 
         public SharpEyeBook()
             : base(3)
@@ -962,7 +1009,7 @@ namespace LKCamelot.script.item
     {
         public override string Name { get { return "BOOK OF SHOKE"; } }
         public override int MenReq { get { return 127; } }
-        public override int MenReqPl { get { return 12; } }
+        public override int MenReqPl { get { return 13; } }
         public override int DexReq { get { return 0; } }
         public override int DexReqPl { get { return 0; } }
         public override int LevelReq { get { return 0; } }

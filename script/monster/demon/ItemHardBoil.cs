@@ -35,7 +35,7 @@ namespace LKCamelot.script.monster
                     new LootPackEntry(8, typeof(script.item.DemonDeathBook), "15d10+225", 1, 1, 1),
                     new LootPackEntry(8, typeof(script.item.BigBangBook), "15d10+225", 1, 1, 1),
                     new LootPackEntry(8, typeof(script.item.RevelationBook), "15d10+225", 1, 1, 1),
-                    //은신
+                    new LootPackEntry(2, typeof(script.item.TransparencyBook), "15d10+225", 1, 1, 1),      //은신
                     new LootPackEntry(8, typeof(script.item.SamuraiPlate), "15d10+225", 1, 1, 1),
                     new LootPackEntry(8, typeof(script.item.WidePlate), "15d10+225", 1, 1, 1),
                     new LootPackEntry(8, typeof(script.item.GreatAxe), "15d10+225", 1, 1, 1),

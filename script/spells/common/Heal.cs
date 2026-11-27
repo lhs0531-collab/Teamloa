@@ -45,6 +45,7 @@ namespace LKCamelot.script.spells
             player.HPCur += (int)(player.HP * temp);
 
             World.SendToSoundRange(new QueDele(player.m_Channel, player.Map, new EffectSound(library.EffectSound.Heal).Compile()), player);
+            World.SendToAll(new QueDele(player.m_Channel, player.Map, new MagicEffect(player.m_Serial, Seq.OnCastSprite).Compile()));
             World.SendToAll(new QueDele(player.m_Channel, player.Map, new MagicMotion(player).Compile()));
         }
     }

@@ -162,17 +162,31 @@ namespace LKCamelot.script.npc
                     if (inv != null && inv.Quantity + amount > tempitem.Limit)
                     {
                         amount = tempitem.Limit - inv.Quantity;
-                        if (amount == 0)
+                        if (amount <= 0)
                             return;
                     }
-                    checked
+
+                    // 골드는 지급이 가능한지 확인한 뒤에 차감한다.
+                    // (기존: 먼저 차감해서 인벤토리가 가득 차 있으면 아이템 없이 골드만 빠져나갔다)
+                    if (player.GetFreeSlot() == -1)
                     {
-                        player.Gold -= (ulong)(tempitem.BuyPrice * (ulong)amount);
+                        this.Event_Chat("인벤토리에 빈 공간이 없습니다.", true);
+                        return;
                     }
 
+                    ulong cost;
+                    try { cost = checked(tempitem.BuyPrice * (ulong)amount); }
+                    catch (OverflowException) { return; }
+                    if (player.Gold < cost)
+                        return;
+
+                    // Inventory()는 묶음에 일부만 합쳐지고 나머지가 새 칸으로 갈 때 null을 돌려주지만 지급은 된 것이므로
+                    // 반환값 대신 미리 받아 둔 이름을 쓴다.
+                    string itemName = tempitem.Name;
                     tempitem.Quantity = (int)amount;
-                    tempitem = tempitem.Inventory(player);
-                    this.Event_Chat(string.Format("{0}를 {1}개 판매했습니다.", tempitem.Name, amount), true);
+                    tempitem.Inventory(player);
+                    player.Gold -= cost;
+                    this.Event_Chat(string.Format("{0}를 {1}개 판매했습니다.", itemName, amount), true);
                 }
             }
             #endregion

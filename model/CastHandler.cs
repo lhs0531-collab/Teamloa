@@ -17,15 +17,17 @@ namespace LKCamelot.model
             this.handler = handler;
         }
 
-        public void CreateMagicEffect(Point2D target, int channel, string map, short dir, byte sprite, int time = 1500, byte width = 0)
+        /// <returns>만든 효과 오브젝트의 시리얼. 만들지 못했으면 0.</returns>
+        public int CreateMagicEffect(Point2D target, int channel, string map, short dir, byte sprite, int time = 1500, byte width = 0)
         {
-            if (target == null) return;
+            if (target == null) return 0;
 
             int mobile = Serial.NewMobile;
             World.SendToAll(new QueDele(channel, map, new CreateMagicEffect(mobile, dir, (short)target.X, (short)target.Y, new byte[] { 4, 0, 0, 0, 0, 0, 0, 0, 0, sprite }, width).Compile()));
             var tmp = new QueDele(LKCamelot.Server.tickcount.ElapsedMilliseconds + time, channel, map, new DeleteObject(mobile).Compile());
             tmp.tempser = mobile;
             World.TickQue.Add(tmp);
+            return mobile;
         }
 
         public void TakeDamage(Player caster, Player target, script.spells.Spell spell)

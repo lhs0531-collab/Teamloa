@@ -60,16 +60,23 @@ namespace LKCamelot
             LKCamelot.model.World.SaveAll();
         }
 
+        /// <summary>
+        /// 저장 파일 로드가 끝났는지 여부. false인 동안에는 World.SaveAll()이 저장하지 않는다.
+        /// (로드 도중 예외로 종료될 때 비어 있는 메모리 상태로 저장 파일을 덮어쓰는 것을 막는다)
+        /// </summary>
+        public static volatile bool WorldLoaded = false;
+
         public static void App_ThreadException(object sender, UnhandledExceptionEventArgs e)
         {
-            World.SaveAll();
+            try { World.SaveAll(); }
+            catch (Exception saveEx) { Console.WriteLine("SaveAll failed in exception handler: " + saveEx.Message); }
 
-            Console.WriteLine((e.ExceptionObject as Exception).StackTrace);
+            Console.WriteLine(e.ExceptionObject as Exception);
 
             var trace = new System.Diagnostics.StackTrace();
             using (StreamWriter sw = new StreamWriter("lastexep.txt", true))
             {
-                sw.WriteLine((e.ExceptionObject as Exception).StackTrace);
+                sw.WriteLine(DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss] ") + (e.ExceptionObject as Exception));
             }
 
         }
@@ -149,6 +156,9 @@ namespace LKCamelot
                 foreach (var item in World.NewAuctions)
                     World.m_MObjects.TryAdd(item.Key, item.Key);
             }
+
+            // 여기까지 예외 없이 왔을 때만 저장을 허용한다.
+            WorldLoaded = true;
 
             if (World.NewMonsters == null)
                 Spawnere.Spawn();
@@ -503,6 +513,7 @@ namespace LKCamelot
             {
                 connection.Client.player.InstancedObjects.Clear();
                 connection.Client.player.m_Buffs.Clear();
+                connection.Client.player.RefreshTransparency();
             }
 
             // Remove the connection from the dictionary and raise the OnDisconnection event.

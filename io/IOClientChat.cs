@@ -67,6 +67,7 @@ namespace LKCamelot.io
         public static List<string> GMCommands = new List<string>()
         {
             "#도움말",
+            "#길드해체",
             "#공지",
             "#정보",
             "#얼음",
@@ -101,6 +102,8 @@ namespace LKCamelot.io
             "#맵디비갱신",
             "#벤아이피",
 
+            "#광부",
+            "#대장장이",
         };
 
 
@@ -158,6 +161,12 @@ namespace LKCamelot.io
                         GMSave();           break;
                     case "#길드저장":
                         GMGuildSave();      break;
+                    case "#길드해체":
+                        GMGuildDelete(str2); break;
+                    case "#광부":
+                        GMSubJobLevel(str2, true);  break;
+                    case "#대장장이":
+                        GMSubJobLevel(str2, false); break;
                     case "#아이템저장":
                         GMItemSave();       break;
                     case "#플레이어저장":
@@ -221,7 +230,8 @@ namespace LKCamelot.io
             UpdateChat("#경험치배율, #골드배율, #배율, #초기화, #얼음");
             UpdateChat("#저장, #접속알림, #피케이알림, #맵정보, #강퇴");
             UpdateChat("#이웃레벨, #이웃, #이웃벤, #뻐꾸기, #몹소환, #은신");
-            UpdateChat("#몹디비갱신, #벤아이피");
+            UpdateChat("#몹디비갱신, #벤아이피, #길드해체");
+            UpdateChat("#광부 [레벨], #대장장이 [레벨]");
         }
 
         #region GM Commands
@@ -627,6 +637,94 @@ namespace LKCamelot.io
             SendPacket(new UpdateChatBox(0x00, 0xff, 1, "길드가 저장되었습니다.").Compile());
         }
 
+        /// <summary>
+        /// GM이 길드를 강제로 해체한다. 실수 방지를 위해 @길드삭제처럼 길드명을 두 번 입력받는다.
+        /// </summary>
+        private void GMGuildDelete(string[] str2)
+        {
+            if (str2.Count() != 3)
+            {
+                SendPacket(new UpdateChatBox(0x00, 0xff, 1, "#길드해체 [길드명] [길드명]").Compile());
+                return;
+            }
+            if (str2[1] != str2[2])
+            {
+                SendPacket(new UpdateChatBox(0x00, 0xff, 1, "길드명 두 개가 서로 다릅니다.").Compile());
+                return;
+            }
+
+            // 길드 키는 생성 직후에는 입력한 그대로, 재시작 후에는 대문자라서 대소문자 구분 없이 찾는다.
+            var entry = World.NewGuilds.Where(xe => string.Equals(xe.Key, str2[1], StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+            if (entry.Value == null)
+            {
+                SendPacket(new UpdateChatBox(0x00, 0xff, 1, "해당 길드를 찾을 수 없습니다.").Compile());
+                return;
+            }
+
+            BaseGuild guild = entry.Value;
+            int memberCount = 0;
+            foreach (var p in PlayerHandler.getSingleton().Total.Values.Where(xe => xe != null && xe.Guild == guild).ToList())
+            {
+                p.Guild = null;
+                memberCount++;
+                if (p.loggedIn && p.client != null)
+                    p.client.SendPacket(new UpdateChatBox(0x00, 0xff, 1, "운영자에 의해 길드가 해체되었습니다.").Compile());
+            }
+
+            BaseGuild removed;
+            World.NewGuilds.TryRemove(entry.Key, out removed);
+
+            // 길드맵 표지판이 있으면 함께 제거한다.
+            if (guild.Board != null)
+            {
+                script.npc.BaseNPC board;
+                World.NewNpcs[guild.Board.m_Channel].TryRemove(guild.Board.m_Serial, out board);
+                World.SendToAll(new QueDele(guild.Board.m_Channel, guild.Board.m_Map, new DeleteObject(guild.Board.m_Serial).Compile()));
+            }
+
+            io.IOClient.WriteBug(string.Format("{0} [GuildDelete] GM={1} guild={2} members={3}",
+                DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"), player.Name, entry.Key, memberCount));
+            SendPacket(new UpdateChatBox(0x00, 0xff, 1, string.Format("{0}길드를 해체했습니다. (길드원 {1}명)", entry.Key, memberCount)).Compile());
+        }
+
+        /// <summary>
+        /// 서브직업(광부/대장장이) 레벨을 지정한 값으로 맞춘다.
+        /// #광부 [레벨] / #대장장이 [레벨]. 어뷰징 방지를 위해 명령을 친 GM 본인에게만 적용한다(대상 지정 없음).
+        /// </summary>
+        private void GMSubJobLevel(string[] str2, bool miner)
+        {
+            const int MaxSubJobLevel = 99;
+            string jobName = miner ? "광부" : "대장장이";
+
+            int level;
+            if (str2.Count() != 2
+                || !int.TryParse(str2[1], System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out level)
+                || level < 1 || level > MaxSubJobLevel)
+            {
+                SendPacket(new UpdateChatBox(0x00, 0xff, 1, string.Format("{0} [레벨: 1~{1}]", str2[0], MaxSubJobLevel)).Compile());
+                return;
+            }
+
+            // 경험치도 레벨에 맞춰 둔다. 레벨만 바꾸면 다음 경험치 획득 때 경험치 기준으로 레벨이 다시 내려간다.
+            int xp = level > 1 ? library.NextLevelC.NextLevelTable[level - 1] + 1 : 0;
+            if (miner)
+            {
+                player.MinerLevel = level;
+                player._MinerXP = xp;
+            }
+            else
+            {
+                player.BSLevel = level;
+                player._BSXP = xp;
+            }
+
+            SendPacket(new Attrib(player).Compile());
+
+            io.IOClient.WriteBug(string.Format("{0} [SubJobLevel] GM={1} job={2} level={3}",
+                DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"), player.Name, jobName, level));
+            SendPacket(new UpdateChatBox(0x00, 0xff, 1, string.Format("{0} 레벨을 {1}(으)로 설정했습니다.", jobName, level)).Compile());
+        }
+
         private void GMMapInfo(string[] str2)
         {
             if (str2.Count() != 2)
@@ -745,12 +843,13 @@ namespace LKCamelot.io
         }
         private void GMTransparancy()
         {
-            if (player.Transparancy == 0)
-            {
-                player.Transparancy = 100;
-            }
-            else player.Transparancy = 0;
-            World.SendToAll(new QueDele(player.m_Channel, player.Map, new SetObjectEffects(player).Compile()));
+            // 운영자 은신: 완전 투명 + 남에게 빛 원이 보이지 않음 + 몬스터가 대상으로 잡지 않음.
+            player.GMHidden = !player.GMHidden;
+            player.RefreshTransparency();
+            // 맵 밝기(안개)는 맵을 로드할 때만 전달되므로, 현재 맵을 다시 로드해 바로 반영한다.
+            player.Map = player.Map;
+            player.SendEffects();
+            SendPacket(new UpdateChatBox(0x00, 0xff, 1, player.GMHidden ? "은신 ON" : "은신 OFF").Compile());
         }
         private void GMKick(string[] str2)
         {
@@ -879,7 +978,7 @@ namespace LKCamelot.io
             {
                 UpdateChat("@길드생성, @길드삭제, @길드가입, @길드탈퇴, @길드정보");
                 UpdateChat("@길드맵설정, @출두");
-                UpdateChat("@길드직책명, @길드직책변경");
+                UpdateChat("@길드직책명, @길드직책변경, @길드양도");
             }
 
             #region @핑, @시간
@@ -1009,6 +1108,8 @@ namespace LKCamelot.io
             else if (str2[0] == "@턴속성")
             {
                 SendPacket(new UpdateChatBox(0x94, 0x52, 1, string.Format("힘 : {0}, 지력 : {1} 숙련 : {2} 생명 : {3}", player.b_Str, player.b_Men, player.b_Dex, player.b_Vit)).Compile());
+                if (player.b_Extra > 0)
+                    SendPacket(new UpdateChatBox(0x94, 0x52, 1, string.Format("미분배 : {0}", player.b_Extra)).Compile());
             }
             #endregion
 
@@ -1482,6 +1583,10 @@ namespace LKCamelot.io
                 else if (position < 0 || position >= 6)
                     SendPacket(new UpdateChatBox(0x00, 0xff, 1, "직책을 찾을 수 없습니다.").Compile());
 
+                // 수장(0) 직책으로는 가입시킬 수 없다. 수장 교체는 @길드양도로만 한다.
+                else if (position == 0)
+                    SendPacket(new UpdateChatBox(0x00, 0xff, 1, "수장 직책으로는 가입시킬 수 없습니다. (@길드양도)").Compile());
+
                 else if ((position == 1 && play.Level < 100) || play.Level < Settings.GuildJoinLevel)
                     SendPacket(new UpdateChatBox(0x00, 0xff, 1, "해당 레벨이 부족합니다.").Compile());
 
@@ -1587,6 +1692,45 @@ namespace LKCamelot.io
             }
             #endregion
 
+            #region @길드양도
+            else if (str2[0] == "@길드양도")
+            {
+                int myPosition;
+                if (player.Guild == null || !player.Guild.Member.TryGetValue(player.m_Serial, out myPosition) || myPosition != 0)
+                {
+                    SendPacket(new UpdateChatBox(0x00, 0xff, 1, "길드가 없거나 권한이 없습니다. (수장만 가능)").Compile());
+                    return;
+                }
+                else if (str2.Count() != 2)
+                {
+                    SendPacket(new UpdateChatBox(0x00, 0xff, 1, "@길드양도 [아이디]").Compile());
+                    return;
+                }
+
+                var guild = player.Guild;
+                string targetName = str2[1].ToUpper();
+                var play = handler.Total.Where(xe => xe.Value != null && xe.Value.Guild == guild && xe.Value.Name == targetName).FirstOrDefault().Value;
+
+                if (play == null || !guild.Member.ContainsKey(play.m_Serial))
+                    SendPacket(new UpdateChatBox(0x00, 0xff, 1, "해당 길드원을 찾을 수 없습니다.").Compile());
+
+                else if (play == player)
+                    SendPacket(new UpdateChatBox(0x00, 0xff, 1, "자기 자신에게는 양도할 수 없습니다.").Compile());
+
+                else
+                {
+                    // 기존 수장은 가장 낮은 직책(일반 등급)으로, 양도받는 길드원은 수장으로.
+                    int memberPosition = guild.PostionName.Length - 1;
+                    guild.Member[play.m_Serial] = 0;
+                    guild.Member[player.m_Serial] = memberPosition;
+
+                    string notice = string.Format("{0}길드의 {1}이(가) {2}님에서 {3}님으로 변경되었습니다.", guild.Name, guild.PostionName[0], player.Name, play.Name);
+                    foreach (var member in handler.Total.Values.Where(xe => xe != null && xe.Guild == guild && xe.loggedIn && xe.client != null).ToList())
+                        member.client.SendPacket(new UpdateChatBox(0x00, 0xff, 1, notice).Compile());
+                }
+            }
+            #endregion
+
             #region @길드직책변경
             else if (str2[0] == "@길드직책변경")
             {
@@ -1609,6 +1753,13 @@ namespace LKCamelot.io
                             play.Guild.Member.TryGetValue(play.m_Serial, out target);               //해당자
                             if (pl > target)
                                 return;
+
+                            // 수장이 자신의 직책을 바꾸면 수장 없는 길드가 된다. 수장 교체는 @길드양도로만 한다.
+                            if (target == 0 && play.Guild.Member.ContainsKey(play.m_Serial))
+                            {
+                                SendPacket(new UpdateChatBox(0x00, 0xff, 1, "수장의 직책은 변경할 수 없습니다. (@길드양도)").Compile());
+                                return;
+                            }
 
                             if (player.Guild.PostionName.Where(xe => xe.Equals(str2[2])).Any())
                             {
@@ -1647,9 +1798,16 @@ namespace LKCamelot.io
                     if (Encoding.Default.GetByteCount(str2[2]) > 10)
                         SendPacket(new UpdateChatBox(0x00, 0xff, 1, "직책명은 한글 5자이내, 영문 10자이내 입니다.").Compile());
 
+                    // 쉼표 등 특수문자가 들어가면 길드 저장 줄의 칸이 밀려 다음 기동 때 그 길드를 읽지 못한다.
+                    else if (!System.Text.RegularExpressions.Regex.IsMatch(str2[2], @"^[a-zA-Z0-9가-힣]+$"))
+                        SendPacket(new UpdateChatBox(0x00, 0xff, 1, "직책명은 한글, 영문, 숫자만 사용할 수 있습니다.").Compile());
+
                     else if (player.Guild.Member.Where(xe => xe.Value == 0 && xe.Key == player.m_Serial).Any())
                     {
-                        if (player.Guild.FindPosition(str2[2]) == -1)
+                        if (player.Guild.FindPosition(str2[1]) == -1)
+                            SendPacket(new UpdateChatBox(0x00, 0xff, 1, "변경할 직책을 찾을 수 없습니다.").Compile());
+
+                        else if (player.Guild.FindPosition(str2[2]) == -1)
                         {
                             player.Guild.PostionName[player.Guild.FindPosition(str2[1])] = str2[2];
                             SendPacket(new UpdateChatBox(0x00, 0xff, 1, "변경완료").Compile());

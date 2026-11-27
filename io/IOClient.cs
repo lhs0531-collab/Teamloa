@@ -156,39 +156,79 @@ namespace LKCamelot.io
                 SendPacket(new CreateSlotMagic2(spell).Compile());
 
             //아이템 셋팅
-            List<script.item.Item> temp = new List<script.item.Item>();
+            player.Equipped2.Clear();                                           // 재접속마다 장착 캐시를 실제 슬롯 상태로 재구성
+            List<script.item.Item> unknownSlot = new List<script.item.Item>();  // 24, 31~39, 52 이상
+            List<script.item.Item> orphan = new List<script.item.Item>();       // InvSlot < 0
             foreach (var item in World.NewItems.Where(xe => (xe.Value.m_Parent == player || xe.Value.ParSer == player.m_Serial) && !Settings.NoSaveItem.Contains(xe.Value.GetType()) ).ToList())
             {
                 item.Value.Parent = player;
+                int itemSlot = item.Value.InvSlot;
 
-                if (item.Value.InvSlot >= 0 && item.Value.InvSlot < 24)
+                if (itemSlot >= 0 && itemSlot < 24)
                 {
                     SendPacket(new AddItemToInventory2(item.Value).Compile());
                 }
-                else if (item.Value.InvSlot >= 25 && item.Value.InvSlot <= 30)
+                else if (itemSlot >= 25 && itemSlot <= 30)
                 {
-                        player.Equipped2.TryAdd(item.Value.m_Serial, item.Value);
-                        SendPacket(new EquipItem2(item.Value).Compile());
+                    player.Equipped2.TryAdd(item.Value.m_Serial, item.Value);
+                    SendPacket(new EquipItem2(item.Value).Compile());
                 }
-                else if (item.Value.InvSlot >= 40 && item.Value.InvSlot <= 51)
+                else if (itemSlot >= 40 && itemSlot <= 51)
                 {
                     SendPacket(new AddItemToEntrust(item.Value).Compile());
                 }
+                else if (itemSlot < 0)
+                    orphan.Add(item.Value);
                 else
-                    temp.Add(item.Value);
+                    unknownSlot.Add(item.Value);
             }
-            foreach (var it in temp)
+
+            // 슬롯이 없는 소유 아이템은 Clone 잔재(유령 아이템)다. 빈 칸에 다시 넣지 않고 기록 후 제거한다.
+            // 저장 대상(InvSlot >= 0)이 아니므로 파일에는 원래 남지 않는 아이템이다.
+            // 제거는 로그인(first) 때만 한다. 마을 티켓 이동(LoadPlayer(false)) 중에는 자동 줍기가
+            // 소유자만 넣고 슬롯은 아직 넣지 않은 아이템이 잠깐 있을 수 있어 건드리지 않는다.
+            if (!first)
+                orphan.Clear();
+
+            foreach (var it in orphan)
+            {
+                WriteBug(string.Format("{0} [LoadPlayer] orphan removed: player={1} serial={2} name={3} stage={4} qty={5}",
+                    DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"), player.Name, (int)it.m_Serial, it.Name, it.Stage, it.Quantity));
+                script.item.Item removed;
+                World.NewItems.TryRemove(it.m_Serial, out removed);
+            }
+
+            foreach (var it in unknownSlot)
             {
                 int slot = player.GetFreeSlot();
                 if (slot != -1)
                     it.InvSlot = slot;
+                else
+                    WriteBug(string.Format("{0} [LoadPlayer] unknown slot item not placed: player={1} serial={2} name={3} slot={4}",
+                        DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"), player.Name, (int)it.m_Serial, it.Name, it.InvSlot));
             }
-            temp.Clear();
 
             if (Settings.GMS.Contains(player.Name))
             {
                 player.m_Loc = new Point2D(Settings.StartGMLoc.X, Settings.StartGMLoc.Y);
                 player.Map = Settings.VillageName.ElementAt(this.player.m_Channel) + Settings.StartGMMap;
+            }
+            else if (player.PKCount >= Settings.PrisonCount)
+            {
+                // 감옥 수치인 캐릭터는 HandleGo가 이동을 막아 맵 로드 패킷이 한 번도 가지 않는다.
+                // 저장된 맵이 "독방"이라 타이머의 독방 이동 조건에도 걸리지 않으므로 여기서 직접 독방으로 보낸다.
+                string prisonMap = GetPrisonMap(player.m_Channel);
+
+                if (prisonMap != null)
+                {
+                    player.m_Loc = new Point2D(13, 12);
+                    player.Map = prisonMap;
+                }
+                else
+                {
+                    // 독방 맵이 DB에 없으면 맵을 로드할 방법이 없으므로 마을로 보낸다.
+                    player.client.HandleGo("마을", true);
+                }
             }
             else
                 player.client.HandleGo("마을");
@@ -211,13 +251,35 @@ namespace LKCamelot.io
                 SendPacket(new UpdateChatBox(0x00, 0xff, 1, string.Format("이웃 나라 백성으로 접속 되었습니다.")).Compile());
 
 
+            // 분배하지 않은 턴이 있으면 접속(마을 이동 포함) 때 알린다.
+            player.NotifyUnspentTurn();
+
             if (Settings.LoginAlarm && !Settings.GMS.Contains(player.Name))
                 World.SendToAll(new QueDele(player.m_Serial, "all", new UpdateChatBox(0x94, 0x52, 1, string.Format("{0}님이 접속하였습니다.", player.Name)).Compile()));
         }
 
-        public void HandleGo(string goloc)
+        /// <summary>
+        /// 해당 채널의 독방 맵 이름을 돌려준다. 맵 이름은 DB(mapmaster)에 따라 "독방,마을이름" 또는 "독방"이므로
+        /// 실제로 맵 목록에 있는 쪽을 쓴다. 둘 다 없으면 null.
+        /// </summary>
+        public static string GetPrisonMap(int channel)
         {
-            if (player.PKCount >= Settings.PrisonCount || player.m_Buffs.Where(xe=>xe.Value.BuffEffect.BuffType == script.spells.BuffCase.Freezing).Any())
+            var maps = model.Map.FullMaps[channel];
+            string perVillage = "독방" + "," + Settings.VillageName.ElementAt(channel);
+            if (maps.ContainsKey(perVillage))
+                return perVillage;
+            if (maps.ContainsKey("독방"))
+                return "독방";
+            return null;
+        }
+
+        /// <param name="force">
+        /// true면 감옥 수치·얼음 상태여도 이동시킨다. 사망 처리 전용.
+        /// (이동이 막히면 죽은 자리에 HP 1로 남아, 맞을 때마다 사망 처리(골드·아이템 드랍)가 반복된다)
+        /// </param>
+        public void HandleGo(string goloc, bool force = false)
+        {
+            if (!force && (player.PKCount >= Settings.PrisonCount || player.m_Buffs.Where(xe=>xe.Value.BuffEffect.BuffType == script.spells.BuffCase.Freezing).Any()))
                 return;
 
             var gotoMap = script.map.GotoCmd.Gotocmd[player.m_Channel].Where(xe=>xe.GoName == goloc.ToLower()).FirstOrDefault();
@@ -617,20 +679,21 @@ namespace LKCamelot.io
                         var itemtofind = World.NewItems.Where(xe => xe.Value.ParSer == player.m_Serial && xe.Value.InvSlot == slot).FirstOrDefault().Value;
                         if (itemtofind != null)
                         {
-                            if (player.GetFreeSlot() == -1)
-                                return;
-
                             if (itemtofind is script.item.BasePotion)
                             {
-                                var potions = player.Inventory.Where(xe => xe.Name == itemtofind.Name && xe.InvSlot < 24).FirstOrDefault();
+                                // 정책: 같은 물약은 인벤토리에 한 묶음(Limit)까지만. 가득 찬 묶음이 하나라도 있으면 꺼내지 않는다.
+                                var samePotions = player.Inventory.Where(xe => xe.Name == itemtofind.Name).ToList();
+                                if (samePotions.Any(xe => xe.Quantity >= xe.Limit))
+                                    return;
+
+                                var potions = samePotions.FirstOrDefault();
 
                                 if (potions != null)
                                 {
-                                    int Remainder;
-                                    int limit = itemtofind.Limit;
-                                    if ((potions.Quantity + itemtofind.Quantity) > limit)
+                                    // 기존 묶음에 합치는 경우는 빈 칸이 필요 없다.
+                                    int Remainder = potions.Limit - potions.Quantity;   // 소유 가능한 갯수를 구함
+                                    if (itemtofind.Quantity > Remainder)
                                     {
-                                        Remainder = (limit - potions.Quantity);         // 소유 가능한 갯수를 구함
                                         itemtofind.Quantity -= Remainder;                          // 바닥에 떨어진 아이템 갯수를  삭제
                                         potions.Quantity += Remainder;                  // 줍는다.
                                         SendPacket(new LKCamelot.model.AddItemToEntrust(itemtofind).Compile());       //보관함에 뿌린다.
@@ -647,12 +710,18 @@ namespace LKCamelot.io
                                 }
                                 else
                                 {
-                                    itemtofind.InvSlot = player.GetFreeSlot();
+                                    int freeSlot = player.GetFreeSlot();
+                                    if (freeSlot == -1)
+                                        return;
+                                    itemtofind.InvSlot = freeSlot;
                                 }
                             }
                             else
                             {
-                                itemtofind.InvSlot = player.GetFreeSlot();
+                                int freeSlot = player.GetFreeSlot();
+                                if (freeSlot == -1)
+                                    return;
+                                itemtofind.InvSlot = freeSlot;
                             }
                         }
                     }

@@ -39,6 +39,12 @@ namespace LKCamelot.script.spells
         public int Time = Int32.MaxValue;
         public int TimePI = 0;
         public BuffCase BuffType;
+
+        // 이동속도 감소율(%). BuffType이 Slow일 때 몬스터의 걷기 간격에 반영된다. (Monster.EffectiveWalkSpeed)
+        public int MoveSlowPercent = 0;
+
+        // 지속 피해 주기(ms). 0보다 크면 이 버프가 걸린 몬스터는 주기마다 마법 피해를 받는다. (Monster.ProcessDot)
+        public int TickInterval = 0;
     }
     
 	public class Spell
@@ -174,6 +180,39 @@ namespace LKCamelot.script.spells
             return Result;
         }
         /// <summary>
+        /// 누른 좌표를 시전자에서 그 방향으로 Settings.WaveReach칸까지 늘린 좌표를 돌려준다.
+        /// 뻗어 나가는 마법(프레임웨이브, 썬더스트록)이 누른 곳에서 끊기지 않고 화면 끝까지 가게 한다.
+        /// </summary>
+        protected Point2D ExtendCast(Player player, short castx, short casty)
+        {
+            int dx = castx - player.Loc.X;
+            int dy = casty - player.Loc.Y;
+            int longest = Math.Max(Math.Abs(dx), Math.Abs(dy));
+            if (longest == 0)
+                return new Point2D(castx, casty);
+
+            int x = player.Loc.X + dx * Settings.WaveReach / longest;
+            int y = player.Loc.Y + dy * Settings.WaveReach / longest;
+
+            // 맵 밖으로 나가지 않게 자른다.
+            int maxX = short.MaxValue, maxY = short.MaxValue;
+            try
+            {
+                var full = model.Map.FullMaps[player.m_Channel].Where(xe => xe.Key == player.Map).FirstOrDefault().Value;
+                if (full != null && model.Map.loadedmaps.ContainsKey(full.Filename))
+                {
+                    maxX = model.Map.loadedmaps[full.Filename].sizeX - 1;
+                    maxY = model.Map.loadedmaps[full.Filename].sizeY - 1;
+                }
+            }
+            catch { }
+
+            x = Math.Max(0, Math.Min(maxX, x));
+            y = Math.Max(0, Math.Min(maxY, y));
+            return new Point2D(x, y);
+        }
+
+        /// <summary>
         /// 단일 타켓팅을 위한 함수
         /// </summary>
         /// <param name="Serial">시리얼</param>
@@ -242,6 +281,37 @@ namespace LKCamelot.script.spells
         {
             return PlayerHandler.getSingleton().add[Channel].Where(xe => xe.Value.loggedIn && xe.Value.m_Serial == castonid).FirstOrDefault().Value;
         }
+        /// <summary>
+        /// 버프 대상 찾기. 시전자와 같은 맵의 접속자만 대상으로 한다.
+        /// 1) 시리얼이 맞는 유저가 있으면 그 유저.
+        /// 2) 없으면 누른 좌표가 다른 유저의 몸통 범위(Settings.BuffTarget*) 안일 때 가장 가까운 유저.
+        /// 3) 그 외(빈 땅 등)에는 시전자 자신.
+        /// </summary>
+        protected Player FindBuffTarget(Player caster, int castonid, int x, int y)
+        {
+            var candidates = PlayerHandler.getSingleton().add[caster.m_Channel].Values
+                .Where(xe => xe.loggedIn && xe.Map == caster.Map && xe.Loc != null)
+                .ToList();
+
+            if (castonid != 0)
+            {
+                var bySerial = candidates.FirstOrDefault(xe => xe.m_Serial == castonid);
+                if (bySerial != null)
+                    return bySerial;
+            }
+
+            // 캐릭터 그림은 서 있는 칸보다 위쪽으로 그려지므로, 몸통을 누르면 발밑 칸보다 위(Y가 작은 쪽) 좌표가 온다.
+            var near = candidates
+                .Where(xe => xe != caster
+                    && Math.Abs(xe.Loc.X - x) <= Settings.BuffTargetRangeX
+                    && (xe.Loc.Y - y) <= Settings.BuffTargetRangeUp
+                    && (y - xe.Loc.Y) <= Settings.BuffTargetRangeDown)
+                .OrderBy(xe => World.Dist2d(xe.Loc.X, xe.Loc.Y, x, y))
+                .FirstOrDefault();
+
+            return near ?? caster;
+        }
+
         protected Player SerialPlayerTarget(int Channel, int castonid, int x, int y)
         {
             return PlayerHandler.getSingleton().add[Channel].Where(xe => xe.Value.loggedIn && 

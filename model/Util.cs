@@ -8,7 +8,15 @@ namespace LKCamelot.model
 {
     public static class Util
     {
-        private static Random m_Random = new Random();
+        // System.Random은 스레드 안전하지 않다. 락 없이 여러 스레드가 쓰면 내부 상태가 깨져
+        // 재시작 전까지 계속 0만 돌려준다. 모든 호출은 Next()를 거친다.
+        private static readonly Random m_Random = new Random();
+
+        private static int Next(int maxValue)
+        {
+            lock (m_Random)
+                return m_Random.Next(maxValue);
+        }
 
         public static int ToInt32(string value)
         {
@@ -33,7 +41,7 @@ namespace LKCamelot.model
 
         public static bool RandomBool()
         {
-            return (m_Random.Next(2) == 0);
+            return (Next(2) == 0);
         }
 
         public static int RandomMinMax(int min, int max)
@@ -49,7 +57,7 @@ namespace LKCamelot.model
                 return min;
             }
 
-            return min + m_Random.Next((max - min) + 1);
+            return min + Next((max - min) + 1);
         }
 
         public static int Random(int from, int count)
@@ -60,11 +68,11 @@ namespace LKCamelot.model
             }
             else if (count > 0)
             {
-                return from + m_Random.Next(count);
+                return from + Next(count);
             }
             else
             {
-                return from - m_Random.Next(-count);
+                return from - Next(-count);
             }
         }
 
@@ -72,7 +80,7 @@ namespace LKCamelot.model
         {
             if (count == 0)
                 return 0;
-            return m_Random.Next(count);
+            return Next(count);
         }
 
         public static ushort checkUShort(uint value)

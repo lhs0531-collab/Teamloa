@@ -52,6 +52,23 @@ namespace LKCamelot.script.spells
 
             if (Target != null)
             {
+                // 유저 간에는 쌍방이 @대인공격 ON일 때만 걸 수 있다.
+                if (!player.PK || !Target.PK)
+                {
+                    player.client.SendPacket(new UpdateChatBox(0x00, 0xff, 1, "서로 대인공격이 ON인 상태에서만 사용할 수 있습니다.").Compile());
+                    return;
+                }
+
+                // PK 불가 맵에서는 걸 수 없다. 대상이 다른 맵(안전지대 포함)에 있을 때도 걸 수 없다.
+                model.Map.MapAttribute currMap = null;
+                if (player.Map != null)
+                    model.Map.FullMaps[player.m_Channel].TryGetValue(player.Map, out currMap);
+                if (currMap == null || currMap.PKable == model.Map.PKType.ImpossiblePK || Target.Map != player.Map)
+                {
+                    player.client.SendPacket(new UpdateChatBox(0x00, 0xff, 1, "이곳에서는 사용할 수 없습니다.").Compile());
+                    return;
+                }
+
                 if (!Target.AddBuff(this))
                     player.client.SendPacket(new UpdateChatBox(0x00, 0xff, 1, "마법이 실패하였습니다").Compile());
             }

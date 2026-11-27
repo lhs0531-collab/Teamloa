@@ -43,6 +43,9 @@ namespace LKCamelot.script.spells
         }
         public override void UseSpell(model.Player player, int castonid, short castx, short casty)
         {
+            // 벽이 남아 있는 동안 다시 쓰면 이전 벽을 지우고 새 위치에 다시 깐다.
+            WallTrap.Clear(player, this);
+
             m_buff = new Buff();
             m_buff.BuffType = BuffCase.Wall;
 
@@ -56,7 +59,8 @@ namespace LKCamelot.script.spells
             {
                 int time = BuffEffect.Time + ((Level - 1) * BuffEffect.TimePI);
 
-                player.client.castHandler.CreateMagicEffect(m_buff.Loc, player.m_Channel, player.Map, (short)((player.Face + 2) % 8), 0x2D, time, 3);
+                int effect = player.client.castHandler.CreateMagicEffect(m_buff.Loc, player.m_Channel, player.Map, (short)((player.Face + 2) % 8), 0x2D, time, 3);
+                WallTrap.Register(player, this, m_buff, time, effect);
             }
         }
     }

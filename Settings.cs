@@ -59,6 +59,40 @@ namespace LKCamelot
             "초보 사냥터는 \"@이동 초보\", \"@이동 위클리\" 입니다.",
         };
 
+        // 타인에게 걸 수 있는 버프(와콘다, 버터플라이, 실버스크린)의 대상 판정 범위(칸).
+        // 누른 좌표가 다른 유저의 발밑 칸 기준으로 이 범위 안이면 그 유저에게, 아니면 시전자 자신에게 건다.
+        public static int BuffTargetRangeX = 1;         // 좌우
+        public static int BuffTargetRangeUp = 2;        // 위쪽(몸통·머리)
+        public static int BuffTargetRangeDown = 1;      // 아래쪽
+
+        // 감속 마법(몬스터 대상). 이동속도 감소율(%)과 아이스백의 지속시간.
+        // 유저의 걷기 속도는 서버가 검증하지 않으므로 유저에게는 감속이 걸리지 않는다.
+        public static int HailStormSlowPercent = 30;
+        public static int IceBagSlowPercent = 50;
+        public static int IceBagSlowTime = 8 * Second;      // 1권 기준
+        public static int IceBagSlowTimePl = 1 * Second;    // 권당 증가
+        public static int SlowPercentMax = 90;              // 감속 상한(%)
+
+        // 은신(TRANSPARENCY): 권당 투명도(%)와 지속시간. 샤프아이(SHARP EYE): 권당 벗기는 투명도(%)와 대상 판정 범위(칸).
+        public static int HidePercentPl = 10;               // 1권 10% ~ 10권 100%
+        public static int HideTime = 30 * Second;           // 1권 기준
+        public static int HideTimePl = 10 * Second;         // 권당 증가 (10권 = 120초)
+        public static int SharpEyePercentPl = 10;
+        public static int SharpEyeRange = 2;                // 누른 좌표에서 이 범위 안의 은신 유저를 찾는다
+
+        // 쇼크(몬스터 대상 지속 피해). 주기마다 마법 피해(30 + 권당 5)를 준다.
+        public static int ShokeTickInterval = 1 * Second;   // 피해 주기
+        public static int ShokeTime = 5 * Second;           // 지속시간, 1권 기준
+        public static int ShokeTimePl = 1 * Second;         // 권당 증가 (12권 = 16초)
+        public static int ShokeEffectSprite = 53;           // 걸린 몬스터에 표시되는 효과 번호
+
+        // 불벽·전기벽의 몬스터 유인. 어그로가 끌린 몬스터가 벽 가운데에서 이 범위(칸) 안에 있으면 벽으로 들어간다.
+        public static int WallLureRange = 6;
+        public static int WallInfightChance = 10;           // 벽 위 몬스터가 공격 주기마다 가운데 몬스터를 공격할 확률(%)
+
+        // 뻗어 나가는 마법(프레임웨이브, 썬더스트록)이 시전자에서 나아가는 거리(칸). 누른 위치와 무관하게 이 거리까지 간다.
+        public static int WaveReach = 10;
+
         public static int AutoDeleteDaysPromo = 100;
         public static int AutoDeleteDaysNormal = 50;
 
@@ -94,7 +128,16 @@ namespace LKCamelot
         //게임 설정
         public static int SaveTime = 30 * Minute;       // 저장 시간
         public static short MaxLevel = 231;             // 만렙 설정 (7승11->231, 12승20-> 340)
-        public static int TrunXP = 1000000;            // 턴 경험치 설정 (승급기준 : 100만)
+        // 미분배 턴 안내 메시지 색상(UpdateChatBox의 앞 두 값)과 반복 주기(초).
+        // 색상 값은 기존 시스템 안내에 쓰이던 (0x00, 0xff)를 그대로 썼다. 클라이언트에서 노란색이 아니면 이 두 값을 바꾼다.
+        public static byte TurnNoticeColor1 = 0x00;
+        public static byte TurnNoticeColor2 = 0xff;
+        public static int TurnNoticeInterval = 180;
+
+        // 전직 책(기사·검객·위저드·샤먼) 가격. 아론의 턴 초기화 비용도 이 값을 쓴다.
+        public static ulong ClassBookPrice = 85000000;
+
+        public static int TrunXP = 1000000;           // 턴 경험치 설정 (승급기준 : 100만)
         public static bool DieDropGold = true;          // 죽을 경우 골드 떨굼 여부 (10%)
         public static bool DieDropItem = false;         // 죽을 경우 아이템 떨굼 여부
 

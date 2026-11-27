@@ -76,10 +76,12 @@ namespace LKCamelot.model
 
         public static void FullMapsLoad()
         {
-            FullMaps = new Dictionary<string, MapAttribute>[Settings.VillageName.Count];
+            // 새 목록을 지역 변수에 다 채운 뒤 마지막에 교체한다.
+            // (#맵디비갱신 도중 맵 목록이 비어 있는 구간이 생기지 않게 한다)
+            var newMaps = new Dictionary<string, MapAttribute>[Settings.VillageName.Count];
             for (int i = 0; i < Settings.VillageName.Count(); i++)
             {
-                FullMaps[i] = new Dictionary<string, MapAttribute>();
+                newMaps[i] = new Dictionary<string, MapAttribute>();
             }
 
             string strConn = Settings.DB_Conn;
@@ -99,11 +101,13 @@ namespace LKCamelot.model
                 if (vilgNum == -1)
                 {
                     for (int i = 0; i < Settings.VillageName.Count(); i++)
-                        FullMaps[i].Add(d["MAPNAME"].ToString(), new MapAttribute(d["FILENAME"], d["Fog"], d["Sound"], d["WorldTime"], d["LimitLevel"], d["isOpen"], d["isPK"], d["isLegend"]));
+                        newMaps[i].Add(d["MAPNAME"].ToString(), new MapAttribute(d["FILENAME"], d["Fog"], d["Sound"], d["WorldTime"], d["LimitLevel"], d["isOpen"], d["isPK"], d["isLegend"]));
                 }
                 else
-                    FullMaps[vilgNum].Add(d["MAPNAME"].ToString(), new MapAttribute(d["FILENAME"], d["Fog"], d["Sound"], d["WorldTime"], d["LimitLevel"], d["isOpen"], d["isPK"], d["isLegend"]));
+                    newMaps[vilgNum].Add(d["MAPNAME"].ToString(), new MapAttribute(d["FILENAME"], d["Fog"], d["Sound"], d["WorldTime"], d["LimitLevel"], d["isOpen"], d["isPK"], d["isLegend"]));
             }
+
+            FullMaps = newMaps;
 
             script.map.GotoCmd.GotoCmdLoad();
 
