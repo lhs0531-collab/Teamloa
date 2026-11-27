@@ -57,6 +57,7 @@ namespace LKCamelot.script.spells
                 int time = BuffEffect.Time + ((Level - 1) * BuffEffect.TimePI);
 
                 player.client.castHandler.CreateMagicEffect(m_buff.Loc, player.m_Channel, player.Map, (short)((player.Face + 2) % 8), 0x2D, time, 3);
+                WallTrap.Register(player, m_buff, time);
             }
         }
     }

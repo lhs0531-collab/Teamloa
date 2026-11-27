@@ -187,6 +187,7 @@
     <Compile Include="model\World\Map2.cs" />
     <Compile Include="model\World\Spawner.cs" />
     <Compile Include="model\World\World.cs" />
+    <Compile Include="model\World\WallTrap.cs" />
     <Compile Include="net\PacketReader.cs" />
     <Compile Include="net\PacketWriter.cs" />
     <Compile Include="net\Stream.cs" />

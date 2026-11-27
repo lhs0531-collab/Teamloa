@@ -531,6 +531,57 @@ namespace LKCamelot.script.monster
             }
         }
 
+        // 불벽·전기벽 위에서 가운데 몬스터를 공격할지 다음에 판정할 시각(ms)
+        public long NextInfightRoll;
+
+        /// <summary>
+        /// 다른 몬스터를 공격한다(불벽·전기벽의 가운데 자리 다툼).
+        /// 이 공격으로 죽은 몬스터는 아이템을 떨어뜨리지 않고, 경험치는 그때까지 유저가 준 피해만큼만 나뉜다.
+        /// </summary>
+        public void AttackMonster(Monster victim)
+        {
+            if (victim == null || !victim.Alive)
+                return;
+
+            World.SendToAll(new QueDele(this.m_Channel, this.m_Map, new SwingAnimation(m_Serial, World.AttackRange((short)victim.m_Loc.X, (short)victim.m_Loc.Y, (short)m_Loc.X, (short)m_Loc.Y)).Compile()));
+
+            float total = (float)Hit + (float)victim.Hit;
+            float h = total <= 0 ? 100 : ((float)Hit / total) * 200;
+            if (h < 100 && Util.Random(100) >= (int)h)
+                return;
+
+            int take = Dam - victim.AC;
+            if (take <= 0)
+                take = 1;
+            if (victim.HPCur - take <= 0)
+                take = victim.HPCur;
+
+            victim.HPCur -= take;
+            World.SendToAll(new QueDele(victim.m_Channel, victim.m_Map, new HitAnimation(victim.m_Serial,
+                Convert.ToByte(((float)victim.m_HPCur / (float)victim.HP) * 100)).Compile()));
+
+            if (victim.HPCur <= 0)
+            {
+                foreach (var p in victim.Exp)
+                {
+                    if (victim.m_Channel != p.Key.m_Channel || victim.m_Map != p.Key.Map)
+                        continue;
+                    if (World.Dist2d(victim.m_Loc.X, victim.m_Loc.Y, p.Key.Loc.X, p.Key.Loc.Y) > 12)
+                        continue;
+
+                    float temp = (float)p.Value / victim.HP;
+                    temp = victim.XP * temp;
+
+                    var currMap = model.Map.FullMaps[victim.m_Channel].Where(Xe => Xe.Key == victim.m_Map).FirstOrDefault().Value;
+                    if (p.Key.Level == Settings.MaxLevel && !currMap.isLegend)
+                        temp = 0;
+
+                    AwardExperience(p.Key, temp);
+                }
+                victim.Exp.Clear();
+            }
+        }
+
         public virtual void TakeDamage(Player player)
         {
             if (Target == 0)
