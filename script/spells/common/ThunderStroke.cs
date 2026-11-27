@@ -23,12 +23,12 @@ namespace LKCamelot.script.spells
             {
                 return new SpellSequence(
                     12,  //oncast
-                    45,  //moving
+                    53,  //moving
                     0,  //impact
                     3,  //thickness
                     0,  //type
-                    16,  //speed
-                    4  //streak (시전 방향으로 이어지는 줄 수)
+                    20,  //speed
+                    6  //streak (시전 방향으로 이어지는 줄 수)
                     );
             }
         }
