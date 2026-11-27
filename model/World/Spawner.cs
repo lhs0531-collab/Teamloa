@@ -38,6 +38,7 @@ namespace LKCamelot.model
                     World.NewNpcs[i].TryAdd(NPCSerial, new script.npc.Exchange(NPCSerial++, i, "교환", new Point2D(17, 36)));
                     World.NewNpcs[i].TryAdd(NPCSerial, new script.npc.Exchange(NPCSerial++, i, "교환", new Point2D(66, 36)));
                     World.NewNpcs[i].TryAdd(NPCSerial, new script.npc.Exchange(NPCSerial++, i, "교환", new Point2D(40, 63)));
+                    World.NewNpcs[i].TryAdd(NPCSerial, new script.npc.Helper(NPCSerial++, i, Settings.VillageName.ElementAt(i) + ",32", new Point2D(93, 174)));
 
                     World.NewNpcs[i].TryAdd(SignSerial, new script.npc.Sign(SignSerial++, i, "ItemVillage", new Point2D(97, 106), new Point2D(186, 5), 1, "아이템스켈(185:5)"));
                     World.NewNpcs[i].TryAdd(SignSerial, new script.npc.Sign(SignSerial++, i, "ItemVillage", new Point2D(99, 108), new Point2D(193, 30), 1, "아이템부처(193:30)"));

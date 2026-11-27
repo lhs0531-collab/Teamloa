@@ -547,6 +547,7 @@
     <Compile Include="script\npc\npcs\Quester.cs" />
     <Compile Include="script\npc\npcs\Quiz.cs" />
     <Compile Include="script\npc\npcs\RestEmployee.cs" />
+    <Compile Include="script\npc\npcs\Helper.cs" />
     <Compile Include="script\npc\npcs\RockPaperScissors.cs" />
     <Compile Include="script\npc\npcs\Exchange.cs" />
     <Compile Include="script\npc\sign.cs" />

@@ -985,7 +985,11 @@ namespace LKCamelot.io
                         }
                         else if (npclook.Value is script.npc.BoardSign)
                             World.SendToRange(new QueDele(player.m_Channel, player.Map, new UpdateCharChatBox(npclook.Key, npclook.Value.ChatString[0]).Compile()), player, 12);
-                        
+                        else if (npclook.Value.Event_Click(player))
+                        {
+                            // NPC가 클릭을 직접 처리했다(도우미 등).
+                        }
+
                         else
                         {
                             if (npclook.Value.m_Map == player.Map && npclook.Value.Gump != null)

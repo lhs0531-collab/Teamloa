@@ -87,6 +87,10 @@ namespace LKCamelot
         public static int ShokeEffectSprite = 53;           // 걸린 몬스터에 표시되는 효과 번호
 
         // 불벽·전기벽의 몬스터 유인. 어그로가 끌린 몬스터가 벽 가운데에서 이 범위(칸) 안에 있으면 벽으로 들어간다.
+        // 도우미(버프 동상): 클릭하면 이 골드를 받고 버터플라이를 이 권수로 걸어 준다.
+        public static ulong HelperBuffCost = 1000000;
+        public static int HelperBuffLevel = 1;
+
         public static int WallLureRange = 6;
 
         // 교환창이 열려 있는 동안 받은 패킷을 로그 폴더의 _Log_ExchangePacket.txt에 남긴다.
