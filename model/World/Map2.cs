@@ -107,6 +107,14 @@ namespace LKCamelot.model
                     newMaps[vilgNum].Add(d["MAPNAME"].ToString(), new MapAttribute(d["FILENAME"], d["Fog"], d["Sound"], d["WorldTime"], d["LimitLevel"], d["isOpen"], d["isPK"], d["isLegend"]));
             }
 
+            // 마을 맵이 DB에 없는 마을이 있으면 알린다. 이 상태로는 몬스터 스폰이 맵을 찾지 못해 서버 기동이 멈춘다.
+            for (int i = 0; i < Settings.VillageName.Count(); i++)
+            {
+                string villageMap = Settings.VillageName.ElementAt(i) + Settings.StartMap;
+                if (!newMaps[i].ContainsKey(villageMap))
+                    Console.WriteLine("[오류] {0}번 마을의 맵 '{1}'이 mapmaster에 없습니다. DB에 마을 데이터를 먼저 넣어야 합니다.", i, villageMap);
+            }
+
             FullMaps = newMaps;
 
             script.map.GotoCmd.GotoCmdLoad();

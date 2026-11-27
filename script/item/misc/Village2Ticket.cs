@@ -9,7 +9,7 @@ namespace LKCamelot.script.item
     public class Village2Ticket : Item
     {
         int Channel = 2;
-        public override string Name { get { return "새벽의마을" + " 티켓"; } }
+        public override string Name { get { return Settings.VillageName.ElementAt(Channel) + " 티켓"; } }
         public override ulong BuyPrice { get { return 100; } }
 
         public Village2Ticket()
@@ -25,7 +25,6 @@ namespace LKCamelot.script.item
 
         public override void Use(Player player)
         {
-            /*
             Player p;
             this.Delete(player);
             PlayerHandler.getSingleton().add[player.m_Channel].TryRemove(player.Name, out p);
@@ -49,7 +48,6 @@ namespace LKCamelot.script.item
 
             player.m_Channel = Channel;
             player.client.LoadPlayer(false);
-             */ 
         }
     }
 }
