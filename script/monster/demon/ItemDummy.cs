@@ -29,17 +29,16 @@ namespace LKCamelot.script.monster
                     // 15.01.31 GM티리엘
                     // 아이템 확률 전체2 -> 10~15 로 변경
 
-                    new LootPackEntry(7, typeof(script.item.WarStaff), "15d10+225", 1, 1, 1),      //temp (프리징,스톤커즈,은신,샤프아이 드랍시 삭제)
-                    new LootPackEntry(7, typeof(script.item.Javelin), "15d10+225", 1, 1, 1),       //temp (프리징,스톤커즈,은신,샤프아이 드랍시 삭제)
+                    // 프리징·스톤커즈·은신·샤프아이가 모두 드랍되면서 임시 항목(WarStaff, Javelin 각 7)을 삭제함
                     new LootPackEntry(8, typeof(script.item.BreastPlate), "15d10+225", 1, 1, 1),
                     new LootPackEntry(8, typeof(script.item.BattleAxe), "15d10+225", 1, 1, 1),
                     new LootPackEntry(8, typeof(script.item.GrandShield), "15d10+225", 1, 1, 1),
                     new LootPackEntry(8, typeof(script.item.SamuraiSword), "15d10+225", 1, 1, 1),
                     new LootPackEntry(2, typeof(script.item.StoneCurseBook), "10d22+250", 40, 1, 1),
-                    //샤프아이
+                    new LootPackEntry(2, typeof(script.item.SharpEyeBook), "10d22+250", 40, 1, 1),         //샤프아이
                     //라디에이션
                     new LootPackEntry(2, typeof(script.item.FreezingBook), "10d22+250", 40, 1, 1),
-                    //은신
+                    new LootPackEntry(2, typeof(script.item.TransparencyBook), "10d22+250", 40, 1, 1),     //은신
                     new LootPackEntry(15, typeof(script.item.ScaleMail), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15, typeof(script.item.WarHammer), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15, typeof(script.item.GrandeurHelmet), "15d10+225", 1, 1, 1),

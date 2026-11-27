@@ -33,10 +33,10 @@ namespace LKCamelot.script.monster
                     new LootPackEntry(8, typeof(script.item.Maul), "15d10+225", 1, 1, 1),
                     new LootPackEntry(8, typeof(script.item.Tuck), "15d10+225", 1, 1, 1),      
                     //스톤커즈
-                    //샤프아이
+                    new LootPackEntry(1.5, typeof(script.item.SharpEyeBook), "15d10+225", 1, 1, 1),        //샤프아이
                     //라디에이션
                     //프리징
-                    //new LootPackEntry(1.5, typeof(script.item.TransparencyBook), "15d10+225", 1, 1, 1),
+                    new LootPackEntry(1.5, typeof(script.item.TransparencyBook), "15d10+225", 1, 1, 1),    //은신
                     new LootPackEntry(8, typeof(script.item.BoneMail), "15d10+225", 1, 1, 1),
                     new LootPackEntry(8, typeof(script.item.RingMail), "15d10+225", 1, 1, 1),
                     new LootPackEntry(8, typeof(script.item.BroadAxe), "15d10+225", 1, 1, 1),

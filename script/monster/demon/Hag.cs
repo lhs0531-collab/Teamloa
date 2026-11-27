@@ -25,10 +25,10 @@ namespace LKCamelot.script.monster
             {
                 return new LootPack(new LootPackEntry[]
                 {
-                    //은신
+                    new LootPackEntry(0.05, typeof(script.item.TransparencyBook), "10d22+250", 40, 1, 1),   //은신
                     //프리징
                     //스톤커즈
-                    //샤프아이
+                    new LootPackEntry(0.05, typeof(script.item.SharpEyeBook), "10d22+250", 40, 1, 1),       //샤프아이
                     new LootPackEntry(0.05, typeof(script.item.Troy), "10d22+250", 40, 1, 1),
                     new LootPackEntry(0.05, typeof(script.item.DemonDeathBook), "10d22+250", 40, 1, 1),
                     new LootPackEntry(0.05, typeof(script.item.BigBangBook), "10d22+250", 40, 1, 1),
