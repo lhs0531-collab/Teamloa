@@ -879,7 +879,7 @@ namespace LKCamelot.io
             {
                 UpdateChat("@길드생성, @길드삭제, @길드가입, @길드탈퇴, @길드정보");
                 UpdateChat("@길드맵설정, @출두");
-                UpdateChat("@길드직책명, @길드직책변경");
+                UpdateChat("@길드직책명, @길드직책변경, @길드양도");
             }
 
             #region @핑, @시간
@@ -1482,6 +1482,10 @@ namespace LKCamelot.io
                 else if (position < 0 || position >= 6)
                     SendPacket(new UpdateChatBox(0x00, 0xff, 1, "직책을 찾을 수 없습니다.").Compile());
 
+                // 수장(0) 직책으로는 가입시킬 수 없다. 수장 교체는 @길드양도로만 한다.
+                else if (position == 0)
+                    SendPacket(new UpdateChatBox(0x00, 0xff, 1, "수장 직책으로는 가입시킬 수 없습니다. (@길드양도)").Compile());
+
                 else if ((position == 1 && play.Level < 100) || play.Level < Settings.GuildJoinLevel)
                     SendPacket(new UpdateChatBox(0x00, 0xff, 1, "해당 레벨이 부족합니다.").Compile());
 
@@ -1587,6 +1591,45 @@ namespace LKCamelot.io
             }
             #endregion
 
+            #region @길드양도
+            else if (str2[0] == "@길드양도")
+            {
+                int myPosition;
+                if (player.Guild == null || !player.Guild.Member.TryGetValue(player.m_Serial, out myPosition) || myPosition != 0)
+                {
+                    SendPacket(new UpdateChatBox(0x00, 0xff, 1, "길드가 없거나 권한이 없습니다. (수장만 가능)").Compile());
+                    return;
+                }
+                else if (str2.Count() != 2)
+                {
+                    SendPacket(new UpdateChatBox(0x00, 0xff, 1, "@길드양도 [아이디]").Compile());
+                    return;
+                }
+
+                var guild = player.Guild;
+                string targetName = str2[1].ToUpper();
+                var play = handler.Total.Where(xe => xe.Value != null && xe.Value.Guild == guild && xe.Value.Name == targetName).FirstOrDefault().Value;
+
+                if (play == null || !guild.Member.ContainsKey(play.m_Serial))
+                    SendPacket(new UpdateChatBox(0x00, 0xff, 1, "해당 길드원을 찾을 수 없습니다.").Compile());
+
+                else if (play == player)
+                    SendPacket(new UpdateChatBox(0x00, 0xff, 1, "자기 자신에게는 양도할 수 없습니다.").Compile());
+
+                else
+                {
+                    // 기존 수장은 가장 낮은 직책(일반 등급)으로, 양도받는 길드원은 수장으로.
+                    int memberPosition = guild.PostionName.Length - 1;
+                    guild.Member[play.m_Serial] = 0;
+                    guild.Member[player.m_Serial] = memberPosition;
+
+                    string notice = string.Format("{0}길드의 {1}이(가) {2}님에서 {3}님으로 변경되었습니다.", guild.Name, guild.PostionName[0], player.Name, play.Name);
+                    foreach (var member in handler.Total.Values.Where(xe => xe != null && xe.Guild == guild && xe.loggedIn && xe.client != null).ToList())
+                        member.client.SendPacket(new UpdateChatBox(0x00, 0xff, 1, notice).Compile());
+                }
+            }
+            #endregion
+
             #region @길드직책변경
             else if (str2[0] == "@길드직책변경")
             {
@@ -1609,6 +1652,13 @@ namespace LKCamelot.io
                             play.Guild.Member.TryGetValue(play.m_Serial, out target);               //해당자
                             if (pl > target)
                                 return;
+
+                            // 수장이 자신의 직책을 바꾸면 수장 없는 길드가 된다. 수장 교체는 @길드양도로만 한다.
+                            if (target == 0)
+                            {
+                                SendPacket(new UpdateChatBox(0x00, 0xff, 1, "수장의 직책은 변경할 수 없습니다. (@길드양도)").Compile());
+                                return;
+                            }
 
                             if (player.Guild.PostionName.Where(xe => xe.Equals(str2[2])).Any())
                             {
