@@ -15,7 +15,7 @@ namespace LKCamelot.model
             for (int i = 0; i < 4; i++)
             {
                 if (owner.Exchange.CellItem.Count() > i)
-                    m_Stream.Write((byte)owner.Exchange.CellItem[i].m_ItemID);
+                    m_Stream.Write((byte)owner.Exchange.CellItem[i].Item.m_ItemID);
                 else
                     m_Stream.Write((byte)0);
             }
@@ -23,7 +23,7 @@ namespace LKCamelot.model
             for (int i = 0; i < 4; i++)
             {
                 if (target.Exchange.CellItem.Count() > i)
-                    m_Stream.Write((byte)target.Exchange.CellItem[i].m_ItemID);
+                    m_Stream.Write((byte)target.Exchange.CellItem[i].Item.m_ItemID);
                 else
                     m_Stream.Write((byte)0);
             }

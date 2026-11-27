@@ -734,6 +734,9 @@ namespace LKCamelot.io
                     {
                         var itemtoentrust = World.NewItems.Where(xe => xe.Value.ParSer == player.m_Serial && xe.Value.InvSlot == data[1]).FirstOrDefault();
                         
+                        if (player.Exchange != null && player.Exchange.Contains(itemtoentrust.Value))
+                            return;
+
                         if (itemtoentrust.Value != null)
                         {
                             int index = (World.NewNpcs[this.player.m_Channel].Count * this.player.m_Channel) + 3;
@@ -749,6 +752,9 @@ namespace LKCamelot.io
                     if (player.Map.Contains("대장간"))
                     {
                         var itemtosell = World.NewItems.Where(xe => xe.Value.ParSer == player.m_Serial && xe.Value.InvSlot == data[1]).FirstOrDefault();
+                        if (player.Exchange != null && player.Exchange.Contains(itemtosell.Value))
+                            return;
+
                         if (itemtosell.Value != null && itemtosell.Value.SellPrice > 0)
                         {
                             try
@@ -1006,6 +1012,10 @@ namespace LKCamelot.io
                     var itemu = World.NewItems.Where(xe => xe.Value.m_Parent == player
                       && xe.Value.InvSlot == data[1]).FirstOrDefault();
 
+                    // 교환창에 올린 아이템은 교환이 끝날 때까지 쓸 수 없다. (이하 버리기·장착·교체·건네기·판매·보관·수리도 같다)
+                    if (player.Exchange != null && player.Exchange.Contains(itemu.Value))
+                        return;
+
                     if (itemu.Value != null)
                         itemu.Value.Use(player);
 
@@ -1015,6 +1025,11 @@ namespace LKCamelot.io
                 #region 인벤토리 드랍
                 case 0x20: //drop
                     var item = World.NewItems.Where(xe => xe.Value.m_Parent == player && xe.Value.InvSlot == data[1]).FirstOrDefault();
+
+                    if (item.Value == null)
+                        return;
+                    if (player.Exchange != null && player.Exchange.Contains(item.Value))
+                        return;
 
                     if (item.Value != null && !item.Value.Stackable)
                         item.Value.Drop(player);
@@ -1043,6 +1058,9 @@ namespace LKCamelot.io
                     // case 0x36:
                     var eitem = World.NewItems.Where(xe => xe.Value.m_Parent == player
                         && xe.Value.InvSlot == data[1]).FirstOrDefault();
+
+                    if (player.Exchange != null && player.Exchange.Contains(eitem.Value))
+                        return;
 
                     if (eitem.Value != null)
                     {
@@ -1073,6 +1091,9 @@ namespace LKCamelot.io
 
                     var target1 = World.NewItems.Where(xe => xe.Value.ParSer == player.m_Serial && xe.Value.InvSlot == sss).FirstOrDefault().Value;
 
+                    if (player.Exchange != null && (player.Exchange.Contains(item11) || player.Exchange.Contains(target1)))
+                        return;
+
                     player.SwapItems(item11, target1, sss);
 
                     break;
@@ -1081,6 +1102,9 @@ namespace LKCamelot.io
                 #region 아이템 건내기
                 case 0x24: //drag,drop
                     var itemdragdrop = player.Inventory.Where(xe => xe.ParSer == player.m_Serial && xe.InvSlot == data[1]).FirstOrDefault();
+                    if (player.Exchange != null && player.Exchange.Contains(itemdragdrop))
+                        return;
+
                     if (itemdragdrop != null)
                     {
                         p = new PacketReader(data, data.Count(), false);
@@ -1142,6 +1166,9 @@ namespace LKCamelot.io
                     {
                         var items = player.Inventory.Where(xe => xe.ParSer == player.m_Serial && xe.InvSlot == data[1]).FirstOrDefault();
 
+                        if (player.Exchange != null && player.Exchange.Contains(items))
+                            return;
+
                         if (items != null)
                             items.Repair(player);
                     }
@@ -1153,30 +1180,31 @@ namespace LKCamelot.io
                 //교환
                 #region 교환 체크
                 case 0x4A:
+                    if (player.Exchange == null)
+                        return;
                     //아이템 추가
-                    if (data[1] == 0x07)
+                    if (data.Length > 1 && data[1] == 0x07)
                     {
-                        //GOLD
-                        //player.client.SendPacket(new AmountBox(, itemdragdrop).Compile());
+                        // 골드: 클라이언트가 보내는 금액의 바이트 위치가 확인되지 않아 아직 처리하지 않는다.
+                        // 확인되면 금액을 읽어 player.Exchange.SetGold(금액)을 호출한다.
                     }
-                    else if (data[1] == 0x02)
+                    else if (data.Length > 1 && data[1] == 0x02)
                     {
                         //data[7] : Item slot
-                        var freeslot = player.Exchange.GetFreeSlot();
-
-                        if (freeslot >= 0)
-                        {
-                            int Slot = 0;
-                            if (((data.Length != 4) && (data.Length != 6)))
-                                Slot = data[7];
-                            player.Exchange.AddItem(Slot, 1);
-                        }
+                        int Slot = 0;
+                        if (data.Length != 4 && data.Length != 6 && data.Length > 7)
+                            Slot = data[7];
+                        player.Exchange.AddItem(Slot, 0);        // 수량 0 = 전량
                     }
                     break;
                 case 0x4C:
+                    if (player.Exchange == null)
+                        return;
                     player.Exchange.isCheck = !player.Exchange.isCheck;
                     break;
                 case 0x4F:
+                    if (player.Exchange == null)
+                        return;
                     player.Exchange.Cancle();
                     break;
                 #endregion
@@ -1195,6 +1223,10 @@ namespace LKCamelot.io
                             return;
 
                         var invItem = player.Inventory.Where(xe => xe.InvSlot == invslot).FirstOrDefault();
+                        if (invItem == null)
+                            return;
+                        if (player.Exchange != null && player.Exchange.Contains(invItem))
+                            return;
                         if (amount > invItem.Quantity)
                             amount = invItem.Quantity;
 
@@ -1352,6 +1384,8 @@ namespace LKCamelot.io
 
                 #region 로그인 로그아웃 비번 변경
                 case 0x01: //Logout
+                    if (player.Exchange != null)
+                        player.Exchange.Cancle();
                     World.SendToAll(new QueDele(player.m_Serial, player.m_Channel, player.Map, new DeleteObject(player.m_Serial).Compile()));
                     player.loggedIn = false;
                     player.SoundFlag = false;
@@ -1495,6 +1529,21 @@ namespace LKCamelot.io
                     sr.WriteLine(bug);
                     sr.Close();
                     sr.Dispose();
+                }
+            }
+        }
+        static object WriteExchangeLock = new object();
+        public static void WriteExchangeLog(string line)
+        {
+            lock (WriteExchangeLock)
+            {
+                string path = Settings.LogPath + DateTime.Now.ToString("yyyyMMdd") + "\\";
+                if (!System.IO.Directory.Exists(path))
+                    System.IO.Directory.CreateDirectory(path);
+
+                using (System.IO.StreamWriter sr = new System.IO.StreamWriter(path + DateTime.Now.ToString("yyyyMMdd") + "_Log_Exchange.txt", true))
+                {
+                    sr.WriteLine(line);
                 }
             }
         }

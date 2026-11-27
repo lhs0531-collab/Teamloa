@@ -1940,6 +1940,12 @@ namespace LKCamelot.io
             #region 교환
             else if (str2[0] == "@교환")
             {
+                if (str2.Length < 2)
+                {
+                    SendPacket(new UpdateChatBox(0x00, 0xff, 1, "사용법 : @교환 [아이디]").Compile());
+                    return;
+                }
+
                 var target = handler.add[player.m_Channel].Where(xe => xe.Value != null && xe.Value.loggedIn && xe.Value.Name == str2[1].ToUpper() && xe.Value.Name != player.Name).FirstOrDefault();
 
                 if (target.Value == null || World.Dist2d(target.Value.Loc, player.Loc) > 5 || target.Value.Map != player.Map || target.Value.m_Channel != player.m_Channel)
