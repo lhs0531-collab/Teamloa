@@ -42,6 +42,9 @@ namespace LKCamelot.script.spells
 
         // 이동속도 감소율(%). BuffType이 Slow일 때 몬스터의 걷기 간격에 반영된다. (Monster.EffectiveWalkSpeed)
         public int MoveSlowPercent = 0;
+
+        // 지속 피해 주기(ms). 0보다 크면 이 버프가 걸린 몬스터는 주기마다 마법 피해를 받는다. (Monster.ProcessDot)
+        public int TickInterval = 0;
     }
     
 	public class Spell

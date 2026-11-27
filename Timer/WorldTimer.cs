@@ -251,6 +251,12 @@ namespace LKCamelot.Timer
                                 Monster.TakeDamage(playe, buff.Value);
                         }
 
+                        // 지속 피해(쇼크). 이 타이머가 1초 주기라 유저에게는 1초마다 들어간다.
+                        // 지속시간이 끝나거나 이 피해로 죽을 때만 풀린다. 시전자의 상태(접속, 맵, 대인공격)는 보지 않는다.
+                        bool isDot = buff.Value.BuffEffect.TickInterval > 0;
+                        if (isDot && time > 0 && playe.TakeDotDamage(buff.Value))
+                            time = 0;
+
 
                         if (time <= 0)
                         {

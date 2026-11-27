@@ -985,7 +985,7 @@ namespace LKCamelot.script.item
     {
         public override string Name { get { return "BOOK OF SHOKE"; } }
         public override int MenReq { get { return 127; } }
-        public override int MenReqPl { get { return 12; } }
+        public override int MenReqPl { get { return 13; } }
         public override int DexReq { get { return 0; } }
         public override int DexReqPl { get { return 0; } }
         public override int LevelReq { get { return 0; } }

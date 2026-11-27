@@ -1964,6 +1964,43 @@ namespace LKCamelot.model
         }
 
         /// <summary>
+        /// 이 유저가 caster의 공격 마법을 맞을 수 있는 상태인지 확인한다.
+        /// 아래 TakeDamage(Player, Spell)의 조건과 같다: 같은 맵, PK 가능 맵, 시전자 대인공격 ON, 보호 레벨 초과.
+        /// </summary>
+        public bool CanTakeSpellFrom(Player caster)
+        {
+            if (caster == null || caster == this || !caster.loggedIn || !caster.PK)
+                return false;
+            if (caster.m_Channel != this.m_Channel || caster.Map == null || caster.Map != this.Map)
+                return false;
+
+            model.Map.MapAttribute currMap;
+            if (!model.Map.FullMaps[caster.m_Channel].TryGetValue(caster.Map, out currMap) || currMap == null)
+                return false;
+            if (currMap.PKable == model.Map.PKType.ImpossiblePK)
+                return false;
+            if (Settings.PKProtectLevel >= Level && currMap.PKable != model.Map.PKType.PossiblePK_NoIncrease)
+                return false;
+            return true;
+        }
+
+        /// <summary>
+        /// 지속 피해 마법의 한 주기 피해를 받는다. 시전자의 현재 상태(접속, 맵, 대인공격)는 보지 않는다.
+        /// 이 피해로 죽었으면 true. (죽으면 HPCur 처리에서 휴게실로 이동하므로 맵이 바뀐 것으로 판단한다)
+        /// </summary>
+        public bool TakeDotDamage(script.spells.Spell spell)
+        {
+            int take = spell.DamBase + (spell.DamPl * spell.Level - 1) - this.AC;
+            if (take <= 0)
+                return false;
+
+            string mapBefore = this.Map;
+            this.HPCur -= take;
+            World.SendToAll(new QueDele(this.m_Channel, this.m_Map, new HitAnimation(m_Serial, Convert.ToByte(((((float)HPCur / (float)HP) * 100) * 1))).Compile()));
+            return this.Map != mapBefore;
+        }
+
+        /// <summary>
         /// 사용자로부터 마법 경격을 당함
         /// </summary>
         /// <param name="caster">마법 시전자</param>
@@ -1994,14 +2031,18 @@ namespace LKCamelot.model
                 if (spell is script.spells.DemonDeath)
                     take += spell.DamBase + (spell.DamPl * spell.Level) + Convert.ToInt32((player.m_HPCur + (player.HP * 0.30)) * 0.5) + player.GetStat("dex");
 
-                this.HPCur -= (take - this.AC);
+                // 방어력이 피해보다 높으면 0으로 처리한다. (보정이 없으면 피해가 음수가 되어 맞은 쪽이 회복된다)
+                take -= this.AC;
+                if (take < 0)
+                    take = 0;
+                this.HPCur -= take;
                 if (Settings.RestMap.Contains(this.Map) && this.PKCount < Settings.PKRedCount)
                 {
                     //if (Settings.NotIncreasePKCountMap.Contains(player.Map.Split(',')[0]))
                     //    return;
                     if (currMap.PKable == model.Map.PKType.PossiblePK_NoIncrease)
                         return;
-                    
+
                     if (Settings.PKAlarm)
                         World.SendToAll(new QueDele("all", new UpdateChatBox(0x25, 0x65, 0, string.Format("{0}님(PK:{1})이 {2}님을 죽임. 맵:{3}({4},{5})", player.Name, player.PKCount, this.Name, player.Map.Split(',')[0], player.Loc.X, player.Loc.Y)).Compile()));
 

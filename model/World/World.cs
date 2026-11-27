@@ -218,6 +218,9 @@ namespace LKCamelot.model
                         }
                         #endregion
 
+                        // 지속 피해(쇼크 등)
+                        mob.Value.ProcessDot();
+
                         if (mob.Value.Alive == false)
                         {
                             if (Server.tickcount.ElapsedMilliseconds - mob.Value.SpawnTime > mob.Value.LastSpawn)

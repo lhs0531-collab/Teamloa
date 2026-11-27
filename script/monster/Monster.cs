@@ -118,12 +118,67 @@ namespace LKCamelot.script.monster
         /// </summary>
         public void ApplySlow(script.spells.Spell spell)
         {
+            RefreshBuff(spell);
+        }
+
+        /// <summary>
+        /// 버프를 건다. 같은 이름의 버프가 이미 있으면 지우고 다시 걸어 지속시간을 갱신한다.
+        /// </summary>
+        public void RefreshBuff(script.spells.Spell spell)
+        {
             foreach (var old in m_Buffs.Where(xe => xe.Value.Name == spell.Name).ToList())
             {
                 script.spells.Spell removed;
                 m_Buffs.TryRemove(old.Key, out removed);
             }
             AddBuff(spell);
+        }
+
+        // 다음 지속 피해 시각(ms)
+        public long NextDotTick;
+
+        /// <summary>
+        /// 지속 피해 마법을 건다. 첫 피해는 한 주기 뒤에 들어간다.
+        /// </summary>
+        public void ApplyDot(script.spells.Spell spell)
+        {
+            RefreshBuff(spell);
+            var effect = spell.BuffEffect;
+            if (effect != null && effect.TickInterval > 0)
+                NextDotTick = Server.tickcount.ElapsedMilliseconds + effect.TickInterval;
+        }
+
+        /// <summary>
+        /// 지속 피해 처리. 몬스터 AI 루프가 매번 호출한다.
+        /// 버프는 지속시간이 끝나거나 몬스터가 죽을 때까지 유지된다.
+        /// </summary>
+        public void ProcessDot()
+        {
+            if (!Alive || m_Buffs.IsEmpty)
+                return;
+
+            long now = Server.tickcount.ElapsedMilliseconds;
+            if (now < NextDotTick)
+                return;
+
+            foreach (var buff in m_Buffs)
+            {
+                var effect = buff.Value.BuffEffect;
+                if (effect == null || effect.TickInterval <= 0)
+                    continue;
+
+                NextDotTick = now + effect.TickInterval;
+
+                // 버프는 지속시간이 끝나거나 몬스터가 죽을 때까지 유지한다.
+                // 시전자가 접속 중이 아니면 피해와 경험치를 받을 대상이 없으므로 그 주기의 피해만 건너뛴다.
+                var caster = buff.Value.Caster;
+                if (caster == null || !caster.loggedIn || caster.client == null)
+                    continue;
+
+                TakeDamage(caster, buff.Value);
+                if (!Alive)
+                    break;
+            }
         }
 
         public virtual int SpawnTime { get { return 30000; } }
