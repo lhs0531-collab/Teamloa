@@ -52,6 +52,8 @@ namespace LKCamelot.script.spells
                         target.HPCur = target.HP;
                     else
                         target.HPCur += (int)per;
+
+                    World.SendToAll(new QueDele(player.m_Channel, player.Map, new MagicEffect(target.m_Serial, new Heal().Seq.OnCastSprite).Compile()));
                 }
             }
             else
