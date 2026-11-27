@@ -455,6 +455,30 @@ namespace LKCamelot.script.item
         {
         }
     }
+    public class IceWallBook : BaseSpellbook
+    {
+        public override string Name { get { return "BOOK OF ICE WALL"; } }
+        public override int MenReq { get { return 56; } }
+        public override int MenReqPl { get { return 14; } }
+        public override int DexReq { get { return 0; } }
+        public override int DexReqPl { get { return 0; } }
+        public override int LevelReq { get { return 0; } }
+        public override Class ClassReq { get { return 0; } }
+
+        public override int SellPrice { get { return 15000; } }
+
+        public override spells.Spell SpellTaught { get { return new spells.IceWall(); } }
+
+        public IceWallBook()
+            : base(3)
+        {
+        }
+
+        public IceWallBook(Serial serial)
+            : base(serial)
+        {
+        }
+    }
     public class FireWallBook : BaseSpellbook
     {
         public override string Name { get { return "BOOK OF FIRE WALL"; } }

@@ -573,6 +573,7 @@
     <Compile Include="script\spells\knight\Twister.cs" />
     <Compile Include="script\spells\common\-Lightning.cs" />
     <Compile Include="script\spells\common\-LightningWall.cs" />
+    <Compile Include="script\spells\common\-IceWall.cs" />
     <Compile Include="script\spells\common\Oblivion.cs" />
     <Compile Include="script\spells\shaman\Assassin.cs" />
     <Compile Include="script\spells\shaman\AssassinSpecial.cs" />
