@@ -310,9 +310,15 @@ namespace LKCamelot.model
                                 }
                             }
 
+                            // 불벽·전기벽: 벽 쪽으로 끌려가거나 벽 위에 멈춰 선다.
+                            var wallResult = WallTrap.Process(mob.Value);
+                            if (wallResult == WallTrap.Result.Acted)
+                                continue;
+                            bool wallHold = wallResult == WallTrap.Result.Hold;
+
                             var mobdist = World.Dist2d(mob.Value.m_Loc.X, mob.Value.m_Loc.Y, mob.Value.TargetP.Loc.X, mob.Value.TargetP.Loc.Y);
 
-                            if (mobdist >= 2 && mobdist < mob.Value.MaxAggro && Server.tickcount.ElapsedMilliseconds - mob.Value.EffectiveWalkSpeed > mob.Value.LastAction)
+                            if (!wallHold && mobdist >= 2 && mobdist < mob.Value.MaxAggro && Server.tickcount.ElapsedMilliseconds - mob.Value.EffectiveWalkSpeed > mob.Value.LastAction)
                             {
                                 //이동
                                 mob.Value.LastAction = LKCamelot.Server.tickcount.ElapsedMilliseconds;
@@ -349,7 +355,7 @@ namespace LKCamelot.model
 
                                 World.SendToAll(new QueDele(mob.Value.m_Channel, mob.Value.m_Map, new SwingAnimation(mob.Value.m_Serial, World.AttackRange((short)mob.Value.TargetP.Loc.X, (short)mob.Value.TargetP.Loc.Y, (short)mob.Value.m_Loc.X, (short)mob.Value.m_Loc.Y)).Compile()));
                             }
-                            else if (mobdist > mob.Value.MaxAggro)
+                            else if (!wallHold && mobdist > mob.Value.MaxAggro)
                             {
                                 mob.Value.Target = 0;
                                 mob.Value.TargetP = null;
