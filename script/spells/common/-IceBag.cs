@@ -14,7 +14,7 @@ namespace LKCamelot.script.spells
     public class IceBag : Spell
     {
         public override string Name { get { return "ICE BAG"; } }
-        public override int SpellLearnedIcon { get { return 40; } }      // 헤일스톰과 같은 아이콘
+        public override int SpellLearnedIcon { get { return 73; } } 
         public override LKCamelot.library.MagicType mType { get { return LKCamelot.library.MagicType.Target2; } }
 
         public override int DamBase { get { return 0; } }
@@ -40,12 +40,12 @@ namespace LKCamelot.script.spells
             get
             {
                 return new SpellSequence(
-                    46,   //oncast  (감속 중인 몬스터 위에 표시되는 효과. 헤일스톰과 동일)
-                    79,   //moving  (IceOrLightComet4f)
-                    72,   //impact  (RisingIce48)
+                    11,   //oncast  (감속 중인 몬스터 위에 표시되는 효과. 헤일스톰과 동일)
+                    0,   //moving  (IceOrLightComet4f)
+                    0,   //impact  (RisingIce48)
                     0,    //thickness
                     0,    //type
-                    16,   //speed
+                    0,   //speed
                     0     //streak
                     );
             }
@@ -71,7 +71,6 @@ namespace LKCamelot.script.spells
                     mob.ApplySlow(this);
             }
             World.SendToSoundRange(new QueDele(player.m_Channel, player.Map, new model.EffectSound(library.EffectSound.FrameRound2).Compile()), player);
-            World.SendToAll(new QueDele(player.m_Channel, player.Map, new model.CurveMagic(player.m_Serial, castx, casty, Seq).Compile()));
         }
     }
 }

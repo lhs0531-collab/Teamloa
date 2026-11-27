@@ -34,7 +34,7 @@ namespace LKCamelot.script.spells
             get
             {
                 return new SpellSequence(
-                    46 ,   //oncast
+                    11 ,   //oncast
                     11,  //moving
                     11,   //impact
                     0,   //thickness
