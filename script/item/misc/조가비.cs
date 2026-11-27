@@ -11,7 +11,7 @@ namespace LKCamelot.script.item
         public override string Name { get { return "조가비"; } }
         public override bool Stackable { get { return true; } }
         public override ulong BuyPrice { get { return 100; } }
-        public override short Limit { get { return 200; } }
+        public override short Limit { get { return 1000; } }
 
         public 조가비()
             : base(127)

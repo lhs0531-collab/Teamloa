@@ -11,7 +11,7 @@ namespace LKCamelot.script.item
         public override string Name { get { return "화강석"; } }
         public override bool Stackable { get { return true; } }
         public override ulong BuyPrice { get { return 100; } }
-        public override short Limit { get { return 200; } }
+        public override short Limit { get { return 1000; } }
 
         public 화강석()
             : base(130)
@@ -30,7 +30,7 @@ namespace LKCamelot.script.item
         public override string Name { get { return "대리석"; } }
         public override bool Stackable { get { return true; } }
         public override ulong BuyPrice { get { return 100; } }
-        public override short Limit { get { return 200; } }
+        public override short Limit { get { return 1000; } }
 
         public 대리석()
             : base(121)

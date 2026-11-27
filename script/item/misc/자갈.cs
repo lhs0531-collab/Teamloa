@@ -12,7 +12,7 @@ namespace LKCamelot.script.item
         public override ulong BuyPrice { get { return 1000; } }
         public override int SellPrice { get { return 100; } }
         public override bool Stackable { get { return true; } }
-        public override short Limit { get { return 200; } }
+        public override short Limit { get { return 1000; } }
 
         public 자갈()
             : base(126)
