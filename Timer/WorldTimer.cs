@@ -207,6 +207,11 @@ namespace LKCamelot.Timer
                     }
                     #endregion
 
+                    #region 미분배 턴 안내
+                    if (playe.b_Extra > 0 && (Tick % (ulong)Settings.TurnNoticeInterval) == 0)
+                        playe.NotifyUnspentTurn();
+                    #endregion
+
                     #region 겹침 처리
                     if ((Tick % 60) == 0)
                     {

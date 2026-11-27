@@ -195,6 +195,7 @@ namespace LKCamelot.model
         public byte Stage;
         public ushort m_Str, m_Men, m_Dex, m_Vit, m_AC, m_Hit, m_Dam;
         public ushort b_Str, b_Men, b_Dex, b_Vit;
+        public uint b_Extra;            // 미분배 턴. 전직·턴 초기화로 회수된 턴이 여기 쌓인다. 저장 컬럼 40번째
         public uint m_Extra;
         public short pStr, pMen, pDex, pVit;
         public ushort apStr, apMen, apDex, apVit;
@@ -560,8 +561,69 @@ namespace LKCamelot.model
         {
             get
             {
-                return b_Str + b_Men + b_Dex + b_Vit;
+                // 미분배 턴도 합계에 넣는다. 전직·초기화로 재분배하는 동안 서열이 떨어지지 않게 한다.
+                return (int)(b_Str + b_Men + b_Dex + b_Vit + b_Extra);
             }
+        }
+
+        /// <summary>
+        /// 턴으로 올린 속성(b_Str/b_Men/b_Dex/b_Vit)을 모두 회수해 미분배 턴(b_Extra)으로 돌린다.
+        /// 합계는 변하지 않는다. 이미 모두 미분배 상태면 아무것도 하지 않는다(연속 전직해도 수치 불변).
+        /// </summary>
+        /// <returns>이번에 회수한 턴 수</returns>
+        public uint ResetTurnStats()
+        {
+            uint moved = (uint)b_Str + (uint)b_Men + (uint)b_Dex + (uint)b_Vit;
+            if (moved == 0)
+                return 0;
+
+            b_Extra += moved;
+            b_Str = 0;
+            b_Men = 0;
+            b_Dex = 0;
+            b_Vit = 0;
+
+            // 생명·지력 턴이 빠지면 최대치가 줄어든다. 현재치가 최대치를 넘지 않게 맞춘다.
+            // (HPCur setter를 쓰면 매직실드가 감소분을 마나로 흡수하므로 필드에 직접 넣는다)
+            if (m_HPCur > HP)
+                m_HPCur = HP;
+            if (m_MPCur > MP)
+                m_MPCur = MP;
+
+            if (client != null)
+            {
+                client.SendPacket(new UpdateCharStats(this).Compile());
+                client.SendPacket(new SetHP(this).Compile());
+                client.SendPacket(new SetMP(this).Compile());
+            }
+            return moved;
+        }
+
+        /// <summary>미분배 턴이 남아 있으면 분배 방법을 안내한다.</summary>
+        public void NotifyUnspentTurn()
+        {
+            if (b_Extra == 0 || client == null)
+                return;
+
+            client.SendPacket(new UpdateChatBox(Settings.TurnNoticeColor1, Settings.TurnNoticeColor2, 1,
+                string.Format("분배하지 않은 턴 속성이 {0} 남아 있습니다. 아론에게 \"힘 [수량] 올려주세요\"라고 말하세요.", b_Extra)).Compile());
+        }
+
+        /// <summary>
+        /// 전직 책으로 직업을 바꾼다. 직업이 실제로 바뀌면 턴 속성을 회수해 미분배로 돌린다.
+        /// </summary>
+        public void ChangeClassByBook(Class newClass)
+        {
+            bool changed = newClass != m_Class;
+            Class = newClass;
+            if (!changed)
+                return;
+
+            uint moved = ResetTurnStats();
+            if (moved > 0 && client != null)
+                client.SendPacket(new UpdateChatBox(Settings.TurnNoticeColor1, Settings.TurnNoticeColor2, 1,
+                    string.Format("전직으로 턴 속성 {0}이(가) 초기화되었습니다.", moved)).Compile());
+            NotifyUnspentTurn();
         }
         public ushort GetStat(string stat, bool bas = false)
         {
@@ -2121,6 +2183,9 @@ namespace LKCamelot.model
                 DateTime.TryParse(line[36], out LastAccessTime);
                 IP = line[37];
                 Ben = Convert.ToBoolean(line[38]);
+
+                // 40번째 컬럼(미분배 턴)은 나중에 추가됐다. 없는 줄(기존 39컬럼 파일)은 0으로 읽는다.
+                b_Extra = line.Count() >= 40 ? Convert.ToUInt32(line[39]) : 0;
             }
         }
 

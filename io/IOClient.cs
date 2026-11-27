@@ -251,6 +251,9 @@ namespace LKCamelot.io
                 SendPacket(new UpdateChatBox(0x00, 0xff, 1, string.Format("이웃 나라 백성으로 접속 되었습니다.")).Compile());
 
 
+            // 분배하지 않은 턴이 있으면 접속(마을 이동 포함) 때 알린다.
+            player.NotifyUnspentTurn();
+
             if (Settings.LoginAlarm && !Settings.GMS.Contains(player.Name))
                 World.SendToAll(new QueDele(player.m_Serial, "all", new UpdateChatBox(0x94, 0x52, 1, string.Format("{0}님이 접속하였습니다.", player.Name)).Compile()));
         }

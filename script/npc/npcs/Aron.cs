@@ -25,7 +25,8 @@ namespace LKCamelot.script.npc
                     "\"검객 시켜주세요\"하면 검객이 됩니다.",
                     "\"샤먼 시켜주세요\"하면 샤먼이 됩니다.",
                     "\"위저드 시켜주세요\"하면 위저드가 됩니다.",
-                    
+                    "\"턴 초기화 해주세요\"하면 턴 속성을 다시 나눌 수 있다네.",
+
                 };
             }
         }
@@ -109,9 +110,50 @@ namespace LKCamelot.script.npc
             }
             #endregion
 
+            #region 턴 초기화해주세요
+            // 흐름: "턴 초기화 해주세요" -> "하겠느냐?" -> "예" -> 초기화 + 골드 지불(전직 책 가격). 띄어쓰기는 무시한다.
+            else if (str.Replace(" ", "") == "턴초기화해주세요")
+            {
+                if (player.b_Str + player.b_Men + player.b_Dex + player.b_Vit == 0)
+                    this.Event_Chat("턴 속성이 없구나.", true);
+                else if (player.Gold < Settings.ClassBookPrice)
+                    this.Event_Chat("정성이 부족하구나.", true);
+                else
+                {
+                    this.Event_Chat("하겠느냐?", true);
+                    player.client.AronStage = 5;
+                }
+            }
+            #endregion
+
             #region 예
             else if (str == "예")
             {
+                // 턴 초기화 확인 (AronStage 5)
+                if (player.client.AronStage == 5)
+                {
+                    player.client.AronStage = 0;
+
+                    // "하겠느냐?" 이후 골드를 썼거나 턴 상태가 바뀐 경우에만 걸린다. 다시 묻지 않고 같은 답을 한다.
+                    if (player.b_Str + player.b_Men + player.b_Dex + player.b_Vit == 0)
+                    {
+                        this.Event_Chat("턴 속성이 없구나.", true);
+                        return;
+                    }
+                    if (player.Gold < Settings.ClassBookPrice)
+                    {
+                        this.Event_Chat("정성이 부족하구나.", true);
+                        return;
+                    }
+
+                    player.Gold -= Settings.ClassBookPrice;
+                    uint moved = player.ResetTurnStats();
+                    io.IOClient.WriteTurnLog(DateTime.Now.ToString("[yyyy/MM/dd HH:mm:ss]: ") + "[초기화 " + moved + "] " + player.Name);
+                    this.Event_Chat("턴 속성을 초기화했다네.", true);
+                    player.NotifyUnspentTurn();
+                    return;
+                }
+
                 if (player.Class == library.Class.BlackSmith || player.Class == library.Class.Miner)
                     return;
 
@@ -189,6 +231,57 @@ namespace LKCamelot.script.npc
                     this.Event_Chat("아직 수련이 부족하구나..", true);
                     player.client.AronStage = 0;
                 }
+            }
+            #endregion
+
+            #region 미분배 턴 올려주세요
+            // 전직·초기화로 회수된 턴이 남아 있으면 경험치 없이 그 턴부터 쓴다.
+            // "힘 올려주세요"(1) 또는 "힘 100 올려주세요"(수량 지정)
+            else if ((str2[0] == "힘" || str2[0] == "지력" || str2[0] == "숙련" || str2[0] == "생명")
+                && player.b_Extra > 0
+                && ((str2.Length == 2 && str2[1] == "올려주세요") || (str2.Length == 3 && str2[2] == "올려주세요")))
+            {
+                uint amount = 1;
+                if (str2.Length == 3
+                    && (!uint.TryParse(str2[1], System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out amount) || amount == 0))
+                {
+                    this.Event_Chat("\"힘 100 올려주세요\"처럼 말하게나.", true);
+                    return;
+                }
+
+                if (amount > player.b_Extra)
+                    amount = player.b_Extra;
+
+                ushort current = str2[0] == "힘" ? player.b_Str : str2[0] == "지력" ? player.b_Men : str2[0] == "숙련" ? player.b_Dex : player.b_Vit;
+                uint room = (uint)(ushort.MaxValue - current);
+                if (amount > room)
+                    amount = room;
+                if (amount == 0)
+                {
+                    this.Event_Chat("그 속성은 더 올릴 수 없구나.", true);
+                    return;
+                }
+
+                switch (str2[0])
+                {
+                    case "힘":
+                        player.b_Str += (ushort)amount;
+                        break;
+                    case "지력":
+                        player.b_Men += (ushort)amount;
+                        break;
+                    case "숙련":
+                        player.b_Dex += (ushort)amount;
+                        break;
+                    case "생명":
+                        player.b_Vit += (ushort)amount;
+                        break;
+                }
+                player.b_Extra -= amount;
+
+                io.IOClient.WriteTurnLog(DateTime.Now.ToString("[yyyy/MM/dd HH:mm:ss]: ") + "[재분배 " + str2[0] + " " + amount + "] " + player.Name);
+                player.client.SendPacket(new UpdateCharStats(player).Compile());
+                this.Event_Chat(string.Format("{0}속성이 {1} 올랐다네. 남은 턴은 {2}이라네.", str2[0], amount, player.b_Extra), true);
             }
             #endregion
 

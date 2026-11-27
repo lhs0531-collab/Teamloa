@@ -131,11 +131,11 @@ namespace LKCamelot
                         }
 
                         sw.WriteLine(
-                            string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22},{23},{24},{25},{26},{27},{28},{29},{30},{31},{32},{33},{34},{35},{36},{37},{38}",
+                            string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22},{23},{24},{25},{26},{27},{28},{29},{30},{31},{32},{33},{34},{35},{36},{37},{38},{39}",
                             Convert.ToInt32(play.m_Serial), play.Name, play.Pass, (int)play.Class, play.Stage, play.pkhistoryTime, play.BenNeighbor, play.neighbor, play.Map.Split(',')[0], play.Loc.X, play.Loc.Y,
                             play.Face, play.m_Str, play.m_Men, play.m_Dex, play.m_Vit, play.Extra, play.b_Str, play.b_Men, play.b_Dex, play.b_Vit, play.HP, play.HPCur, play.MP, play.MPCur, 
                             play.Level, play.XP, play.MinerLevel, play.MinerXP, play.BSLevel, play.BSXP, play.HelperLevel, play.Gold, play.BankGold, play.MagicLearnedString(),
-                            play.CreateTime, play.LastAccessTime, play.IP, play.Ben
+                            play.CreateTime, play.LastAccessTime, play.IP, play.Ben, play.b_Extra
                             
                             ));
                     }
@@ -200,11 +200,11 @@ namespace LKCamelot
                 using (StreamWriter sw = new StreamWriter(Settings.rootPath + "worldsavePl.txt", true))
                 {
                     sw.WriteLine(
-                        string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22},{23},{24},{25},{26},{27},{28},{29},{30},{31},{32},{33},{34},{35},{36},{37},{38}",
+                        string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22},{23},{24},{25},{26},{27},{28},{29},{30},{31},{32},{33},{34},{35},{36},{37},{38},{39}",
                         Convert.ToInt32(play.m_Serial), play.Name, play.Pass, (int)play.Class, play.Stage, play.pkhistoryTime, play.BenNeighbor, play.neighbor, play.Map.Split(',')[0], play.Loc.X, play.Loc.Y,
                         play.Face, play.m_Str, play.m_Men, play.m_Dex, play.m_Vit, play.Extra, play.b_Str, play.b_Men, play.b_Dex, play.b_Vit, play.HP, play.HPCur, play.MP, play.MPCur,
                         play.Level, play.XP, play.MinerLevel, play.MinerXP, play.BSLevel, play.BSXP, play.HelperLevel, play.Gold, play.BankGold, play.MagicLearnedString(),
-                        play.CreateTime, play.LastAccessTime, play.IP, play.Ben
+                        play.CreateTime, play.LastAccessTime, play.IP, play.Ben, play.b_Extra
                         ));
                 }
             }
@@ -226,11 +226,11 @@ namespace LKCamelot
                         using (StreamWriter sw = new StreamWriter(Settings.rootPath + "worldsavePl.txt", true))
                         {
                             sw.WriteLine(
-                                string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22},{23},{24},{25},{26},{27},{28},{29},{30},{31},{32},{33},{34},{35},{36},{37},{38}",
+                                string.Format("{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17},{18},{19},{20},{21},{22},{23},{24},{25},{26},{27},{28},{29},{30},{31},{32},{33},{34},{35},{36},{37},{38},{39}",
                                 Convert.ToInt32(play.m_Serial), play.Name, play.Pass, (int)play.Class, play.Stage, play.pkhistoryTime, play.BenNeighbor, play.neighbor, play.Map.Split(',')[0], play.Loc.X, play.Loc.Y,
                                 play.Face, play.m_Str, play.m_Men, play.m_Dex, play.m_Vit, play.Extra, play.b_Str, play.b_Men, play.b_Dex, play.b_Vit, play.HP, play.HPCur, play.MP, play.MPCur,
                                 play.Level, play.XP, play.MinerLevel, play.MinerXP, play.BSLevel, play.BSXP, play.HelperLevel, play.Gold, play.BankGold, play.MagicLearnedString(),
-                                play.CreateTime, play.LastAccessTime, play.IP, play.Ben
+                                play.CreateTime, play.LastAccessTime, play.IP, play.Ben, play.b_Extra
 
                                 ));
                         }

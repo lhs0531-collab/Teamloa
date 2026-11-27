@@ -100,7 +100,16 @@ namespace LKCamelot
         //게임 설정
         public static int SaveTime = 30 * Minute;       // 저장 시간
         public static short MaxLevel = 231;             // 만렙 설정 (7승11->231, 12승20-> 340)
-        public static int TrunXP = 1000000;            // 턴 경험치 설정 (승급기준 : 100만)
+        // 미분배 턴 안내 메시지 색상(UpdateChatBox의 앞 두 값)과 반복 주기(초).
+        // 색상 값은 기존 시스템 안내에 쓰이던 (0x00, 0xff)를 그대로 썼다. 클라이언트에서 노란색이 아니면 이 두 값을 바꾼다.
+        public static byte TurnNoticeColor1 = 0x00;
+        public static byte TurnNoticeColor2 = 0xff;
+        public static int TurnNoticeInterval = 180;
+
+        // 전직 책(기사·검객·위저드·샤먼) 가격. 아론의 턴 초기화 비용도 이 값을 쓴다.
+        public static ulong ClassBookPrice = 85000000;
+
+        public static int TrunXP = 1000000;           // 턴 경험치 설정 (승급기준 : 100만)
         public static bool DieDropGold = true;          // 죽을 경우 골드 떨굼 여부 (10%)
         public static bool DieDropItem = false;         // 죽을 경우 아이템 떨굼 여부
 

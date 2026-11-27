@@ -1107,6 +1107,8 @@ namespace LKCamelot.io
             else if (str2[0] == "@턴속성")
             {
                 SendPacket(new UpdateChatBox(0x94, 0x52, 1, string.Format("힘 : {0}, 지력 : {1} 숙련 : {2} 생명 : {3}", player.b_Str, player.b_Men, player.b_Dex, player.b_Vit)).Compile());
+                if (player.b_Extra > 0)
+                    SendPacket(new UpdateChatBox(0x94, 0x52, 1, string.Format("미분배 : {0}", player.b_Extra)).Compile());
             }
             #endregion
 
