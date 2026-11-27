@@ -1640,21 +1640,17 @@ namespace LKCamelot.model
                         if (Settings.DieDropGold)
                         {
                             // 죽었을 경우 돈을 10%의 돈을 바닥에 떨어트림
-                            var dropgold = ((Math.Truncate(m_Gold * 0.1) > 1) ? (m_Gold * 0.1) : 0);
-                            if (dropgold >= Gold && dropgold != 0)
+                            // 기존 조건(dropgold >= Gold)은 10%가 전체 이상일 수 없어 한 번도 실행되지 않았다.
+                            ulong dropgold = m_Gold / 10;
+                            if (dropgold > int.MaxValue)        // 골드 아이템 수량은 int
+                                dropgold = int.MaxValue;
+                            if (dropgold > 1)
                             {
-                                try
-                                {
-                                    checked
-                                    {
-                                        script.item.Gold inst = new script.item.Gold((int)dropgold);
-                                        Gold -= (ulong)dropgold;
-                                        inst.Drop(this);
-                                        World.SendToAll(new QueDele(this.m_Channel, this.m_Map, new CreateItemGround2(inst, inst.m_Serial).Compile()));  // 땅에떨어진 아이템 그려줌
-                                        World.NewItems.TryAdd((inst).m_Serial, (inst as script.item.Item));                            
-                                    }
-                                }
-                                catch (OverflowException) { }   
+                                script.item.Gold inst = new script.item.Gold((int)dropgold);
+                                World.NewItems.TryAdd(inst.m_Serial, inst);     // 바닥에 보이기 전에 먼저 등록해야 바로 주울 수 있다
+                                Gold -= dropgold;
+                                inst.Drop(this);
+                                World.SendToAll(new QueDele(this.m_Channel, this.m_Map, new CreateItemGround2(inst, inst.m_Serial).Compile()));  // 땅에떨어진 아이템 그려줌
                             }
                         }
                         if (Settings.DieDropItem)
