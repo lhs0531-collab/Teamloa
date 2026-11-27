@@ -1058,9 +1058,15 @@ namespace LKCamelot.model
 
                 if (filename == null)
                 {
-                    // setter를 다시 부르면 이전 맵도 목록에 없을 때 무한 재귀(StackOverflow)로 서버가 즉시 종료된다.
+                    // 새 맵이 목록에 없으면 이전 맵을 다시 로드한다(기존 동작 유지: 바뀐 좌표를 클라이언트에 반영).
+                    // setter를 다시 부르지 않는다. 이전 맵도 목록에 없을 때 무한 재귀(StackOverflow)로 서버가 즉시 종료된다.
                     m_Map = oldMap;
-                    return;
+                    if (oldMap == null)
+                        return;
+
+                    filename = model.Map.FullMaps[this.m_Channel].Where(xe => xe.Key == oldMap).FirstOrDefault().Value;
+                    if (filename == null)
+                        return;
                 }
                 
                 client.SendPacket(new PlayMusic(filename.SoundTrack).Compile());

@@ -67,6 +67,7 @@ namespace LKCamelot.io
         public static List<string> GMCommands = new List<string>()
         {
             "#도움말",
+            "#길드해체",
             "#공지",
             "#정보",
             "#얼음",
@@ -158,6 +159,8 @@ namespace LKCamelot.io
                         GMSave();           break;
                     case "#길드저장":
                         GMGuildSave();      break;
+                    case "#길드해체":
+                        GMGuildDelete(str2); break;
                     case "#아이템저장":
                         GMItemSave();       break;
                     case "#플레이어저장":
@@ -625,6 +628,56 @@ namespace LKCamelot.io
         {
             BinaryIO.SaveGuild(World.NewGuilds.Values.ToList());
             SendPacket(new UpdateChatBox(0x00, 0xff, 1, "길드가 저장되었습니다.").Compile());
+        }
+
+        /// <summary>
+        /// GM이 길드를 강제로 해체한다. 실수 방지를 위해 @길드삭제처럼 길드명을 두 번 입력받는다.
+        /// </summary>
+        private void GMGuildDelete(string[] str2)
+        {
+            if (str2.Count() != 3)
+            {
+                SendPacket(new UpdateChatBox(0x00, 0xff, 1, "#길드해체 [길드명] [길드명]").Compile());
+                return;
+            }
+            if (str2[1] != str2[2])
+            {
+                SendPacket(new UpdateChatBox(0x00, 0xff, 1, "길드명 두 개가 서로 다릅니다.").Compile());
+                return;
+            }
+
+            // 길드 키는 생성 직후에는 입력한 그대로, 재시작 후에는 대문자라서 대소문자 구분 없이 찾는다.
+            var entry = World.NewGuilds.Where(xe => string.Equals(xe.Key, str2[1], StringComparison.OrdinalIgnoreCase)).FirstOrDefault();
+            if (entry.Value == null)
+            {
+                SendPacket(new UpdateChatBox(0x00, 0xff, 1, "해당 길드를 찾을 수 없습니다.").Compile());
+                return;
+            }
+
+            BaseGuild guild = entry.Value;
+            int memberCount = 0;
+            foreach (var p in PlayerHandler.getSingleton().Total.Values.Where(xe => xe != null && xe.Guild == guild).ToList())
+            {
+                p.Guild = null;
+                memberCount++;
+                if (p.loggedIn && p.client != null)
+                    p.client.SendPacket(new UpdateChatBox(0x00, 0xff, 1, "운영자에 의해 길드가 해체되었습니다.").Compile());
+            }
+
+            BaseGuild removed;
+            World.NewGuilds.TryRemove(entry.Key, out removed);
+
+            // 길드맵 표지판이 있으면 함께 제거한다.
+            if (guild.Board != null)
+            {
+                script.npc.BaseNPC board;
+                World.NewNpcs[guild.Board.m_Channel].TryRemove(guild.Board.m_Serial, out board);
+                World.SendToAll(new QueDele(guild.Board.m_Channel, guild.Board.m_Map, new DeleteObject(guild.Board.m_Serial).Compile()));
+            }
+
+            io.IOClient.WriteBug(string.Format("{0} [GuildDelete] GM={1} guild={2} members={3}",
+                DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"), player.Name, entry.Key, memberCount));
+            SendPacket(new UpdateChatBox(0x00, 0xff, 1, string.Format("{0}길드를 해체했습니다. (길드원 {1}명)", entry.Key, memberCount)).Compile());
         }
 
         private void GMMapInfo(string[] str2)
@@ -1654,7 +1707,7 @@ namespace LKCamelot.io
                                 return;
 
                             // 수장이 자신의 직책을 바꾸면 수장 없는 길드가 된다. 수장 교체는 @길드양도로만 한다.
-                            if (target == 0)
+                            if (target == 0 && play.Guild.Member.ContainsKey(play.m_Serial))
                             {
                                 SendPacket(new UpdateChatBox(0x00, 0xff, 1, "수장의 직책은 변경할 수 없습니다. (@길드양도)").Compile());
                                 return;
@@ -1697,9 +1750,16 @@ namespace LKCamelot.io
                     if (Encoding.Default.GetByteCount(str2[2]) > 10)
                         SendPacket(new UpdateChatBox(0x00, 0xff, 1, "직책명은 한글 5자이내, 영문 10자이내 입니다.").Compile());
 
+                    // 쉼표 등 특수문자가 들어가면 길드 저장 줄의 칸이 밀려 다음 기동 때 그 길드를 읽지 못한다.
+                    else if (!System.Text.RegularExpressions.Regex.IsMatch(str2[2], @"^[a-zA-Z0-9가-힣]+$"))
+                        SendPacket(new UpdateChatBox(0x00, 0xff, 1, "직책명은 한글, 영문, 숫자만 사용할 수 있습니다.").Compile());
+
                     else if (player.Guild.Member.Where(xe => xe.Value == 0 && xe.Key == player.m_Serial).Any())
                     {
-                        if (player.Guild.FindPosition(str2[2]) == -1)
+                        if (player.Guild.FindPosition(str2[1]) == -1)
+                            SendPacket(new UpdateChatBox(0x00, 0xff, 1, "변경할 직책을 찾을 수 없습니다.").Compile());
+
+                        else if (player.Guild.FindPosition(str2[2]) == -1)
                         {
                             player.Guild.PostionName[player.Guild.FindPosition(str2[1])] = str2[2];
                             SendPacket(new UpdateChatBox(0x00, 0xff, 1, "변경완료").Compile());

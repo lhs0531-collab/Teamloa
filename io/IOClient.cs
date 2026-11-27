@@ -185,6 +185,11 @@ namespace LKCamelot.io
 
             // 슬롯이 없는 소유 아이템은 Clone 잔재(유령 아이템)다. 빈 칸에 다시 넣지 않고 기록 후 제거한다.
             // 저장 대상(InvSlot >= 0)이 아니므로 파일에는 원래 남지 않는 아이템이다.
+            // 제거는 로그인(first) 때만 한다. 마을 티켓 이동(LoadPlayer(false)) 중에는 자동 줍기가
+            // 소유자만 넣고 슬롯은 아직 넣지 않은 아이템이 잠깐 있을 수 있어 건드리지 않는다.
+            if (!first)
+                orphan.Clear();
+
             foreach (var it in orphan)
             {
                 WriteBug(string.Format("{0} [LoadPlayer] orphan removed: player={1} serial={2} name={3} stage={4} qty={5}",
