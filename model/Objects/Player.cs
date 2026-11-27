@@ -108,6 +108,9 @@ namespace LKCamelot.model
 
             CellItem.Add(new ExchangeEntry { Item = item, Amount = amount });
             Refresh();
+
+            // 교환창에는 아이콘만 보이므로 무엇을 올렸는지 양쪽에 글로 알린다.
+            Notify(string.Format("[교환] {0}님이 {1}번 칸에 {2} 올렸습니다.", Owner.Name, CellItem.Count, Describe(item, amount)));
             return true;
         }
 
@@ -119,9 +122,24 @@ namespace LKCamelot.model
             if (cellIndex < 0 || cellIndex >= CellItem.Count)
                 return false;
 
+            var removed = CellItem[cellIndex];
             CellItem.RemoveAt(cellIndex);
             Refresh();
+
+            Notify(string.Format("[교환] {0}님이 {1} 내렸습니다.", Owner.Name, Describe(removed.Item, removed.Amount)));
             return true;
+        }
+
+        private static string Describe(script.item.Item item, int amount)
+        {
+            string name = (item.NPrefix() + " " + item.Name).Trim();
+            return item.Stackable ? string.Format("{0} {1}개를", name, amount) : name + "(을)를";
+        }
+
+        private void Notify(string message)
+        {
+            SendIfOnline(Owner, new UpdateChatBox(0x00, 0xff, 1, message).Compile());
+            SendIfOnline(Target, new UpdateChatBox(0x00, 0xff, 1, message).Compile());
         }
 
         public bool isCheck

@@ -1964,6 +1964,25 @@ namespace LKCamelot.io
                     new ExchangeBox(player, target.Value);
                 }
             }
+            // 교환창에 올린 아이템 내리기. 칸 번호는 왼쪽부터 1~4.
+            else if (str2[0] == "@내리기")
+            {
+                if (player.Exchange == null)
+                {
+                    SendPacket(new UpdateChatBox(0x00, 0xff, 1, "교환중이 아닙니다.").Compile());
+                    return;
+                }
+
+                int cell;
+                if (str2.Length < 2 || !int.TryParse(str2[1], out cell) || cell < 1 || cell > ExchangeBox.MaxCell)
+                {
+                    SendPacket(new UpdateChatBox(0x00, 0xff, 1, "사용법 : @내리기 [칸번호 1~4]").Compile());
+                    return;
+                }
+
+                if (!player.Exchange.RemoveItem(cell - 1))
+                    SendPacket(new UpdateChatBox(0x00, 0xff, 1, "내릴 수 없습니다. (빈 칸이거나 체크 상태)").Compile());
+            }
 
             #endregion
 

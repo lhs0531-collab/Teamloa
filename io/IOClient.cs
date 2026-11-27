@@ -52,6 +52,39 @@ namespace LKCamelot.io
 
         delegate void UpdatePacketInvoker(Byte[] packet);
 
+        // 교환창 골드 입력창을 구분하는 값. 수량 입력 결과(0x4E)의 대상 시리얼·슬롯이 이 값이면 골드 입력이다.
+        const int ExchangeGoldMarker = 0x7FFFFFF0;
+        const short ExchangeGoldSlot = 100;
+
+        /// <summary>
+        /// 수량 입력 결과(0x4E)가 교환창 골드 입력이면 처리하고 true를 돌려준다.
+        /// </summary>
+        bool HandleExchangeGoldAmount(byte[] data)
+        {
+            if (data.Length < 10)
+                return false;
+
+            var reader = new PacketReader(data, data.Length, true);
+            byte ok = reader.ReadByte();
+            short slot = reader.ReadInt16();
+            int target = reader.ReadInt32();
+            if (target != ExchangeGoldMarker && slot != ExchangeGoldSlot)
+                return false;
+
+            if (ok != 1)
+                return true;        // 입력 취소
+
+            // 금액이 2바이트로 오는지 4바이트로 오는지 확인되지 않아 길이로 구분한다.
+            ulong amount;
+            if (data.Length >= 12)
+                amount = (uint)reader.ReadInt32();
+            else
+                amount = (ushort)reader.ReadInt16();
+
+            player.Exchange.SetGold(amount);
+            return true;
+        }
+
         public void Parse(ConnectionDataEventArgs e)
         {
             incomingStream.AppendData(e.Data.ToArray());
@@ -66,6 +99,11 @@ namespace LKCamelot.io
                     //여기1
                     // Console.WriteLine(string.Format("RecvData : {0} - {1}",
                     //     packet.Length, packet.ToFormatedHexString()));
+
+                    // 교환창이 열려 있는 동안 받은 패킷을 기록한다. (골드·내리기·수량 패킷 형식을 확인하기 위한 임시 기록)
+                    if (Settings.ExchangePacketLog && player != null && player.Exchange != null)
+                        WriteExchangePacketLog(string.Format("{0} {1} RecvData : {2} - {3}",
+                            DateTime.Now.ToString("[HH:mm:ss.fff]"), player.Name, packet.Length, packet.ToFormatedHexString()));
 
                     HandleIncoming(packet);
                 }
@@ -1185,8 +1223,10 @@ namespace LKCamelot.io
                     //아이템 추가
                     if (data.Length > 1 && data[1] == 0x07)
                     {
-                        // 골드: 클라이언트가 보내는 금액의 바이트 위치가 확인되지 않아 아직 처리하지 않는다.
-                        // 확인되면 금액을 읽어 player.Exchange.SetGold(금액)을 호출한다.
+                        // 골드: 수량 입력창을 띄우고, 입력한 값은 0x4E(수량)로 돌아온다고 보고 처리한다.
+                        // (패킷 형식을 확인하지 못한 추정 구현. _Log_ExchangePacket.txt로 검증한다)
+                        int maxGold = player.Gold > int.MaxValue ? int.MaxValue : (int)player.Gold;
+                        SendPacket(new AmountBox(ExchangeGoldMarker, ExchangeGoldSlot, maxGold, "GOLD").Compile());
                     }
                     else if (data.Length > 1 && data[1] == 0x02)
                     {
@@ -1211,6 +1251,8 @@ namespace LKCamelot.io
 
                 #region 수량
                 case 0x4E:
+                    if (player.Exchange != null && HandleExchangeGoldAmount(data))
+                        return;
                     if (data.Count() > 10)
                         return;
                     p = new PacketReader(data, data.Count(), true);
@@ -1546,6 +1588,24 @@ namespace LKCamelot.io
                     sr.WriteLine(line);
                 }
             }
+        }
+        public static void WriteExchangePacketLog(string line)
+        {
+            try
+            {
+                lock (WriteExchangeLock)
+                {
+                    string path = Settings.LogPath + DateTime.Now.ToString("yyyyMMdd") + "\\";
+                    if (!System.IO.Directory.Exists(path))
+                        System.IO.Directory.CreateDirectory(path);
+
+                    using (System.IO.StreamWriter sr = new System.IO.StreamWriter(path + DateTime.Now.ToString("yyyyMMdd") + "_Log_ExchangePacket.txt", true))
+                    {
+                        sr.WriteLine(line);
+                    }
+                }
+            }
+            catch { }   // 기록 실패가 패킷 처리를 막으면 안 된다.
         }
         public static void WriteUpgradeItem(string bug)
         {

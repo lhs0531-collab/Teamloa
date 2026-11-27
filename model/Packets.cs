@@ -36,8 +36,43 @@ namespace LKCamelot.model
             m_Stream.Write((byte)(owner.Exchange.isCheck ? 0x01 : 0x00)); //user1 체크
             m_Stream.Write((byte)(target.Exchange.isCheck ? 0x01 : 0x00)); //user2 체크
 
-            m_Stream.Write((short)Encoding.Default.GetByteCount(owner.Name + "," + target.Name));         // 한글 문자 포함 가변 길이 체크;
-            m_Stream.WriteEUCKR(owner.Name + "," + target.Name);
+            // 이름 뒤에 칸별 아이템 설명(내 4칸, 상대 4칸)을 쉼표로 이어 붙인다.
+            // 상점창 패킷(0x3E)이 아이템 글자를 쉼표로 이어 보내는 것과 같은 형식일 것이라는 추정이며,
+            // 교환창 툴팁이 이 값으로 뜨는지 확인하기 위한 것이다. 창이 깨지면 Settings.ExchangeTooltipText를 false로 둔다.
+            string text = owner.Name + "," + target.Name;
+            if (Settings.ExchangeTooltipText)
+                text += "," + CellText(owner.Exchange) + "," + CellText(target.Exchange);
+
+            m_Stream.Write((short)Encoding.Default.GetByteCount(text));         // 한글 문자 포함 가변 길이 체크;
+            m_Stream.WriteEUCKR(text);
+        }
+
+        private static string CellText(ExchangeBox box)
+        {
+            var cells = new string[ExchangeBox.MaxCell];
+            for (int i = 0; i < cells.Length; i++)
+            {
+                if (box.CellItem.Count <= i)
+                {
+                    cells[i] = "";
+                    continue;
+                }
+
+                // 원작은 스펙 없이 이름만 보였다. 강화 접두어와 이름, 겹치는 아이템은 수량까지 보낸다.
+                var entry = box.CellItem[i];
+                if (Settings.ExchangeTooltipFull)
+                {
+                    // 인벤토리 툴팁과 같은 전체 설명(이름, 수량, 능력치, 요구치)
+                    cells[i] = entry.Item.ParsedStats.Replace(",", " ");
+                    continue;
+                }
+
+                string name = (entry.Item.NPrefix() + " " + entry.Item.Name).Trim();
+                if (entry.Item.Stackable)
+                    name += " : " + entry.Amount;
+                cells[i] = name.Replace(",", " ");
+            }
+            return string.Join(",", cells);
         }
     }
 
@@ -102,6 +137,18 @@ namespace LKCamelot.model
 
     public sealed class AmountBox : Packet
     {
+        /// <summary>아이템 없이 띄우는 수량 입력창(교환창의 골드 입력용).</summary>
+        public AmountBox(Serial ReturnSeral, short slot, int max, string name)
+            : base(0x46)
+        {
+            m_Stream.Write((int)ReturnSeral);
+            m_Stream.Write((short)slot);
+            m_Stream.Write((int)max);
+            m_Stream.Fill(4);
+            m_Stream.Write((short)Encoding.Default.GetBytes(name).Length);
+            m_Stream.WriteEUCKR(name);
+        }
+
         public AmountBox(Serial ReturnSeral, script.item.Item item)
             : base(0x46)
         {

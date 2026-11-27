@@ -88,6 +88,15 @@ namespace LKCamelot
 
         // 불벽·전기벽의 몬스터 유인. 어그로가 끌린 몬스터가 벽 가운데에서 이 범위(칸) 안에 있으면 벽으로 들어간다.
         public static int WallLureRange = 6;
+
+        // 교환창이 열려 있는 동안 받은 패킷을 로그 폴더의 _Log_ExchangePacket.txt에 남긴다.
+        // 골드·내리기·수량 패킷 형식을 확인하기 위한 임시 기록이며, 확인이 끝나면 false로 둔다.
+        public static bool ExchangePacketLog = true;
+
+        // 교환창 패킷의 이름 문자열 뒤에 칸별 아이템 설명을 붙여 보낸다(툴팁 표시 시도). 창이 깨지면 false.
+        public static bool ExchangeTooltipText = true;
+        // true면 인벤토리 툴팁과 같은 전체 설명을, false면 이름(겹치는 아이템은 수량 포함)만 보낸다.
+        public static bool ExchangeTooltipFull = true;
         public static int WallInfightChance = 10;           // 벽 위 몬스터가 공격 주기마다 가운데 몬스터를 공격할 확률(%)
 
         // 뻗어 나가는 마법(프레임웨이브, 썬더스트록)이 시전자에서 나아가는 거리(칸). 누른 위치와 무관하게 이 거리까지 간다.
