@@ -87,9 +87,10 @@ namespace LKCamelot
         public static int ShokeEffectSprite = 53;           // 걸린 몬스터에 표시되는 효과 번호
 
         // 불벽·전기벽의 몬스터 유인. 어그로가 끌린 몬스터가 벽 가운데에서 이 범위(칸) 안에 있으면 벽으로 들어간다.
-        // 도우미(버프 동상): 클릭하면 이 골드를 받고 버터플라이를 이 권수로 걸어 준다.
-        public static ulong HelperBuffCost = 1000000;
-        public static int HelperBuffLevel = 1;
+        // 도우미: 클릭하면 이 골드를 받고 이웃마을 백성을 해제해 준다(접속을 끊을 때까지).
+        public static ulong CitizenPassCost = 1000000;
+        public static int CitizenPassBuffLevel = 12;        // 해제할 때 서비스로 걸어 주는 버프 3종(와콘다, 버터플라이, 실버스크린)의 권수
+        public static int CitizenPassBuffTime = 3 * Minute; // 서비스 버프 3종의 지속시간 (마법의 원래 지속시간과 무관하게 이 값을 쓴다)
 
         public static int WallLureRange = 6;
 
@@ -174,7 +175,7 @@ namespace LKCamelot
 
         //이웃관련 설정
         public static int NeighborLevel = 30;           // 이웃마을 레벨 설정
-        public static bool Neighbor = false;            // 이웃마을 설정
+        public static bool Neighbor = true;             // 이웃마을 설정 (켜져 있으면 NeighborLevel 이상은 자동으로 이웃마을 백성. #이웃 으로 전환)
         public static bool IPNeighbor = false;          // 중복 아이피 이웃 설정
 
         //외치기 설정

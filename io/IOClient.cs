@@ -285,7 +285,7 @@ namespace LKCamelot.io
                 foreach(var str in Settings.BegginerNotice)
                     SendPacket(new UpdateChatBox(0xB6, 0x56, 9, str).Compile());
             }
-            if ( player.IPNeighbor || player.BenNeighbor || (Settings.Neighbor && player.Level >= Settings.NeighborLevel && player.neighbor) )
+            if (player.IsNeighbor)
                 SendPacket(new UpdateChatBox(0x00, 0xff, 1, string.Format("이웃 나라 백성으로 접속 되었습니다.")).Compile());
 
 
@@ -1435,6 +1435,7 @@ namespace LKCamelot.io
                     World.SendToAll(new QueDele(player.m_Serial, player.m_Channel, player.Map, new DeleteObject(player.m_Serial).Compile()));
                     player.loggedIn = false;
                     player.SoundFlag = false;
+                    player.CitizenPass = false;     // 접속을 끊으면 다시 이웃마을 백성
                     player = null;
                     Loaded = false;
                     break;
@@ -1451,6 +1452,7 @@ namespace LKCamelot.io
                             player = handler.GetPlayer(puser2[0]);
                             player.client = this;
                             player.loggedIn = true;
+                            player.CitizenPass = false;     // 이웃마을 백성 해제는 접속마다 새로 받아야 한다
                             LoadPlayer();
                             SendPacket(new CloseLogin().Compile());
                             break;

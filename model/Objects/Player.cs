@@ -341,6 +341,25 @@ namespace LKCamelot.model
         public bool BenNeighbor = false;                // 벤 이웃
         public bool IPNeighbor = false;                 // 아이피 중복 이웃
 
+        // 이번 접속 동안만 유효한 이웃마을 백성 해제. 도우미에게 골드를 내면 켜지고, 접속을 끊으면 꺼진다. (저장하지 않는다)
+        public bool CitizenPass = false;
+
+        /// <summary>
+        /// 이웃마을 백성 여부. 이웃마을 백성은 기본 능력치가 절반으로 적용된다.
+        /// 서버 이웃마을 설정이 켜져 있으면 Settings.NeighborLevel 이상인 캐릭터는 자동으로 이웃마을 백성이 되고,
+        /// 도우미에게 해제를 받으면(CitizenPass) 접속을 끊을 때까지 마지막왕국 백성이 된다.
+        /// 중복 아이피·벤으로 걸린 이웃은 해제 대상이 아니다.
+        /// </summary>
+        public bool IsNeighbor
+        {
+            get
+            {
+                if (IPNeighbor || BenNeighbor)
+                    return true;
+                return Settings.Neighbor && Level >= Settings.NeighborLevel && neighbor && !CitizenPass;
+            }
+        }
+
 
         public List<string> WhispBlockList = new List<string>();
 
@@ -799,7 +818,7 @@ namespace LKCamelot.model
                 else if (m_Class == Class.Shaman)
                     temp += 15;
 
-                if (bas == false && (this.IPNeighbor || this.BenNeighbor || (Settings.Neighbor && Level >= Settings.NeighborLevel && neighbor == true)))
+                if (bas == false && IsNeighbor)
                     temp = (uint)Math.Round((double)(temp / 2));
 
                 if (bas == false)
@@ -824,7 +843,7 @@ namespace LKCamelot.model
                 else if (m_Class == Class.Shaman)
                     temp += 25;
 
-                if (bas == false && (this.IPNeighbor || this.BenNeighbor || (Settings.Neighbor && Level >= Settings.NeighborLevel && neighbor == true)))
+                if (bas == false && IsNeighbor)
                     temp = (uint)Math.Round((double)(temp / 2));
 
                 if (bas == false)
@@ -849,7 +868,7 @@ namespace LKCamelot.model
                 else if (m_Class == Class.Shaman)
                     temp += 20;
 
-                if (bas == false && (this.IPNeighbor || this.BenNeighbor || (Settings.Neighbor && Level >= Settings.NeighborLevel && neighbor == true)))
+                if (bas == false && IsNeighbor)
                     temp = (uint)Math.Round((double)(temp / 2));
 
                 if (bas == false)
@@ -868,7 +887,7 @@ namespace LKCamelot.model
                 else
                     temp += 10;
 
-                if (bas == false && (this.IPNeighbor || this.BenNeighbor || (Settings.Neighbor && Level >= Settings.NeighborLevel && neighbor == true)))
+                if (bas == false && IsNeighbor)
                     temp = (uint)Math.Round( (double)(temp / 2));
 
                 if (bas == false)
@@ -1986,6 +2005,9 @@ namespace LKCamelot.model
                     {
                         Level++;
                     }
+                    // 이웃마을 레벨에 도달하면 자동으로 이웃마을 백성이 된다.
+                    if (Level == Settings.NeighborLevel && IsNeighbor)
+                        client.SendPacket(new UpdateChatBox(0x00, 0xff, 1, "이웃 나라 백성이 되었습니다. 도우미에게 가면 마지막왕국 백성이 될 수 있습니다.").Compile());
                     client.SendPacket(new SetLevelGold(this).Compile());
                     client.SendPacket(new UpdateCharStats(this).Compile());
                 }
