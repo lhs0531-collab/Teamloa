@@ -292,8 +292,14 @@ namespace LKCamelot.Timer
 
                         if (playe.PKCount >= Settings.PrisonCount && !playe.Map.Contains("독방"))
                         {
-                            playe.m_Loc = new Point2D(13, 12);
-                            playe.Map = "독방" + "," + Settings.VillageName.ElementAt(playe.m_Channel);
+                            // 맵 목록에 실제로 있는 독방 이름을 쓴다. 없는 이름으로 보내면 독방에 가지 않고
+                            // 지금 있는 맵의 (13, 12)로 10초마다 옮겨지기만 한다.
+                            string prisonMap = io.IOClient.GetPrisonMap(playe.m_Channel);
+                            if (prisonMap != null)
+                            {
+                                playe.m_Loc = new Point2D(13, 12);
+                                playe.Map = prisonMap;
+                            }
                         }
 
                         if (playe.PKhistoryPlayer.Count != 0)

@@ -213,6 +213,23 @@ namespace LKCamelot.io
                 player.m_Loc = new Point2D(Settings.StartGMLoc.X, Settings.StartGMLoc.Y);
                 player.Map = Settings.VillageName.ElementAt(this.player.m_Channel) + Settings.StartGMMap;
             }
+            else if (player.PKCount >= Settings.PrisonCount)
+            {
+                // 감옥 수치인 캐릭터는 HandleGo가 이동을 막아 맵 로드 패킷이 한 번도 가지 않는다.
+                // 저장된 맵이 "독방"이라 타이머의 독방 이동 조건에도 걸리지 않으므로 여기서 직접 독방으로 보낸다.
+                string prisonMap = GetPrisonMap(player.m_Channel);
+
+                if (prisonMap != null)
+                {
+                    player.m_Loc = new Point2D(13, 12);
+                    player.Map = prisonMap;
+                }
+                else
+                {
+                    // 독방 맵이 DB에 없으면 맵을 로드할 방법이 없으므로 마을로 보낸다.
+                    player.client.HandleGo("마을", true);
+                }
+            }
             else
                 player.client.HandleGo("마을");
 
@@ -236,6 +253,21 @@ namespace LKCamelot.io
 
             if (Settings.LoginAlarm && !Settings.GMS.Contains(player.Name))
                 World.SendToAll(new QueDele(player.m_Serial, "all", new UpdateChatBox(0x94, 0x52, 1, string.Format("{0}님이 접속하였습니다.", player.Name)).Compile()));
+        }
+
+        /// <summary>
+        /// 해당 채널의 독방 맵 이름을 돌려준다. 맵 이름은 DB(mapmaster)에 따라 "독방,마을이름" 또는 "독방"이므로
+        /// 실제로 맵 목록에 있는 쪽을 쓴다. 둘 다 없으면 null.
+        /// </summary>
+        public static string GetPrisonMap(int channel)
+        {
+            var maps = model.Map.FullMaps[channel];
+            string perVillage = "독방" + "," + Settings.VillageName.ElementAt(channel);
+            if (maps.ContainsKey(perVillage))
+                return perVillage;
+            if (maps.ContainsKey("독방"))
+                return "독방";
+            return null;
         }
 
         /// <param name="force">
