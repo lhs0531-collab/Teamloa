@@ -308,7 +308,7 @@ namespace LKCamelot.model
 
                             var mobdist = World.Dist2d(mob.Value.m_Loc.X, mob.Value.m_Loc.Y, mob.Value.TargetP.Loc.X, mob.Value.TargetP.Loc.Y);
 
-                            if (mobdist >= 2 && mobdist < mob.Value.MaxAggro && Server.tickcount.ElapsedMilliseconds - mob.Value.WalkSpeed > mob.Value.LastAction)
+                            if (mobdist >= 2 && mobdist < mob.Value.MaxAggro && Server.tickcount.ElapsedMilliseconds - mob.Value.EffectiveWalkSpeed > mob.Value.LastAction)
                             {
                                 //이동
                                 mob.Value.LastAction = LKCamelot.Server.tickcount.ElapsedMilliseconds;
@@ -503,7 +503,7 @@ namespace LKCamelot.model
 
                             var mobdist = World.Dist2d(mob.Value.m_Loc.X, mob.Value.m_Loc.Y, mob.Value.TargetP.Loc.X, mob.Value.TargetP.Loc.Y);
 
-                            if (mobdist >= 2 && mobdist < mob.Value.MaxAggro && Server.tickcount.ElapsedMilliseconds - mob.Value.WalkSpeed > mob.Value.LastAction)
+                            if (mobdist >= 2 && mobdist < mob.Value.MaxAggro && Server.tickcount.ElapsedMilliseconds - mob.Value.EffectiveWalkSpeed > mob.Value.LastAction)
                             {
                                 //이동
                                 mob.Value.LastAction = LKCamelot.Server.tickcount.ElapsedMilliseconds;

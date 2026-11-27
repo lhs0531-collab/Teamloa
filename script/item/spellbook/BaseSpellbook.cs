@@ -84,6 +84,29 @@ namespace LKCamelot.script.item
             m_ItemID = 3;
         }
     }
+    public class IceBagBook : BaseSpellbook
+    {
+        public override string Name { get { return "BOOK OF ICE BAG"; } }
+        public override int MenReq { get { return 80; } }
+        public override int MenReqPl { get { return 6; } }
+        public override Class ClassReq { get { return Class.Wizard | Class.Beginner | Class.Knight | Class.Shaman | Class.Swordsman; } }
+
+        public override ulong BuyPrice { get { return 10000; } }
+        public override int SellPrice { get { return 5000; } }
+
+        public override spells.Spell SpellTaught { get { return new spells.IceBag(); } }
+
+        public IceBagBook()
+            : base(3)
+        {
+        }
+
+        public IceBagBook(Serial serial)
+            : base(serial)
+        {
+            m_ItemID = 3;
+        }
+    }
     public class ViewBook : BaseSpellbook
     {
         public override string Name { get { return "BOOK OF VIEW"; } }

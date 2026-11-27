@@ -84,6 +84,48 @@ namespace LKCamelot.script.monster
         public int WalkSpeed { get { return Convert.ToInt32(MonsterData["WALKSPEED"]); } }
         public int AttackSpeed { get { return Convert.ToInt32(MonsterData["ATTACKSPEED"]); } }
 
+        /// <summary>
+        /// 감속(Slow) 버프를 반영한 걷기 간격(ms). 이동속도가 N% 줄면 간격은 100/(100-N)배가 된다.
+        /// 감속이 여러 개 걸려 있으면 가장 강한 것 하나만 적용한다(합산하지 않음).
+        /// </summary>
+        public int EffectiveWalkSpeed
+        {
+            get
+            {
+                int walk = WalkSpeed;
+                if (m_Buffs.IsEmpty)
+                    return walk;
+
+                int slow = 0;
+                foreach (var buff in m_Buffs.Values)
+                {
+                    var effect = buff.BuffEffect;
+                    if (effect != null && effect.BuffType == script.spells.BuffCase.Slow && effect.MoveSlowPercent > slow)
+                        slow = effect.MoveSlowPercent;
+                }
+                if (slow <= 0)
+                    return walk;
+                if (slow > Settings.SlowPercentMax)
+                    slow = Settings.SlowPercentMax;
+
+                return (int)((long)walk * 100 / (100 - slow));
+            }
+        }
+
+        /// <summary>
+        /// 감속 마법을 건다. 같은 마법이 이미 걸려 있으면 지우고 다시 걸어 지속시간을 갱신한다.
+        /// (AddBuff는 같은 이름의 버프가 있으면 거부하므로 갱신이 되지 않는다)
+        /// </summary>
+        public void ApplySlow(script.spells.Spell spell)
+        {
+            foreach (var old in m_Buffs.Where(xe => xe.Value.Name == spell.Name).ToList())
+            {
+                script.spells.Spell removed;
+                m_Buffs.TryRemove(old.Key, out removed);
+            }
+            AddBuff(spell);
+        }
+
         public virtual int SpawnTime { get { return 30000; } }
         public virtual int AliveTime { get { return 0; } }
         public virtual Race Race { get { return 0; } }

@@ -39,6 +39,9 @@ namespace LKCamelot.script.spells
         public int Time = Int32.MaxValue;
         public int TimePI = 0;
         public BuffCase BuffType;
+
+        // 이동속도 감소율(%). BuffType이 Slow일 때 몬스터의 걷기 간격에 반영된다. (Monster.EffectiveWalkSpeed)
+        public int MoveSlowPercent = 0;
     }
     
 	public class Spell

@@ -19,6 +19,7 @@ namespace LKCamelot.script.spells
             {
                 var tbuff = new Buff();
                 tbuff.BuffType = BuffCase.Slow;
+                tbuff.MoveSlowPercent = Settings.HailStormSlowPercent;
                 tbuff.Time = 180 * Settings.Second;
                 tbuff.TimePI = 10;
                 tbuff.Hit = 20;
@@ -59,8 +60,11 @@ namespace LKCamelot.script.spells
             {
                 if (obj is script.monster.Monster)
                 {
-                    (obj as script.monster.Monster).AddBuff(this);
-                    (obj as script.monster.Monster).TakeDamage(player, this);
+                    var mob = obj as script.monster.Monster;
+                    mob.TakeDamage(player, this);
+                    // 피해로 죽지 않은 몬스터에게만 감속을 건다. 다시 맞으면 지속시간이 갱신된다.
+                    if (mob.Alive)
+                        mob.ApplySlow(this);
                 }
                 //else if (obj is model.Player)
                 //{

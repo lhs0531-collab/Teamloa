@@ -65,6 +65,14 @@ namespace LKCamelot
         public static int BuffTargetRangeUp = 2;        // 위쪽(몸통·머리)
         public static int BuffTargetRangeDown = 1;      // 아래쪽
 
+        // 감속 마법(몬스터 대상). 이동속도 감소율(%)과 아이스백의 지속시간.
+        // 유저의 걷기 속도는 서버가 검증하지 않으므로 유저에게는 감속이 걸리지 않는다.
+        public static int HailStormSlowPercent = 30;
+        public static int IceBagSlowPercent = 50;
+        public static int IceBagSlowTime = 8 * Second;      // 1권 기준
+        public static int IceBagSlowTimePl = 1 * Second;    // 권당 증가
+        public static int SlowPercentMax = 90;              // 감속 상한(%)
+
         public static int AutoDeleteDaysPromo = 100;
         public static int AutoDeleteDaysNormal = 50;
 
