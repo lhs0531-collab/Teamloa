@@ -1058,7 +1058,8 @@ namespace LKCamelot.model
 
                 if (filename == null)
                 {
-                    Map = oldMap;
+                    // setter를 다시 부르면 이전 맵도 목록에 없을 때 무한 재귀(StackOverflow)로 서버가 즉시 종료된다.
+                    m_Map = oldMap;
                     return;
                 }
                 

@@ -85,12 +85,21 @@ namespace LKCamelot
                 {
                     using (StreamReader sr = new StreamReader(Settings.rootPath + "worldsaveGuild.txt"))
                     {
+                        int lineNo = 0;
                         while (!sr.EndOfStream)
                         {
-                            string[] line = sr.ReadLine().Split(',');
+                            string raw = sr.ReadLine();
+                            lineNo++;
+                            if (string.IsNullOrWhiteSpace(raw))
+                                continue;
 
-                            var ret = new LKCamelot.model.BaseGuild(line);
-                            temp.Add(ret);
+                            // 깨진 줄 하나 때문에 기동 전체가 실패하지 않도록 줄 단위로 보호한다.
+                            try
+                            {
+                                var ret = new LKCamelot.model.BaseGuild(raw.Split(','));
+                                temp.Add(ret);
+                            }
+                            catch (Exception e) { LogLoadError("worldsaveGuild.txt", lineNo, raw, e); }
                         }
                     }
                 }
@@ -144,17 +153,44 @@ namespace LKCamelot
                 {
                     using (StreamReader sr = new StreamReader(Settings.rootPath + "worldsavePl.txt"))
                     {
+                        int lineNo = 0;
                         while (!sr.EndOfStream)
                         {
-                            string[] line = sr.ReadLine().Split(',');
+                            string raw = sr.ReadLine();
+                            lineNo++;
+                            if (string.IsNullOrWhiteSpace(raw))
+                                continue;
 
-                            var ret = new LKCamelot.model.Player(Convert.ToInt32(line[0]), line);
-                            temp.Add(ret);
+                            try
+                            {
+                                string[] line = raw.Split(',');
+                                var ret = new LKCamelot.model.Player(Convert.ToInt32(line[0]), line);
+                                temp.Add(ret);
+                            }
+                            catch (Exception e) { LogLoadError("worldsavePl.txt", lineNo, raw, e); }
                         }
                     }
                 }
                 return temp;
             }
+        }
+
+        /// <summary>
+        /// 저장 파일에서 읽지 못한 줄을 콘솔과 loaderrors.txt(실행 폴더)에 남긴다.
+        /// 건너뛴 줄의 데이터는 메모리에 올라오지 않으므로 다음 저장 때 파일에서 빠진다.
+        /// 원본은 저장 직전 백업(LKDB\backup)에 남아 있으니 로그의 줄 내용을 보고 복구한다.
+        /// </summary>
+        private static void LogLoadError(string file, int lineNo, string raw, Exception e)
+        {
+            string msg = string.Format("{0} [LoadError] {1} line {2}: {3} | {4}",
+                DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"), file, lineNo, e.Message, raw);
+            Console.WriteLine(msg);
+            try
+            {
+                using (StreamWriter sw = new StreamWriter("loaderrors.txt", true))
+                    sw.WriteLine(msg);
+            }
+            catch { }
         }
 
         public static void SavePlayer(LKCamelot.model.Player play)
@@ -355,35 +391,45 @@ namespace LKCamelot
             {
                 using (StreamReader sr = new StreamReader(Settings.rootPath + "worldsaveIt.txt"))
                 {
+                    int lineNo = 0;
                     while (!sr.EndOfStream)
                     {
-                        string[] line = sr.ReadLine().Split(',');
+                        string raw = sr.ReadLine();
+                        lineNo++;
+                        if (string.IsNullOrWhiteSpace(raw))
+                            continue;
 
-                        script.item.Item temp = null;
                         try
                         {
-                            temp = (script.item.Item)Activator.CreateInstance(Type.GetType("LKCamelot.script.item." + line[1]), (LKCamelot.model.Serial)Convert.ToInt32(line[0]));
-                        }
-                        catch { Console.WriteLine(line[1] + " - ParSer:" + line[3]); continue; }
+                            string[] line = raw.Split(',');
 
-                        //내구도
-                        if ((temp.Durability = Convert.ToInt32(line[2])) > temp.InitMaxHits)
-                            temp.Durability = temp.InitMaxHits;
-                        temp.ParSer = Convert.ToInt32(line[3]);         //소유주
-                        try
-                        {
-                            temp.m_InvSlot = Convert.ToInt32(line[4]);      //슬롯번호
+                            script.item.Item temp = null;
+                            try
+                            {
+                                temp = (script.item.Item)Activator.CreateInstance(Type.GetType("LKCamelot.script.item." + line[1]), (LKCamelot.model.Serial)Convert.ToInt32(line[0]));
+                            }
+                            catch { Console.WriteLine(line[1] + " - ParSer:" + line[3]); continue; }
+
+                            //내구도
+                            if ((temp.Durability = Convert.ToInt32(line[2])) > temp.InitMaxHits)
+                                temp.Durability = temp.InitMaxHits;
+                            temp.ParSer = Convert.ToInt32(line[3]);         //소유주
+                            try
+                            {
+                                temp.m_InvSlot = Convert.ToInt32(line[4]);      //슬롯번호
+                            }
+                            catch
+                            {
+                                temp.m_InvSlot = 0;
+                            }
+                            temp.Stage = Convert.ToInt32(line[5]);              //단수
+                            if (temp.Stackable)
+                                temp.Quantity = Convert.ToInt32(line[6]) > temp.Limit ? 1 : Convert.ToInt32(line[6]);           //갯수
+                            else
+                                temp.Quantity = 1;
+                            ret.Add(temp);
                         }
-                        catch
-                        {
-                            temp.m_InvSlot = 0;
-                        }
-                        temp.Stage = Convert.ToInt32(line[5]);              //단수
-                        if (temp.Stackable)
-                            temp.Quantity = Convert.ToInt32(line[6]) > temp.Limit ? 1 : Convert.ToInt32(line[6]);           //갯수
-                        else
-                            temp.Quantity = 1;
-                        ret.Add(temp);
+                        catch (Exception e) { LogLoadError("worldsaveIt.txt", lineNo, raw, e); }
                     }
                 }
             }
@@ -435,30 +481,44 @@ namespace LKCamelot
         public static List<script.item.AuctionItem> LoadAuctions()
         {
             var ret = new List<script.item.AuctionItem>();
+            // 다른 로드 함수와 달리 파일 존재 검사가 없어, 파일이 없으면 기동 중 예외가 났다.
+            if (!File.Exists(Settings.rootPath + "worldsaveAi.txt"))
+                return ret;
+
             using (StreamReader sr = new StreamReader(Settings.rootPath + "worldsaveAi.txt"))
             {
+                int lineNo = 0;
                 while (!sr.EndOfStream)
                 {
-                    string[] line = sr.ReadLine().Split(',');
-                    script.item.Item temp = null;
-                    script.item.AuctionItem temp2 = null;
+                    string raw = sr.ReadLine();
+                    lineNo++;
+                    if (string.IsNullOrWhiteSpace(raw))
+                        continue;
+
                     try
                     {
-                        temp = (script.item.Item)Activator.CreateInstance(Type.GetType("LKCamelot.script.item." + line[1]), (LKCamelot.model.Serial)Convert.ToInt32(line[0]));
-                    }
-                    catch { Console.WriteLine(line[1]); continue; }
+                        string[] line = raw.Split(',');
+                        script.item.Item temp = null;
+                        script.item.AuctionItem temp2 = null;
+                        try
+                        {
+                            temp = (script.item.Item)Activator.CreateInstance(Type.GetType("LKCamelot.script.item." + line[1]), (LKCamelot.model.Serial)Convert.ToInt32(line[0]));
+                        }
+                        catch { Console.WriteLine(line[1]); continue; }
 
-                    temp.m_ItemID = Convert.ToInt32(line[2]);
-                    temp.ParSer = Convert.ToInt32(line[3]);
-                    temp.InvSlot = Convert.ToInt32(line[4]);
-                    temp.Stage = Convert.ToInt32(line[5]);
-                    temp.Quantity = Convert.ToInt32(line[6]);
-                    temp2 = new script.item.AuctionItem(temp, Convert.ToUInt64(line[7]), Convert.ToInt32(line[9]));
-                    temp2.item = temp;
-                    temp2.sellerSerial = Convert.ToInt32(line[10]);
-                    temp2.buyerSerial = Convert.ToInt32(line[11]);
-                    temp2.state = (script.item.aucState)Convert.ToInt32(line[12]);
-                    ret.Add(temp2);
+                        temp.m_ItemID = Convert.ToInt32(line[2]);
+                        temp.ParSer = Convert.ToInt32(line[3]);
+                        temp.InvSlot = Convert.ToInt32(line[4]);
+                        temp.Stage = Convert.ToInt32(line[5]);
+                        temp.Quantity = Convert.ToInt32(line[6]);
+                        temp2 = new script.item.AuctionItem(temp, Convert.ToUInt64(line[7]), Convert.ToInt32(line[9]));
+                        temp2.item = temp;
+                        temp2.sellerSerial = Convert.ToInt32(line[10]);
+                        temp2.buyerSerial = Convert.ToInt32(line[11]);
+                        temp2.state = (script.item.aucState)Convert.ToInt32(line[12]);
+                        ret.Add(temp2);
+                    }
+                    catch (Exception e) { LogLoadError("worldsaveAi.txt", lineNo, raw, e); }
                 }
             }
             return ret;

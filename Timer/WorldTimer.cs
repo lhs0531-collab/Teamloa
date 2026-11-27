@@ -26,16 +26,43 @@ namespace LKCamelot.Timer
             timer = new System.Threading.Timer(new System.Threading.TimerCallback(run), null, 0, 1 * Settings.Second);
         }
 
+        private readonly object runLock = new object();
+
         private void run(object state)
         {
-            Tick++;
-            PebbleSpwn();
-            TimeAlarm();
-            ToNotice();
-            Del_GroundItem();
-            PlayerTick();
-            Messages();
-            Quest();
+            // 타이머 콜백은 스레드풀에서 돈다. 여기서 예외가 빠져나가면 서버 프로세스가 종료되므로
+            // 작업마다 따로 잡아 로그만 남기고 나머지 작업은 계속한다.
+            // 앞의 틱이 아직 끝나지 않았으면(30분 주기 저장 등) 겹쳐 실행하지 않고 이번 틱은 건너뛴다.
+            if (!System.Threading.Monitor.TryEnter(runLock))
+                return;
+
+            try
+            {
+                Tick++;
+                SafeRun("PebbleSpwn", PebbleSpwn);
+                SafeRun("TimeAlarm", TimeAlarm);
+                SafeRun("ToNotice", ToNotice);
+                SafeRun("Del_GroundItem", Del_GroundItem);
+                SafeRun("PlayerTick", PlayerTick);
+                SafeRun("Messages", Messages);
+                SafeRun("Quest", Quest);
+            }
+            finally
+            {
+                System.Threading.Monitor.Exit(runLock);
+            }
+        }
+
+        private static void SafeRun(string name, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[{0}] WorldTimer.{1} exception: {2}", DateTime.Now, name, e);
+            }
         }
 
         private void PebbleSpwn()
@@ -167,6 +194,9 @@ namespace LKCamelot.Timer
                 var loginplayer = Server.world.handler.add[i].Values.Where(xe => xe.loggedIn).ToList();
                 foreach (var playe in loginplayer)
                 {
+                    // 한 명에서 난 예외가 나머지 접속자의 틱 처리를 막지 않게 한다.
+                    try
+                    {
                     #region 평민알림
                     if ((Tick % 2400) == 0 && (playe.Class & library.Class.Beginner) != 0 && playe.Level >= 5)
                     {
@@ -303,6 +333,7 @@ namespace LKCamelot.Timer
                         if ((Tick % 10) == 0)
                         {
                             var item1 = World.NewItems.Where(xe => xe.Value.m_Map != null
+                                && xe.Value.Loc != null
                                 && xe.Value.m_Channel == playe.m_Channel
                                 && xe.Value.m_Map == playe.Map
                                 && xe.Value.Loc.X == playe.Loc.X && xe.Value.Loc.Y == playe.Loc.Y)
@@ -313,6 +344,11 @@ namespace LKCamelot.Timer
                         }
                     }
                     #endregion
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("[{0}] WorldTimer.PlayerTick exception ({1}): {2}", DateTime.Now, playe.Name, e);
+                    }
                 }
             }
         }

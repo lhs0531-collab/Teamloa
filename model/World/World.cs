@@ -749,8 +749,11 @@ namespace LKCamelot.model
             var cons = w_server.OnlineConnections;
             foreach (var conn in cons)
             {
-                var player = conn.Client.player;
+                // 접속 직후에는 Connections에 먼저 들어가고 Client는 나중에 대입되므로 null일 수 있다.
                 var client = conn.Client;
+                if (client == null)
+                    continue;
+                var player = client.player;
 
                 if (player == null || !player.loggedIn)
                     continue;
@@ -781,8 +784,10 @@ namespace LKCamelot.model
             var cons = w_server.OnlineConnections;
             foreach (var conn in cons)
             {
-                var player = conn.Client.player;
                 var client = conn.Client;
+                if (client == null)
+                    continue;
+                var player = client.player;
 
                 if (player == null || !player.loggedIn || player.ChatBlack)
                     continue;
@@ -997,6 +1002,18 @@ namespace LKCamelot.model
 
         public static void SaveAll()
         {
+                // 저장 파일 로드가 끝나기 전에는 저장하지 않는다. 로드 중 예외로 종료될 때
+                // 플레이어 0명인 상태로 저장 파일을 덮어쓰는 것을 막는다.
+                if (!Server.WorldLoaded)
+                {
+                    Console.WriteLine("World Save skipped: world data is not loaded yet.");
+                    return;
+                }
+
+                // 덮어쓰기 전의 파일을 먼저 백업한다. (기존에는 저장 후에 복사해 직전 상태가 남지 않았다)
+                try { BinaryIO.BackUpData(); }
+                catch (Exception e) { Console.WriteLine("BackUp Err : " + e.Message); }
+
                 Console.WriteLine("Guild Size: ", NewGuilds.Count());
 
                 Console.WriteLine("Player Size: " + Server.playerHandler.Count);
@@ -1034,7 +1051,6 @@ namespace LKCamelot.model
 
 
 
-                BinaryIO.BackUpData();
                 Console.WriteLine("World Save IO Complete");
 
                 World.DeletePlayer.Clear();
