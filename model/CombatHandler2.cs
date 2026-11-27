@@ -25,9 +25,12 @@ namespace LKCamelot.model
         {
             List<BaseObject> target = World.GetTileTarget(play, AdjecentTile(play, swingdir), swingdir);
 
+            if (target == null)
+                return;
+            var take = play.Dam;
+
             // 트리플/트위스터의 추가 방향 모션. 시리얼 없는 QueDele로 보내 시전자 본인에게도 전송한다.
             // (시리얼을 넣으면 SendToAll이 본인을 건너뛰어 본인 화면에는 한 방향만 보였다)
-            // 타격 대상이 없어도 모션은 보이도록 대상 확인보다 먼저 보낸다.
             if (play.m_Buffs.Where(Xe => Xe.Value.BuffEffect.BuffType == script.spells.BuffCase.Triple).Any())
             {
                 SendExtraSwing(play, (int)play.Face - 1);
@@ -39,10 +42,6 @@ namespace LKCamelot.model
                 SendExtraSwing(play, (int)play.Face + 2);
                 SendExtraSwing(play, (int)play.Face + 4);
             }
-
-            if (target == null)
-                return;
-            var take = play.Dam;
 
             foreach (var tar in target)
             {
