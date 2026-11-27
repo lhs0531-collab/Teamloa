@@ -238,9 +238,13 @@ namespace LKCamelot.io
                 World.SendToAll(new QueDele(player.m_Serial, "all", new UpdateChatBox(0x94, 0x52, 1, string.Format("{0}님이 접속하였습니다.", player.Name)).Compile()));
         }
 
-        public void HandleGo(string goloc)
+        /// <param name="force">
+        /// true면 감옥 수치·얼음 상태여도 이동시킨다. 사망 처리 전용.
+        /// (이동이 막히면 죽은 자리에 HP 1로 남아, 맞을 때마다 사망 처리(골드·아이템 드랍)가 반복된다)
+        /// </param>
+        public void HandleGo(string goloc, bool force = false)
         {
-            if (player.PKCount >= Settings.PrisonCount || player.m_Buffs.Where(xe=>xe.Value.BuffEffect.BuffType == script.spells.BuffCase.Freezing).Any())
+            if (!force && (player.PKCount >= Settings.PrisonCount || player.m_Buffs.Where(xe=>xe.Value.BuffEffect.BuffType == script.spells.BuffCase.Freezing).Any()))
                 return;
 
             var gotoMap = script.map.GotoCmd.Gotocmd[player.m_Channel].Where(xe=>xe.GoName == goloc.ToLower()).FirstOrDefault();

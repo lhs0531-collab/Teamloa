@@ -1670,7 +1670,7 @@ namespace LKCamelot.model
                     }
                     #endregion
 
-                    client.HandleGo("휴게실");
+                    client.HandleGo("휴게실", true);
                     value = 1;
                     //  World.SendToAll(new QueDele(Serial, Map, new DeleteObject(Serial).Compile()));
                 }

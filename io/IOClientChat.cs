@@ -102,6 +102,8 @@ namespace LKCamelot.io
             "#맵디비갱신",
             "#벤아이피",
 
+            "#광부",
+            "#대장장이",
         };
 
 
@@ -161,6 +163,10 @@ namespace LKCamelot.io
                         GMGuildSave();      break;
                     case "#길드해체":
                         GMGuildDelete(str2); break;
+                    case "#광부":
+                        GMSubJobLevel(str2, true);  break;
+                    case "#대장장이":
+                        GMSubJobLevel(str2, false); break;
                     case "#아이템저장":
                         GMItemSave();       break;
                     case "#플레이어저장":
@@ -224,7 +230,8 @@ namespace LKCamelot.io
             UpdateChat("#경험치배율, #골드배율, #배율, #초기화, #얼음");
             UpdateChat("#저장, #접속알림, #피케이알림, #맵정보, #강퇴");
             UpdateChat("#이웃레벨, #이웃, #이웃벤, #뻐꾸기, #몹소환, #은신");
-            UpdateChat("#몹디비갱신, #벤아이피");
+            UpdateChat("#몹디비갱신, #벤아이피, #길드해체");
+            UpdateChat("#광부 [레벨], #대장장이 [레벨]");
         }
 
         #region GM Commands
@@ -678,6 +685,44 @@ namespace LKCamelot.io
             io.IOClient.WriteBug(string.Format("{0} [GuildDelete] GM={1} guild={2} members={3}",
                 DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"), player.Name, entry.Key, memberCount));
             SendPacket(new UpdateChatBox(0x00, 0xff, 1, string.Format("{0}길드를 해체했습니다. (길드원 {1}명)", entry.Key, memberCount)).Compile());
+        }
+
+        /// <summary>
+        /// 서브직업(광부/대장장이) 레벨을 지정한 값으로 맞춘다.
+        /// #광부 [레벨] / #대장장이 [레벨]. 어뷰징 방지를 위해 명령을 친 GM 본인에게만 적용한다(대상 지정 없음).
+        /// </summary>
+        private void GMSubJobLevel(string[] str2, bool miner)
+        {
+            const int MaxSubJobLevel = 99;
+            string jobName = miner ? "광부" : "대장장이";
+
+            int level;
+            if (str2.Count() != 2
+                || !int.TryParse(str2[1], System.Globalization.NumberStyles.None, System.Globalization.CultureInfo.InvariantCulture, out level)
+                || level < 1 || level > MaxSubJobLevel)
+            {
+                SendPacket(new UpdateChatBox(0x00, 0xff, 1, string.Format("{0} [레벨: 1~{1}]", str2[0], MaxSubJobLevel)).Compile());
+                return;
+            }
+
+            // 경험치도 레벨에 맞춰 둔다. 레벨만 바꾸면 다음 경험치 획득 때 경험치 기준으로 레벨이 다시 내려간다.
+            int xp = level > 1 ? library.NextLevelC.NextLevelTable[level - 1] + 1 : 0;
+            if (miner)
+            {
+                player.MinerLevel = level;
+                player._MinerXP = xp;
+            }
+            else
+            {
+                player.BSLevel = level;
+                player._BSXP = xp;
+            }
+
+            SendPacket(new Attrib(player).Compile());
+
+            io.IOClient.WriteBug(string.Format("{0} [SubJobLevel] GM={1} job={2} level={3}",
+                DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"), player.Name, jobName, level));
+            SendPacket(new UpdateChatBox(0x00, 0xff, 1, string.Format("{0} 레벨을 {1}(으)로 설정했습니다.", jobName, level)).Compile());
         }
 
         private void GMMapInfo(string[] str2)
