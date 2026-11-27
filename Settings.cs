@@ -84,7 +84,7 @@ namespace LKCamelot
         public static int ShokeTickInterval = 1 * Second;   // 피해 주기
         public static int ShokeTime = 5 * Second;           // 지속시간, 1권 기준
         public static int ShokeTimePl = 1 * Second;         // 권당 증가 (12권 = 16초)
-        public static int ShokeEffectSprite = 31;           // 걸린 몬스터에 표시되는 효과 번호 (31 = 지그재그의 적중 효과)
+        public static int ShokeEffectSprite = 53;           // 걸린 몬스터에 표시되는 효과 번호
 
         public static int AutoDeleteDaysPromo = 100;
         public static int AutoDeleteDaysNormal = 50;
