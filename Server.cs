@@ -511,6 +511,10 @@ namespace LKCamelot
             if (connection.Client != null
                 && connection.Client.player != null)
             {
+                // 접속이 끊기면 진행 중인 교환을 취소한다.
+                if (connection.Client.player.Exchange != null)
+                    connection.Client.player.Exchange.Cancle();
+
                 connection.Client.player.InstancedObjects.Clear();
                 connection.Client.player.m_Buffs.Clear();
                 connection.Client.player.RefreshTransparency();

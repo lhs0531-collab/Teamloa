@@ -10,14 +10,28 @@ using System.Threading.Tasks;
 
 namespace LKCamelot.model
 {
+    public class ExchangeEntry
+    {
+        public script.item.Item Item;
+        public int Amount;
+    }
+
+    /// <summary>
+    /// 교환창(@교환). 양쪽이 아이템(최대 4칸)과 골드를 올리고 둘 다 체크하면 한 번에 맞바꾼다.
+    /// 플레이어마다 자기 쪽 ExchangeBox를 하나씩 갖고, Target.Exchange가 상대 쪽이다.
+    /// </summary>
     public class ExchangeBox
     {
-        private Player Owner;
-        private Player Target;
-        public List<script.item.Item> CellItem = new List<script.item.Item>();
-        private int Gold = 0;
+        public readonly Player Owner;
+        public readonly Player Target;
+        public List<ExchangeEntry> CellItem = new List<ExchangeEntry>();
+        private ulong m_Gold = 0;
         private bool Check = false;
 
+        public const int MaxCell = 4;
+
+        // 교환 확정은 한 번에 하나씩만 처리한다. (두 사람의 아이템·골드를 함께 바꾸므로)
+        private static readonly object ConfirmLock = new object();
 
         public ExchangeBox(Player player, Player target)
         {
@@ -29,124 +43,266 @@ namespace LKCamelot.model
                 Target.Exchange = new ExchangeBox(target, player);
 
             player.client.SendPacket(new ShowExchangeBox(player, target).Compile());
-            player.client.SendPacket(new UpdateChatBox(0x00, 0xff, 1, "서비스 준비 중입니다.").Compile());
         }
 
-        public void AddGold(int Gold)
+        private ExchangeBox Other { get { return Target.Exchange; } }
+
+        /// <summary>이 아이템이 교환창에 올라가 있는지. 올라간 아이템은 사용·버리기·판매 등이 막힌다.</summary>
+        public bool Contains(script.item.Item item)
         {
-            if (Check || Target.Exchange.Check)
-            {
-                Owner.client.SendPacket(new UpdateChatBox(0x00, 0xff, 1, "체크 상태입니다.").Compile());
-                return;
-            }
-
-
-
+            return item != null && CellItem.Any(xe => xe.Item.m_Serial == item.m_Serial);
         }
-        public void AddItem(int slot, int amount)
-        {
-            if (Check || Target.Exchange.Check)
-            {
-                Owner.client.SendPacket(new UpdateChatBox(0x00, 0xff, 1, "체크 상태입니다.").Compile());
-                return;
-            }
-            var item = Owner.Inventory.Where(xe => xe.InvSlot == slot).FirstOrDefault();
 
-            if (item != null)
+        public ulong Price
+        {
+            get { return m_Gold; }
+        }
+
+        /// <summary>골드 제시. 클라이언트의 골드 입력 패킷 형식이 확정되면 핸들러가 호출한다.</summary>
+        public bool SetGold(ulong gold)
+        {
+            if (Check || Other == null || Other.Check)
             {
-                CellItem.Add(item);
+                SendIfOnline(Owner, new UpdateChatBox(0x00, 0xff, 1, "체크 상태입니다.").Compile());
+                return false;
             }
+            if (gold > Owner.Gold)
+            {
+                SendIfOnline(Owner, new UpdateChatBox(0x00, 0xff, 1, "골드가 부족합니다.").Compile());
+                return false;
+            }
+            if (gold > uint.MaxValue)               // ShowExchangeBox가 uint로 전송
+                return false;
+
+            m_Gold = gold;
             Refresh();
+            return true;
         }
 
-        public int GetFreeSlot()
+        public bool AddItem(int slot, int amount)
         {
-            return (4 - CellItem.Count());
-        }
-        public int Price
-        {
-            get
+            if (Check || Other == null || Other.Check)
             {
-                return Gold;
+                SendIfOnline(Owner, new UpdateChatBox(0x00, 0xff, 1, "체크 상태입니다.").Compile());
+                return false;
+            }
+            if (slot < 0 || slot >= 24)
+                return false;
+            if (CellItem.Count >= MaxCell)
+            {
+                SendIfOnline(Owner, new UpdateChatBox(0x00, 0xff, 1, "더 이상 올릴 수 없습니다.").Compile());
+                return false;
             }
 
-            set
-            {
-                checked
-                {
+            var item = Owner.Inventory.Where(xe => xe.InvSlot == slot).FirstOrDefault();
+            if (item == null)
+                return false;
+            if (Contains(item))
+                return false;
 
-                }
-            }
+            // 수량 지정 패킷이 확정되지 않아 겹치는 아이템은 전량을 올린다.
+            if (!item.Stackable)
+                amount = 1;
+            else if (amount <= 0 || amount > item.Quantity)
+                amount = item.Quantity;
+
+            CellItem.Add(new ExchangeEntry { Item = item, Amount = amount });
+            Refresh();
+
+            // 교환창에는 아이콘만 보이므로 무엇을 올렸는지 양쪽에 글로 알린다.
+            Notify(string.Format("[교환] {0}님이 {1}번 칸에 {2} 올렸습니다.", Owner.Name, CellItem.Count, Describe(item, amount)));
+            return true;
         }
+
+        /// <summary>교환창에서 아이템 내리기. 클라이언트의 내리기 패킷 형식이 확정되면 핸들러가 호출한다.</summary>
+        public bool RemoveItem(int cellIndex)
+        {
+            if (Check || Other == null || Other.Check)
+                return false;
+            if (cellIndex < 0 || cellIndex >= CellItem.Count)
+                return false;
+
+            var removed = CellItem[cellIndex];
+            CellItem.RemoveAt(cellIndex);
+            Refresh();
+
+            Notify(string.Format("[교환] {0}님이 {1} 내렸습니다.", Owner.Name, Describe(removed.Item, removed.Amount)));
+            return true;
+        }
+
+        private static string Describe(script.item.Item item, int amount)
+        {
+            string name = (item.NPrefix() + " " + item.Name).Trim();
+            return item.Stackable ? string.Format("{0} {1}개를", name, amount) : name + "(을)를";
+        }
+
+        private void Notify(string message)
+        {
+            SendIfOnline(Owner, new UpdateChatBox(0x00, 0xff, 1, message).Compile());
+            SendIfOnline(Target, new UpdateChatBox(0x00, 0xff, 1, message).Compile());
+        }
+
         public bool isCheck
         {
-            get
-            {
-                return Check;
-            }
+            get { return Check; }
             set
             {
-                if (this.Check == value)
+                if (Check == value)
                     return;
+                if (Other == null)
+                {
+                    Cancle();
+                    return;
+                }
 
-                this.Check = value;
+                Check = value;
                 Refresh();
 
-                if (Check && Target.Exchange.isCheck)
-                {
-                    if (Owner.m_Channel == Target.m_Channel &&
-                        Owner.Map == Target.Map &&
-                        Owner.loggedIn && Target.loggedIn &&
-                        World.Dist2d(Owner.Loc, Target.Loc) < 10
-                        )
-                    {
-                        Confirm();
-                    }
-                    else
-                        Cancle();
-                }
+                if (Check && Other.Check)
+                    Confirm();
             }
         }
+
+        /// <summary>올린 아이템이 아직 내 인벤토리(0~23)에 있고 수량이 충분한지</summary>
         public bool ItemCheck()
         {
-            foreach (var item in CellItem)
+            var inv = Owner.Inventory;
+            foreach (var e in CellItem)
             {
-                if (!Owner.Inventory.Where(xe => xe.m_Serial == item.m_Serial && xe.InvSlot < 24).Any())
+                var cur = inv.Where(xe => xe.m_Serial == e.Item.m_Serial).FirstOrDefault();
+                if (cur == null)
+                    return false;
+                if (cur.Quantity < e.Amount)
                     return false;
             }
             return true;
         }
-        public void Cancle()
+
+        private bool Preconditions(out string reason)
         {
-            Owner.client.SendPacket(new UpdateChatBox(0x00, 0xff, 1, "취소되었습니다.").Compile());
-            Target.client.SendPacket(new UpdateChatBox(0x00, 0xff, 1, "취소되었습니다.").Compile());
-            Close();
+            reason = null;
+            var theirs = Other;
+            if (theirs == null) { reason = "상대방이 없습니다."; return false; }
+            if (!Owner.loggedIn || !Target.loggedIn || Owner.client == null || Target.client == null)
+            { reason = "상대방이 접속 중이 아닙니다."; return false; }
+            if (Owner.m_Channel != Target.m_Channel || Owner.Map != Target.Map || World.Dist2d(Owner.Loc, Target.Loc) >= 10)
+            { reason = "거리가 너무 멉니다."; return false; }
+            if (!ItemCheck() || !theirs.ItemCheck()) { reason = "아이템이 변경되었습니다."; return false; }
+            if (Owner.Gold < m_Gold || Target.Gold < theirs.m_Gold) { reason = "골드가 부족합니다."; return false; }
+            // 보수적 검사: 상대가 내주어 비는 칸은 계산하지 않는다. 이 조건이면 이동 도중 실패가 없어 되돌릴 일이 없다.
+            if (Target.GetFreeSlots() < CellItem.Count) { reason = Target.Name + "의 빈 칸이 부족합니다."; return false; }
+            if (Owner.GetFreeSlots() < theirs.CellItem.Count) { reason = Owner.Name + "의 빈 칸이 부족합니다."; return false; }
+            return true;
         }
 
         private void Confirm()
         {
-            if (Owner.Exchange.ItemCheck() && Target.Exchange.ItemCheck())
+            lock (ConfirmLock)
             {
-                Owner.client.SendPacket(new UpdateChatBox(0x00, 0xff, 1, "교환 성공하였습니다.").Compile());
-                Target.client.SendPacket(new UpdateChatBox(0x00, 0xff, 1, "교환 성공하였습니다.").Compile());
+                var theirs = Other;
+                string reason;
 
+                if (!Preconditions(out reason))
+                {
+                    SendIfOnline(Owner, new UpdateChatBox(0x00, 0xff, 1, reason).Compile());
+                    SendIfOnline(Target, new UpdateChatBox(0x00, 0xff, 1, reason).Compile());
+                    Cancle();
+                    return;
+                }
+
+                // 골드: 대입 전에 결과값을 모두 계산한다. 넘치면 아무것도 바꾸지 않고 취소한다.
+                ulong ownerGold, targetGold;
+                try
+                {
+                    checked
+                    {
+                        ownerGold = Owner.Gold - m_Gold + theirs.m_Gold;
+                        targetGold = Target.Gold - theirs.m_Gold + m_Gold;
+                    }
+                }
+                catch (OverflowException)
+                {
+                    Cancle();
+                    return;
+                }
+
+                var mineSnapshot = CellItem.ToList();
+                var theirsSnapshot = theirs.CellItem.ToList();
+
+                // 교환창을 먼저 비워야 올린 아이템의 잠금이 풀려 이동할 수 있다.
+                CellItem.Clear();
+                theirs.CellItem.Clear();
+
+                foreach (var e in mineSnapshot)
+                    Target.Event_Give(Owner, e.Item, e.Amount);
+                foreach (var e in theirsSnapshot)
+                    Owner.Event_Give(Target, e.Item, e.Amount);
+
+                if (ownerGold != Owner.Gold)
+                    Owner.Gold = ownerGold;
+                if (targetGold != Target.Gold)
+                    Target.Gold = targetGold;
+
+                WriteLog(mineSnapshot, theirsSnapshot, m_Gold, theirs.m_Gold);
+
+                SendIfOnline(Owner, new UpdateChatBox(0x00, 0xff, 1, "교환 성공하였습니다.").Compile());
+                SendIfOnline(Target, new UpdateChatBox(0x00, 0xff, 1, "교환 성공하였습니다.").Compile());
                 Close();
             }
-            else
-                Cancle();
         }
+
+        private void WriteLog(List<ExchangeEntry> mine, List<ExchangeEntry> theirs, ulong myGold, ulong theirGold)
+        {
+            try
+            {
+                var sb = new StringBuilder();
+                sb.AppendFormat("{0} {1}->{2} gold={3} items=", DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"), Owner.Name, Target.Name, myGold);
+                foreach (var e in mine)
+                    sb.AppendFormat("[{0}:{1}:{2}:{3}]", (int)e.Item.m_Serial, e.Item.Name, e.Item.Stage, e.Amount);
+                sb.AppendFormat(" | {0}->{1} gold={2} items=", Target.Name, Owner.Name, theirGold);
+                foreach (var e in theirs)
+                    sb.AppendFormat("[{0}:{1}:{2}:{3}]", (int)e.Item.m_Serial, e.Item.Name, e.Item.Stage, e.Amount);
+                io.IOClient.WriteExchangeLog(sb.ToString());
+            }
+            catch (Exception ex)
+            {
+                // 로그 실패가 이미 끝난 교환을 되돌리면 안 된다.
+                Console.WriteLine("Exchange log failed: " + ex.Message);
+            }
+        }
+
+        public void Cancle()
+        {
+            SendIfOnline(Owner, new UpdateChatBox(0x00, 0xff, 1, "취소되었습니다.").Compile());
+            SendIfOnline(Target, new UpdateChatBox(0x00, 0xff, 1, "취소되었습니다.").Compile());
+            Close();
+        }
+
         private void Close()
         {
-            Owner.client.SendPacket(new CanselExchangeBox().Compile());
-            Target.client.SendPacket(new CanselExchangeBox().Compile());
+            SendIfOnline(Owner, new CanselExchangeBox().Compile());
+            SendIfOnline(Target, new CanselExchangeBox().Compile());
 
-            Owner.Exchange = null;
-            Target.Exchange = null;
+            if (Owner.Exchange == this)
+                Owner.Exchange = null;
+            if (Target.Exchange != null && Target.Exchange.Target == Owner)
+                Target.Exchange = null;
         }
+
+        // 양쪽 교환창 화면을 다시 그린다.
         private void Refresh()
         {
-            Owner.client.SendPacket(new ShowExchangeBox(Owner, Target).Compile());
-            Target.client.SendPacket(new ShowExchangeBox(Target, Owner).Compile());
+            var theirs = Other;
+            if (theirs == null)
+                return;
+            SendIfOnline(Owner, new ShowExchangeBox(Owner, Target).Compile());
+            SendIfOnline(Target, new ShowExchangeBox(Target, Owner).Compile());
+        }
+
+        private static void SendIfOnline(Player p, byte[] packet)
+        {
+            if (p != null && p.loggedIn && p.client != null)
+                p.client.SendPacket(packet);
         }
     }
 
@@ -1112,6 +1268,10 @@ namespace LKCamelot.model
             set
             {
                 BaseObject Value;
+
+                // 맵을 옮기면 진행 중인 교환을 취소한다. (취소하면 양쪽 Exchange가 null이 되어 다시 호출되지 않는다)
+                if (Exchange != null)
+                    Exchange.Cancle();
 
                 var oldMap = m_Map;
                 m_Map = value;
