@@ -59,6 +59,12 @@ namespace LKCamelot
             "초보 사냥터는 \"@이동 초보\", \"@이동 위클리\" 입니다.",
         };
 
+        // 타인에게 걸 수 있는 버프(와콘다, 버터플라이, 실버스크린)의 대상 판정 범위(칸).
+        // 누른 좌표가 다른 유저의 발밑 칸 기준으로 이 범위 안이면 그 유저에게, 아니면 시전자 자신에게 건다.
+        public static int BuffTargetRangeX = 1;         // 좌우
+        public static int BuffTargetRangeUp = 2;        // 위쪽(몸통·머리)
+        public static int BuffTargetRangeDown = 1;      // 아래쪽
+
         public static int AutoDeleteDaysPromo = 100;
         public static int AutoDeleteDaysNormal = 50;
 

@@ -242,6 +242,37 @@ namespace LKCamelot.script.spells
         {
             return PlayerHandler.getSingleton().add[Channel].Where(xe => xe.Value.loggedIn && xe.Value.m_Serial == castonid).FirstOrDefault().Value;
         }
+        /// <summary>
+        /// 버프 대상 찾기. 시전자와 같은 맵의 접속자만 대상으로 한다.
+        /// 1) 시리얼이 맞는 유저가 있으면 그 유저.
+        /// 2) 없으면 누른 좌표가 다른 유저의 몸통 범위(Settings.BuffTarget*) 안일 때 가장 가까운 유저.
+        /// 3) 그 외(빈 땅 등)에는 시전자 자신.
+        /// </summary>
+        protected Player FindBuffTarget(Player caster, int castonid, int x, int y)
+        {
+            var candidates = PlayerHandler.getSingleton().add[caster.m_Channel].Values
+                .Where(xe => xe.loggedIn && xe.Map == caster.Map && xe.Loc != null)
+                .ToList();
+
+            if (castonid != 0)
+            {
+                var bySerial = candidates.FirstOrDefault(xe => xe.m_Serial == castonid);
+                if (bySerial != null)
+                    return bySerial;
+            }
+
+            // 캐릭터 그림은 서 있는 칸보다 위쪽으로 그려지므로, 몸통을 누르면 발밑 칸보다 위(Y가 작은 쪽) 좌표가 온다.
+            var near = candidates
+                .Where(xe => xe != caster
+                    && Math.Abs(xe.Loc.X - x) <= Settings.BuffTargetRangeX
+                    && (xe.Loc.Y - y) <= Settings.BuffTargetRangeUp
+                    && (y - xe.Loc.Y) <= Settings.BuffTargetRangeDown)
+                .OrderBy(xe => World.Dist2d(xe.Loc.X, xe.Loc.Y, x, y))
+                .FirstOrDefault();
+
+            return near ?? caster;
+        }
+
         protected Player SerialPlayerTarget(int Channel, int castonid, int x, int y)
         {
             return PlayerHandler.getSingleton().add[Channel].Where(xe => xe.Value.loggedIn && 

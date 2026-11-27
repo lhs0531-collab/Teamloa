@@ -52,14 +52,16 @@ namespace LKCamelot.script.spells
         }
         public override void UseSpell(model.Player player, int castonid, short castx, short casty)
         {
-            var Target = SerialPlayerTarget(player.m_Channel, castonid, castx, casty);
+            // 다른 유저의 몸통을 누르면 그 유저에게, 그 외 아무 곳이나 누르면 자신에게 건다.
+            var Target = FindBuffTarget(player, castonid, castx, casty);
 
-            if (Target != null)
+            if (!Target.AddBuff(this))
+                player.client.SendPacket(new UpdateChatBox(0x00, 0xff, 1, string.Format("{0} 마법이 실패하였습니다", this.Name)).Compile());
+            else
             {
-                if (!Target.AddBuff(this))
-                    player.client.SendPacket(new UpdateChatBox(0x00, 0xff, 1, string.Format("{0} 마법이 실패하였습니다", this.Name)).Compile());
-                else
-                    Target.client.SendPacket(new UpdateChatBox(0x00, 0xff, 1, string.Format("{0} 마법이 사용하였습니다.", this.Name)).Compile());
+                Target.client.SendPacket(new UpdateChatBox(0x00, 0xff, 1, string.Format("{0} 마법이 사용하였습니다.", this.Name)).Compile());
+                if (Target != player)
+                    player.client.SendPacket(new UpdateChatBox(0x00, 0xff, 1, string.Format("{0}님에게 {1} 마법을 사용하였습니다.", Target.Name, this.Name)).Compile());
             }
             World.SendToAll(new QueDele(player.m_Channel, player.Map, new MagicMotion(player).Compile()));
         }
