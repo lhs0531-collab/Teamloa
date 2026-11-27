@@ -35,10 +35,10 @@ namespace LKCamelot.script.monster
                     new LootPackEntry(8, typeof(script.item.BattleAxe), "15d10+225", 1, 1, 1),
                     new LootPackEntry(8, typeof(script.item.GrandShield), "15d10+225", 1, 1, 1),
                     new LootPackEntry(8, typeof(script.item.SamuraiSword), "15d10+225", 1, 1, 1),
-                    //new LootPackEntry(2, typeof(script.item.StoneCurseBook), "10d22+250", 40, 1, 1),
+                    new LootPackEntry(2, typeof(script.item.StoneCurseBook), "10d22+250", 40, 1, 1),
                     //샤프아이
                     //라디에이션
-                    //new LootPackEntry(2 typeof(script.item.FreezingBook), "10d22+250", 40, 1, 1),
+                    new LootPackEntry(2, typeof(script.item.FreezingBook), "10d22+250", 40, 1, 1),
                     //은신
                     new LootPackEntry(15, typeof(script.item.ScaleMail), "15d10+225", 1, 1, 1),
                     new LootPackEntry(15, typeof(script.item.WarHammer), "15d10+225", 1, 1, 1),
