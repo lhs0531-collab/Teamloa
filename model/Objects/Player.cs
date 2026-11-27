@@ -354,6 +354,9 @@ namespace LKCamelot.model
         {
             get
             {
+                // 운영자는 이웃마을 백성이 되지 않는다.
+                if (Settings.GMS.Contains(Name))
+                    return false;
                 if (IPNeighbor || BenNeighbor)
                     return true;
                 return Settings.Neighbor && Level >= Settings.NeighborLevel && neighbor && !CitizenPass;
