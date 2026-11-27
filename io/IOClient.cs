@@ -156,34 +156,52 @@ namespace LKCamelot.io
                 SendPacket(new CreateSlotMagic2(spell).Compile());
 
             //아이템 셋팅
-            List<script.item.Item> temp = new List<script.item.Item>();
+            player.Equipped2.Clear();                                           // 재접속마다 장착 캐시를 실제 슬롯 상태로 재구성
+            List<script.item.Item> unknownSlot = new List<script.item.Item>();  // 24, 31~39, 52 이상
+            List<script.item.Item> orphan = new List<script.item.Item>();       // InvSlot < 0
             foreach (var item in World.NewItems.Where(xe => (xe.Value.m_Parent == player || xe.Value.ParSer == player.m_Serial) && !Settings.NoSaveItem.Contains(xe.Value.GetType()) ).ToList())
             {
                 item.Value.Parent = player;
+                int itemSlot = item.Value.InvSlot;
 
-                if (item.Value.InvSlot >= 0 && item.Value.InvSlot < 24)
+                if (itemSlot >= 0 && itemSlot < 24)
                 {
                     SendPacket(new AddItemToInventory2(item.Value).Compile());
                 }
-                else if (item.Value.InvSlot >= 25 && item.Value.InvSlot <= 30)
+                else if (itemSlot >= 25 && itemSlot <= 30)
                 {
-                        player.Equipped2.TryAdd(item.Value.m_Serial, item.Value);
-                        SendPacket(new EquipItem2(item.Value).Compile());
+                    player.Equipped2.TryAdd(item.Value.m_Serial, item.Value);
+                    SendPacket(new EquipItem2(item.Value).Compile());
                 }
-                else if (item.Value.InvSlot >= 40 && item.Value.InvSlot <= 51)
+                else if (itemSlot >= 40 && itemSlot <= 51)
                 {
                     SendPacket(new AddItemToEntrust(item.Value).Compile());
                 }
+                else if (itemSlot < 0)
+                    orphan.Add(item.Value);
                 else
-                    temp.Add(item.Value);
+                    unknownSlot.Add(item.Value);
             }
-            foreach (var it in temp)
+
+            // 슬롯이 없는 소유 아이템은 Clone 잔재(유령 아이템)다. 빈 칸에 다시 넣지 않고 기록 후 제거한다.
+            // 저장 대상(InvSlot >= 0)이 아니므로 파일에는 원래 남지 않는 아이템이다.
+            foreach (var it in orphan)
+            {
+                WriteBug(string.Format("{0} [LoadPlayer] orphan removed: player={1} serial={2} name={3} stage={4} qty={5}",
+                    DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"), player.Name, (int)it.m_Serial, it.Name, it.Stage, it.Quantity));
+                script.item.Item removed;
+                World.NewItems.TryRemove(it.m_Serial, out removed);
+            }
+
+            foreach (var it in unknownSlot)
             {
                 int slot = player.GetFreeSlot();
                 if (slot != -1)
                     it.InvSlot = slot;
+                else
+                    WriteBug(string.Format("{0} [LoadPlayer] unknown slot item not placed: player={1} serial={2} name={3} slot={4}",
+                        DateTime.Now.ToString("[yyyy-MM-dd HH:mm:ss]"), player.Name, (int)it.m_Serial, it.Name, it.InvSlot));
             }
-            temp.Clear();
 
             if (Settings.GMS.Contains(player.Name))
             {
@@ -617,20 +635,21 @@ namespace LKCamelot.io
                         var itemtofind = World.NewItems.Where(xe => xe.Value.ParSer == player.m_Serial && xe.Value.InvSlot == slot).FirstOrDefault().Value;
                         if (itemtofind != null)
                         {
-                            if (player.GetFreeSlot() == -1)
-                                return;
-
                             if (itemtofind is script.item.BasePotion)
                             {
-                                var potions = player.Inventory.Where(xe => xe.Name == itemtofind.Name && xe.InvSlot < 24).FirstOrDefault();
+                                // 정책: 같은 물약은 인벤토리에 한 묶음(Limit)까지만. 가득 찬 묶음이 하나라도 있으면 꺼내지 않는다.
+                                var samePotions = player.Inventory.Where(xe => xe.Name == itemtofind.Name).ToList();
+                                if (samePotions.Any(xe => xe.Quantity >= xe.Limit))
+                                    return;
+
+                                var potions = samePotions.FirstOrDefault();
 
                                 if (potions != null)
                                 {
-                                    int Remainder;
-                                    int limit = itemtofind.Limit;
-                                    if ((potions.Quantity + itemtofind.Quantity) > limit)
+                                    // 기존 묶음에 합치는 경우는 빈 칸이 필요 없다.
+                                    int Remainder = potions.Limit - potions.Quantity;   // 소유 가능한 갯수를 구함
+                                    if (itemtofind.Quantity > Remainder)
                                     {
-                                        Remainder = (limit - potions.Quantity);         // 소유 가능한 갯수를 구함
                                         itemtofind.Quantity -= Remainder;                          // 바닥에 떨어진 아이템 갯수를  삭제
                                         potions.Quantity += Remainder;                  // 줍는다.
                                         SendPacket(new LKCamelot.model.AddItemToEntrust(itemtofind).Compile());       //보관함에 뿌린다.
@@ -647,12 +666,18 @@ namespace LKCamelot.io
                                 }
                                 else
                                 {
-                                    itemtofind.InvSlot = player.GetFreeSlot();
+                                    int freeSlot = player.GetFreeSlot();
+                                    if (freeSlot == -1)
+                                        return;
+                                    itemtofind.InvSlot = freeSlot;
                                 }
                             }
                             else
                             {
-                                itemtofind.InvSlot = player.GetFreeSlot();
+                                int freeSlot = player.GetFreeSlot();
+                                if (freeSlot == -1)
+                                    return;
+                                itemtofind.InvSlot = freeSlot;
                             }
                         }
                     }
