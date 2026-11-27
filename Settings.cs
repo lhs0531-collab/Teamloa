@@ -25,7 +25,7 @@ namespace LKCamelot
         public static string DB_Conn = string.Format("Server=127.0.0.1;Database={0};Uid={1};Pwd={2};", DB_TableName, DB_UserName, DB_Password);
 
         public static string ServerName = "The Last Kingdom";
-        public static string Version = "v2015-10-11-0001";
+        public static string Version = "v2026.11.";
         public static string WelComeMessage = "마지막왕국에 오신걸 환영합니다.";
         public static string ServerIPAddress = "0.0.0.0";
         public static int CycleTime = 500;
@@ -46,11 +46,7 @@ namespace LKCamelot
 
         public static HashSet<string> WelComeNotice = new HashSet<string>()
         {
-            "구마왕에 대해서 기억나는 부분은 카페에 올려주시면 반영합니다.",
-            "<<<<<<< 테스트 서버 >>>>>>>",
-            "1. 현거래 유저 압류조치",
-            "2. 관련공지 [laking.tk ] 에서 확인",
-            "3. 불량사용자 IP 벤 기능 업데이트",
+            "마지막왕국 보존을 위하여 복원된 서버입니다.",
         };
         public static HashSet<string> BegginerNotice = new HashSet<string>() 
         {
