@@ -36,6 +36,11 @@ namespace LKCamelot.script.spells
 
         public override void UseSpell(model.Player player, int castonid, short castx, short casty)
         {
+            // 누른 곳에서 끊기지 않고 그 방향으로 끝까지 뻗는다(효과와 피해 범위 모두).
+            var end = ExtendCast(player, castx, casty);
+            castx = (short)end.X;
+            casty = (short)end.Y;
+
             var Target = TargetDistance(player, 3, World.Dist2d(player.Loc.X, player.Loc.Y, castx, casty), player.PK);
 
             foreach (var obj in Target)

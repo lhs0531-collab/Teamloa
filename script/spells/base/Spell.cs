@@ -180,6 +180,39 @@ namespace LKCamelot.script.spells
             return Result;
         }
         /// <summary>
+        /// 누른 좌표를 시전자에서 그 방향으로 Settings.WaveReach칸까지 늘린 좌표를 돌려준다.
+        /// 뻗어 나가는 마법(프레임웨이브, 썬더스트록)이 누른 곳에서 끊기지 않고 화면 끝까지 가게 한다.
+        /// </summary>
+        protected Point2D ExtendCast(Player player, short castx, short casty)
+        {
+            int dx = castx - player.Loc.X;
+            int dy = casty - player.Loc.Y;
+            int longest = Math.Max(Math.Abs(dx), Math.Abs(dy));
+            if (longest == 0)
+                return new Point2D(castx, casty);
+
+            int x = player.Loc.X + dx * Settings.WaveReach / longest;
+            int y = player.Loc.Y + dy * Settings.WaveReach / longest;
+
+            // 맵 밖으로 나가지 않게 자른다.
+            int maxX = short.MaxValue, maxY = short.MaxValue;
+            try
+            {
+                var full = model.Map.FullMaps[player.m_Channel].Where(xe => xe.Key == player.Map).FirstOrDefault().Value;
+                if (full != null && model.Map.loadedmaps.ContainsKey(full.Filename))
+                {
+                    maxX = model.Map.loadedmaps[full.Filename].sizeX - 1;
+                    maxY = model.Map.loadedmaps[full.Filename].sizeY - 1;
+                }
+            }
+            catch { }
+
+            x = Math.Max(0, Math.Min(maxX, x));
+            y = Math.Max(0, Math.Min(maxY, y));
+            return new Point2D(x, y);
+        }
+
+        /// <summary>
         /// 단일 타켓팅을 위한 함수
         /// </summary>
         /// <param name="Serial">시리얼</param>

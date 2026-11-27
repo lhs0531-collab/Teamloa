@@ -90,6 +90,9 @@ namespace LKCamelot
         public static int WallLureRange = 6;
         public static int WallInfightChance = 10;           // 벽 위 몬스터가 공격 주기마다 가운데 몬스터를 공격할 확률(%)
 
+        // 뻗어 나가는 마법(프레임웨이브, 썬더스트록)이 시전자에서 나아가는 거리(칸). 누른 위치와 무관하게 이 거리까지 간다.
+        public static int WaveReach = 10;
+
         public static int AutoDeleteDaysPromo = 100;
         public static int AutoDeleteDaysNormal = 50;
 
