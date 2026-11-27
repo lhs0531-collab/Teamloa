@@ -31,13 +31,43 @@ namespace LKCamelot.model
         static ConcurrentDictionary<int, WallTrap> Walls = new ConcurrentDictionary<int, WallTrap>();
         static int NextId = 0;
 
-        /// <summary>벽을 등록한다. time은 지속시간(ms).</summary>
-        public static void Register(Player owner, script.spells.Buff effect, int time)
+        public string SpellName;
+        public int EffectSerial;
+
+        /// <summary>
+        /// 시전자가 깔아 둔 같은 마법의 벽을 지운다(버프, 바닥 효과, 유인). 벽을 다시 쓸 때 새 벽으로 바꾸기 위해 호출한다.
+        /// </summary>
+        public static void Clear(Player owner, script.spells.Spell spell)
+        {
+            foreach (var old in owner.m_Buffs.Where(xe => xe.Value.Name == spell.Name).ToList())
+            {
+                script.spells.Spell removedBuff;
+                owner.m_Buffs.TryRemove(old.Key, out removedBuff);
+            }
+
+            foreach (var entry in Walls)
+            {
+                var w = entry.Value;
+                if (w.Owner != owner || w.SpellName != spell.Name)
+                    continue;
+
+                WallTrap removed;
+                Walls.TryRemove(entry.Key, out removed);
+                // 예약된 삭제는 나중에 한 번 더 나가지만, 이미 없는 오브젝트라 영향이 없다.
+                if (w.EffectSerial != 0)
+                    World.SendToAll(new QueDele(w.Channel, w.Map, new DeleteObject(w.EffectSerial).Compile()));
+            }
+        }
+
+        /// <summary>벽을 등록한다. time은 지속시간(ms), effectSerial은 바닥 효과 오브젝트의 시리얼.</summary>
+        public static void Register(Player owner, script.spells.Spell spell, script.spells.Buff effect, int time, int effectSerial)
         {
             if (owner == null || effect == null || effect.Loc == null)
                 return;
 
             var wall = new WallTrap();
+            wall.SpellName = spell.Name;
+            wall.EffectSerial = effectSerial;
             wall.Channel = owner.m_Channel;
             wall.Map = effect.Map;
             wall.Center = new Point2D(effect.Loc.X, effect.Loc.Y);
