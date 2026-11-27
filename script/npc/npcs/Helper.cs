@@ -92,7 +92,8 @@ namespace LKCamelot.script.npc
             if (player.Transparancy >= 100)
                 player.client.SendPacket(new SetObjectEffects(player, true).Compile());
 
-            Say(player, string.Format("{0:N0}골드를 내고 마지막왕국 백성이 되었습니다. 접속을 끊으면 다시 이웃 나라 백성이 됩니다.", cost));
+            Say(player, string.Format("{0:N0}골드를 내고 마지막왕국 백성이 되었습니다.", cost));
+            Say(player, "접속을 끊으면 다시 이웃 나라 백성이 됩니다.");
             Say(player, "WAKONDA, BUTTERFLY, SILVER SCREEN 마법을 받았습니다.");
             return true;
         }

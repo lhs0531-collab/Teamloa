@@ -1891,9 +1891,12 @@ namespace LKCamelot.model
                     {
                         if (Settings.DieDropGold)
                         {
-                            // 죽었을 경우 돈을 10%의 돈을 바닥에 떨어트림
+                            // 죽었을 경우 가진 돈의 일부를 바닥에 떨어트림
                             // 기존 조건(dropgold >= Gold)은 10%가 전체 이상일 수 없어 한 번도 실행되지 않았다.
-                            ulong dropgold = m_Gold / 10;
+                            // 비율과 상한은 Settings.DieDropGoldPercent / Settings.DieDropGoldMax
+                            ulong dropgold = m_Gold / 100 * (ulong)Math.Max(0, Math.Min(100, Settings.DieDropGoldPercent));
+                            if (Settings.DieDropGoldMax > 0 && dropgold > Settings.DieDropGoldMax)
+                                dropgold = Settings.DieDropGoldMax;
                             if (dropgold > int.MaxValue)        // 골드 아이템 수량은 int
                                 dropgold = int.MaxValue;
                             if (dropgold > 1)
@@ -2010,7 +2013,10 @@ namespace LKCamelot.model
                     }
                     // 이웃마을 레벨에 도달하면 자동으로 이웃마을 백성이 된다.
                     if (Level == Settings.NeighborLevel && IsNeighbor)
-                        client.SendPacket(new UpdateChatBox(0x00, 0xff, 1, "이웃 나라 백성이 되었습니다. 도우미에게 가면 마지막왕국 백성이 될 수 있습니다.").Compile());
+                    {
+                        client.SendPacket(new UpdateChatBox(0x00, 0xff, 1, "이웃 나라 백성이 되었습니다.").Compile());
+                        client.SendPacket(new UpdateChatBox(0x00, 0xff, 1, "도우미에게 가면 마지막왕국 백성이 될 수 있습니다.").Compile());
+                    }
                     client.SendPacket(new SetLevelGold(this).Compile());
                     client.SendPacket(new UpdateCharStats(this).Compile());
                 }

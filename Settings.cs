@@ -152,7 +152,9 @@ namespace LKCamelot
         public static ulong ClassBookPrice = 85000000;
 
         public static int TrunXP = 1000000;           // 턴 경험치 설정 (승급기준 : 100만)
-        public static bool DieDropGold = true;          // 죽을 경우 골드 떨굼 여부 (10%)
+        public static bool DieDropGold = true;          // 죽을 경우 골드 떨굼 여부
+        public static int DieDropGoldPercent = 5;       // 죽을 때 떨구는 골드 비율(%). 기존 10
+        public static ulong DieDropGoldMax = 0;         // 한 번에 떨구는 골드 상한. 0이면 상한 없음
         public static bool DieDropItem = false;         // 죽을 경우 아이템 떨굼 여부
 
         public static float[] XPrate = new float[2] { 1.0f, 0 };              // 경험치 배율
