@@ -28,7 +28,7 @@ namespace LKCamelot.script.spells
                     3,  //thickness
                     0,  //type
                     16,  //speed
-                    2  //streak
+                    4  //streak (시전 방향으로 이어지는 줄 수)
                     );
             }
         }
