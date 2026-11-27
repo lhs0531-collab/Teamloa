@@ -84,7 +84,7 @@ namespace LKCamelot
         public static int ShokeTickInterval = 1 * Second;   // 피해 주기
         public static int ShokeTime = 5 * Second;           // 지속시간, 1권 기준
         public static int ShokeTimePl = 1 * Second;         // 권당 증가 (12권 = 16초)
-        public static int ShokeEffectSprite = 31;           // 걸린 몬스터에 표시되는 효과 번호 (31 = 지그재그의 적중 효과)
+        public static int ShokeEffectSprite = 53;           // 걸린 몬스터에 표시되는 효과 번호
 
         // 불벽·전기벽의 몬스터 유인. 어그로가 끌린 몬스터가 벽 가운데에서 이 범위(칸) 안에 있으면 벽으로 들어간다.
         public static int WallLureRange = 6;
