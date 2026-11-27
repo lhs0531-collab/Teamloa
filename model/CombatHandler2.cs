@@ -25,21 +25,24 @@ namespace LKCamelot.model
         {
             List<BaseObject> target = World.GetTileTarget(play, AdjecentTile(play, swingdir), swingdir);
 
-            if (target == null)
-                return;
-            var take = play.Dam;
-
+            // 트리플/트위스터의 추가 방향 모션. 시리얼 없는 QueDele로 보내 시전자 본인에게도 전송한다.
+            // (시리얼을 넣으면 SendToAll이 본인을 건너뛰어 본인 화면에는 한 방향만 보였다)
+            // 타격 대상이 없어도 모션은 보이도록 대상 확인보다 먼저 보낸다.
             if (play.m_Buffs.Where(Xe => Xe.Value.BuffEffect.BuffType == script.spells.BuffCase.Triple).Any())
             {
-                World.SendToAll(new QueDele(play.m_Serial, play.m_Channel, play.Map, new SwingAnimation(play.m_Serial, World.AttackRange((short)AdjecentTile(play, (int)play.Face - 1).X, (short)AdjecentTile(play, (int)play.Face - 1).Y, (short)play.Loc.X, (short)play.Loc.Y)).Compile()));
-                World.SendToAll(new QueDele(play.m_Serial, play.m_Channel, play.Map, new SwingAnimation(play.m_Serial, World.AttackRange((short)AdjecentTile(play, (int)play.Face + 1).X, (short)AdjecentTile(play, (int)play.Face + 1).Y, (short)play.Loc.X, (short)play.Loc.Y)).Compile()));
+                SendExtraSwing(play, (int)play.Face - 1);
+                SendExtraSwing(play, (int)play.Face + 1);
             }
             else if (play.m_Buffs.Where(Xe => Xe.Value.BuffEffect.BuffType == script.spells.BuffCase.Twister).Any())
             {
-                World.SendToAll(new QueDele(play.m_Serial, play.m_Channel, play.Map, new SwingAnimation(play.m_Serial, World.AttackRange((short)AdjecentTile(play, (int)play.Face - 2).X, (short)AdjecentTile(play, (int)play.Face - 2).Y, (short)play.Loc.X, (short)play.Loc.Y)).Compile()));
-                World.SendToAll(new QueDele(play.m_Serial, play.m_Channel, play.Map, new SwingAnimation(play.m_Serial, World.AttackRange((short)AdjecentTile(play, (int)play.Face + 2).X, (short)AdjecentTile(play, (int)play.Face + 2).Y, (short)play.Loc.X, (short)play.Loc.Y)).Compile()));
-                World.SendToAll(new QueDele(play.m_Serial, play.m_Channel, play.Map, new SwingAnimation(play.m_Serial, World.AttackRange((short)AdjecentTile(play, (int)play.Face + 4).X, (short)AdjecentTile(play, (int)play.Face + 4).Y, (short)play.Loc.X, (short)play.Loc.Y)).Compile()));
+                SendExtraSwing(play, (int)play.Face - 2);
+                SendExtraSwing(play, (int)play.Face + 2);
+                SendExtraSwing(play, (int)play.Face + 4);
             }
+
+            if (target == null)
+                return;
+            var take = play.Dam;
 
             foreach (var tar in target)
             {
@@ -64,6 +67,13 @@ namespace LKCamelot.model
                 else
                     (tar as script.npc.BaseNPC).TakeDamage(play);
             }
+        }
+
+        private static void SendExtraSwing(Player play, int dir)
+        {
+            Point2D tile = AdjecentTile(play, dir);
+            short face = World.AttackRange((short)tile.X, (short)tile.Y, (short)play.Loc.X, (short)play.Loc.Y);
+            World.SendToAll(new QueDele(play.m_Channel, play.Map, new SwingAnimation(play.m_Serial, face).Compile()));
         }
 
         public static Point2D AdjecentTile(Player player, int swingloc)
