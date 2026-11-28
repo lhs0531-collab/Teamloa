@@ -19,7 +19,7 @@ namespace LKCamelot.script.npc
             {
                 return new List<string>()
                 {
-                    string.Format("저를 누르면 {0:N0}골드에 마지막왕국 백성으로 만들어 드립니다.", Settings.CitizenPassCost),
+                    "저를 누르면 마지막왕국 백성으로 만들어 드립니다.",
                 };
             }
         }
@@ -28,6 +28,7 @@ namespace LKCamelot.script.npc
         public override byte aSpeed { get { return 4; } }
         public override byte aFrames { get { return 4; } }
         public override int EventRange { get { return 6; } }
+        public override int MessageGap { get { return 8 * Settings.Second; } }
 
         // 동상이므로 다른 NPC처럼 주기적으로 사라졌다 다시 나타나지 않는다.
         public override int AliveTime { get { return 0; } }
@@ -71,10 +72,10 @@ namespace LKCamelot.script.npc
                 return true;
             }
 
-            ulong cost = Settings.CitizenPassCost;
+            ulong cost = player.Promo > 0 ? Settings.CitizenPassCostPromo : Settings.CitizenPassCost;
             if (player.Gold < cost)
             {
-                Say(player, string.Format("골드가 부족합니다. ({0:N0}골드 필요)", cost));
+                Say(player, "골드가 부족합니다.");
                 return true;
             }
 
@@ -92,7 +93,7 @@ namespace LKCamelot.script.npc
             if (player.Transparancy >= 100)
                 player.client.SendPacket(new SetObjectEffects(player, true).Compile());
 
-            Say(player, string.Format("{0:N0}골드를 내고 마지막왕국 백성이 되었습니다.", cost));
+            Say(player, "마지막왕국 백성이 되었습니다.");
             Say(player, "접속을 끊으면 다시 이웃 나라 백성이 됩니다.");
             Say(player, "WAKONDA, BUTTERFLY, SILVER SCREEN 마법을 받았습니다.");
             return true;

@@ -84,7 +84,8 @@ namespace LKCamelot
 
         // 불벽·전기벽의 몬스터 유인. 어그로가 끌린 몬스터가 벽 가운데에서 이 범위(칸) 안에 있으면 벽으로 들어간다.
         // 도우미: 클릭하면 이 골드를 받고 이웃마을 백성을 해제해 준다(접속을 끊을 때까지).
-        public static ulong CitizenPassCost = 1000000;
+        public static ulong CitizenPassCost = 500000;       // 비승급
+        public static ulong CitizenPassCostPromo = 2000000; // 승급
         public static int CitizenPassBuffLevel = 12;        // 해제할 때 서비스로 걸어 주는 버프 3종(와콘다, 버터플라이, 실버스크린)의 권수
         public static int CitizenPassBuffTime = 3 * Minute; // 서비스 버프 3종의 지속시간 (마법의 원래 지속시간과 무관하게 이 값을 쓴다)
 
@@ -145,7 +146,7 @@ namespace LKCamelot
         public static int TurnNoticeInterval = 180;
 
         // 전직 책(기사·검객·위저드·샤먼) 가격. 아론의 턴 초기화 비용도 이 값을 쓴다.
-        public static ulong ClassBookPrice = 85000000;
+        public static ulong ClassBookPrice = 100000000;
 
         public static int TrunXP = 1000000;           // 턴 경험치 설정 (승급기준 : 100만)
         public static bool DieDropGold = true;          // 죽을 경우 골드 떨굼 여부

@@ -787,21 +787,10 @@ namespace LKCamelot.model
                 string.Format("분배하지 않은 턴 속성이 {0} 남아 있습니다. 아론에게 \"힘 [수량] 올려주세요\"라고 말하세요.", b_Extra)).Compile());
         }
 
-        /// <summary>
-        /// 전직 책으로 직업을 바꾼다. 직업이 실제로 바뀌면 턴 속성을 회수해 미분배로 돌린다.
-        /// </summary>
+        /// <summary>전직 책으로 직업을 바꾼다. 전직 시 턴 속성은 유지한다.</summary>
         public void ChangeClassByBook(Class newClass)
         {
-            bool changed = newClass != m_Class;
             Class = newClass;
-            if (!changed)
-                return;
-
-            uint moved = ResetTurnStats();
-            if (moved > 0 && client != null)
-                client.SendPacket(new UpdateChatBox(Settings.TurnNoticeColor1, Settings.TurnNoticeColor2, 1,
-                    string.Format("전직으로 턴 속성 {0}이(가) 초기화되었습니다.", moved)).Compile());
-            NotifyUnspentTurn();
         }
         public ushort GetStat(string stat, bool bas = false)
         {
