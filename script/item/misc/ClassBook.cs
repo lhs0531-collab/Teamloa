@@ -8,7 +8,7 @@ namespace LKCamelot.script.item
 {
     public class ShamanBook : Item
     {
-        public override string Name { get { return "[베타]BOOK OF SHAMAN"; } }
+        public override string Name { get { return "BOOK OF SHAMAN"; } }
         public override ulong BuyPrice { get { return Settings.ClassBookPrice; } }
         public override int SellPrice { get { return 1; } }
 
@@ -33,7 +33,7 @@ namespace LKCamelot.script.item
     }
     public class WizardBook : Item
     {
-        public override string Name { get { return "[베타]BOOK OF WIZARD"; } }
+        public override string Name { get { return "BOOK OF WIZARD"; } }
         public override ulong BuyPrice { get { return Settings.ClassBookPrice; } }
         public override int SellPrice { get { return 1; } }
 
@@ -58,7 +58,7 @@ namespace LKCamelot.script.item
     }
     public class SwordmanBook : Item
     {
-        public override string Name { get { return "[베타]BOOK OF SWORDMAN"; } }
+        public override string Name { get { return "BOOK OF SWORDMAN"; } }
         public override ulong BuyPrice { get { return Settings.ClassBookPrice; } }
         public override int SellPrice { get { return 1; } }
 
@@ -83,7 +83,7 @@ namespace LKCamelot.script.item
     }
     public class KnightBook : Item
     {
-        public override string Name { get { return "[베타]BOOK OF KNIGHT"; } }
+        public override string Name { get { return "BOOK OF KNIGHT"; } }
         public override ulong BuyPrice { get { return Settings.ClassBookPrice; } }
         public override int SellPrice { get { return 1; } }
 
@@ -111,7 +111,7 @@ namespace LKCamelot.script.item
 
     public class BegginerBook : Item
     {
-        public override string Name { get { return "[베타]BOOK OF BEGINNER"; } }
+        public override string Name { get { return "BOOK OF BEGINNER"; } }
         public override ulong BuyPrice { get { return 3000000000000; } }
         public override int SellPrice { get { return 1; } }
 
