@@ -515,6 +515,7 @@ namespace LKCamelot
                 if (connection.Client.player.Exchange != null)
                     connection.Client.player.Exchange.Cancle();
 
+                connection.Client.player.CitizenPass = false;       // 접속이 끊기면 다시 이웃마을 백성
                 connection.Client.player.InstancedObjects.Clear();
                 connection.Client.player.m_Buffs.Clear();
                 connection.Client.player.RefreshTransparency();

@@ -61,6 +61,14 @@ namespace LKCamelot.script.npc
             }
         }
 
+        /// <summary>
+        /// 플레이어가 NPC를 눌렀을 때. 직접 처리했으면 true, 기본 동작(상점창 열기)에 맡기려면 false.
+        /// </summary>
+        public virtual bool Event_Click(Player player)
+        {
+            return false;
+        }
+
         public virtual void TakeDamage(Player player)
         {
             Event_Chat("때리지마세요. 아픕니다.");

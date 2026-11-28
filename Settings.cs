@@ -25,7 +25,7 @@ namespace LKCamelot
         public static string DB_Conn = string.Format("Server=127.0.0.1;Database={0};Uid={1};Pwd={2};", DB_TableName, DB_UserName, DB_Password);
 
         public static string ServerName = "The Last Kingdom";
-        public static string Version = "v2015-10-11-0001";
+        public static string Version = "v2026.11.";
         public static string WelComeMessage = "마지막왕국에 오신걸 환영합니다.";
         public static string ServerIPAddress = "0.0.0.0";
         public static int CycleTime = 500;
@@ -46,11 +46,7 @@ namespace LKCamelot
 
         public static HashSet<string> WelComeNotice = new HashSet<string>()
         {
-            "구마왕에 대해서 기억나는 부분은 카페에 올려주시면 반영합니다.",
-            "<<<<<<< 테스트 서버 >>>>>>>",
-            "1. 현거래 유저 압류조치",
-            "2. 관련공지 [laking.tk ] 에서 확인",
-            "3. 불량사용자 IP 벤 기능 업데이트",
+            "마지막왕국 보존을 위하여 복원된 서버입니다.",
         };
         public static HashSet<string> BegginerNotice = new HashSet<string>() 
         {
@@ -87,6 +83,12 @@ namespace LKCamelot
         public static int ShokeEffectSprite = 53;           // 걸린 몬스터에 표시되는 효과 번호
 
         // 불벽·전기벽의 몬스터 유인. 어그로가 끌린 몬스터가 벽 가운데에서 이 범위(칸) 안에 있으면 벽으로 들어간다.
+        // 도우미: 클릭하면 이 골드를 받고 이웃마을 백성을 해제해 준다(접속을 끊을 때까지).
+        public static ulong CitizenPassCost = 500000;       // 비승급
+        public static ulong CitizenPassCostPromo = 2000000; // 승급
+        public static int CitizenPassBuffLevel = 12;        // 해제할 때 서비스로 걸어 주는 버프 3종(와콘다, 버터플라이, 실버스크린)의 권수
+        public static int CitizenPassBuffTime = 3 * Minute; // 서비스 버프 3종의 지속시간 (마법의 원래 지속시간과 무관하게 이 값을 쓴다)
+
         public static int WallLureRange = 6;
 
         // 교환창이 열려 있는 동안 받은 패킷을 로그 폴더의 _Log_ExchangePacket.txt에 남긴다.
@@ -144,10 +146,12 @@ namespace LKCamelot
         public static int TurnNoticeInterval = 180;
 
         // 전직 책(기사·검객·위저드·샤먼) 가격. 아론의 턴 초기화 비용도 이 값을 쓴다.
-        public static ulong ClassBookPrice = 85000000;
+        public static ulong ClassBookPrice = 100000000;
 
         public static int TrunXP = 1000000;           // 턴 경험치 설정 (승급기준 : 100만)
-        public static bool DieDropGold = true;          // 죽을 경우 골드 떨굼 여부 (10%)
+        public static bool DieDropGold = true;          // 죽을 경우 골드 떨굼 여부
+        public static int DieDropGoldPercent = 5;       // 죽을 때 떨구는 골드 비율(%). 기존 10
+        public static ulong DieDropGoldMax = 0;         // 한 번에 떨구는 골드 상한. 0이면 상한 없음
         public static bool DieDropItem = false;         // 죽을 경우 아이템 떨굼 여부
 
         public static float[] XPrate = new float[2] { 1.0f, 0 };              // 경험치 배율
@@ -170,7 +174,7 @@ namespace LKCamelot
 
         //이웃관련 설정
         public static int NeighborLevel = 30;           // 이웃마을 레벨 설정
-        public static bool Neighbor = false;            // 이웃마을 설정
+        public static bool Neighbor = true;             // 이웃마을 설정 (켜져 있으면 NeighborLevel 이상은 자동으로 이웃마을 백성. #이웃 으로 전환)
         public static bool IPNeighbor = false;          // 중복 아이피 이웃 설정
 
         //외치기 설정

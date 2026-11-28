@@ -341,6 +341,28 @@ namespace LKCamelot.model
         public bool BenNeighbor = false;                // 벤 이웃
         public bool IPNeighbor = false;                 // 아이피 중복 이웃
 
+        // 이번 접속 동안만 유효한 이웃마을 백성 해제. 도우미에게 골드를 내면 켜지고, 접속을 끊으면 꺼진다. (저장하지 않는다)
+        public bool CitizenPass = false;
+
+        /// <summary>
+        /// 이웃마을 백성 여부. 이웃마을 백성은 기본 능력치가 절반으로 적용된다.
+        /// 서버 이웃마을 설정이 켜져 있으면 Settings.NeighborLevel 이상인 캐릭터는 자동으로 이웃마을 백성이 되고,
+        /// 도우미에게 해제를 받으면(CitizenPass) 접속을 끊을 때까지 마지막왕국 백성이 된다.
+        /// 중복 아이피·벤으로 걸린 이웃은 해제 대상이 아니다.
+        /// </summary>
+        public bool IsNeighbor
+        {
+            get
+            {
+                // 운영자는 이웃마을 백성이 되지 않는다.
+                if (Settings.GMS.Contains(Name))
+                    return false;
+                if (IPNeighbor || BenNeighbor)
+                    return true;
+                return Settings.Neighbor && Level >= Settings.NeighborLevel && neighbor && !CitizenPass;
+            }
+        }
+
 
         public List<string> WhispBlockList = new List<string>();
 
@@ -765,21 +787,10 @@ namespace LKCamelot.model
                 string.Format("분배하지 않은 턴 속성이 {0} 남아 있습니다. 아론에게 \"힘 [수량] 올려주세요\"라고 말하세요.", b_Extra)).Compile());
         }
 
-        /// <summary>
-        /// 전직 책으로 직업을 바꾼다. 직업이 실제로 바뀌면 턴 속성을 회수해 미분배로 돌린다.
-        /// </summary>
+        /// <summary>전직 책으로 직업을 바꾼다. 전직 시 턴 속성은 유지한다.</summary>
         public void ChangeClassByBook(Class newClass)
         {
-            bool changed = newClass != m_Class;
             Class = newClass;
-            if (!changed)
-                return;
-
-            uint moved = ResetTurnStats();
-            if (moved > 0 && client != null)
-                client.SendPacket(new UpdateChatBox(Settings.TurnNoticeColor1, Settings.TurnNoticeColor2, 1,
-                    string.Format("전직으로 턴 속성 {0}이(가) 초기화되었습니다.", moved)).Compile());
-            NotifyUnspentTurn();
         }
         public ushort GetStat(string stat, bool bas = false)
         {
@@ -799,7 +810,7 @@ namespace LKCamelot.model
                 else if (m_Class == Class.Shaman)
                     temp += 15;
 
-                if (bas == false && (this.IPNeighbor || this.BenNeighbor || (Settings.Neighbor && Level >= Settings.NeighborLevel && neighbor == true)))
+                if (bas == false && IsNeighbor)
                     temp = (uint)Math.Round((double)(temp / 2));
 
                 if (bas == false)
@@ -824,7 +835,7 @@ namespace LKCamelot.model
                 else if (m_Class == Class.Shaman)
                     temp += 25;
 
-                if (bas == false && (this.IPNeighbor || this.BenNeighbor || (Settings.Neighbor && Level >= Settings.NeighborLevel && neighbor == true)))
+                if (bas == false && IsNeighbor)
                     temp = (uint)Math.Round((double)(temp / 2));
 
                 if (bas == false)
@@ -849,7 +860,7 @@ namespace LKCamelot.model
                 else if (m_Class == Class.Shaman)
                     temp += 20;
 
-                if (bas == false && (this.IPNeighbor || this.BenNeighbor || (Settings.Neighbor && Level >= Settings.NeighborLevel && neighbor == true)))
+                if (bas == false && IsNeighbor)
                     temp = (uint)Math.Round((double)(temp / 2));
 
                 if (bas == false)
@@ -868,7 +879,7 @@ namespace LKCamelot.model
                 else
                     temp += 10;
 
-                if (bas == false && (this.IPNeighbor || this.BenNeighbor || (Settings.Neighbor && Level >= Settings.NeighborLevel && neighbor == true)))
+                if (bas == false && IsNeighbor)
                     temp = (uint)Math.Round( (double)(temp / 2));
 
                 if (bas == false)
@@ -1869,9 +1880,12 @@ namespace LKCamelot.model
                     {
                         if (Settings.DieDropGold)
                         {
-                            // 죽었을 경우 돈을 10%의 돈을 바닥에 떨어트림
+                            // 죽었을 경우 가진 돈의 일부를 바닥에 떨어트림
                             // 기존 조건(dropgold >= Gold)은 10%가 전체 이상일 수 없어 한 번도 실행되지 않았다.
-                            ulong dropgold = m_Gold / 10;
+                            // 비율과 상한은 Settings.DieDropGoldPercent / Settings.DieDropGoldMax
+                            ulong dropgold = m_Gold / 100 * (ulong)Math.Max(0, Math.Min(100, Settings.DieDropGoldPercent));
+                            if (Settings.DieDropGoldMax > 0 && dropgold > Settings.DieDropGoldMax)
+                                dropgold = Settings.DieDropGoldMax;
                             if (dropgold > int.MaxValue)        // 골드 아이템 수량은 int
                                 dropgold = int.MaxValue;
                             if (dropgold > 1)
@@ -1985,6 +1999,12 @@ namespace LKCamelot.model
                     else if (Promo == 7 && Level < Settings.MaxLevel)
                     {
                         Level++;
+                    }
+                    // 이웃마을 레벨에 도달하면 자동으로 이웃마을 백성이 된다.
+                    if (Level == Settings.NeighborLevel && IsNeighbor)
+                    {
+                        client.SendPacket(new UpdateChatBox(0x00, 0xff, 1, "이웃 나라 백성이 되었습니다.").Compile());
+                        client.SendPacket(new UpdateChatBox(0x00, 0xff, 1, "도우미에게 가면 마지막왕국 백성이 될 수 있습니다.").Compile());
                     }
                     client.SendPacket(new SetLevelGold(this).Compile());
                     client.SendPacket(new UpdateCharStats(this).Compile());
